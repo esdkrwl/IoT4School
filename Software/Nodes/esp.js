@@ -338,7 +338,48 @@ module.exports = function(RED) {
                     if ((node.brokerConn.broker === "localhost")||(node.brokerConn.broker === "127.0.0.1")){
                         msg._topic = topic;
                     }
-                    node.send(msg);
+                    
+
+//JSON PARSE
+
+			if (msg.hasOwnProperty("payload")) {
+                		if (typeof msg.payload === "string") {
+                    			try {
+                       	 			msg.payload = JSON.parse(msg.payload);
+                        			node.send(msg);
+                    			}
+                    			catch(e) {
+						node.error('Fehler' + e.message,msg); 
+					}
+                	}
+                	else if (typeof msg.payload === "object") {
+                    		if (!Buffer.isBuffer(msg.payload)) {
+                        		try {
+                            			msg.payload = JSON.stringify(msg.payload);
+                            			node.send(msg);
+                        		}
+                        		catch(e) { 
+						node.error(RED._("json.errors.dropped-error"));
+					}
+                    		}
+                    	else { 
+				node.warn(RED._("json.errors.dropped-object")); }
+                	}
+                	else { 
+				node.warn(RED._("json.errors.dropped")); }
+            		}
+            		else { 
+				node.send(msg); 
+			} // If no payload - just pass it on.
+
+
+//JSON PARSE
+
+
+
+
+
+
                     
                 }, this.id);
                 

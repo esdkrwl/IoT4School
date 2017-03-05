@@ -17,7 +17,7 @@ def on_connect(client, userdata, flags, rc):
     logging.info('Verbindung zum Broker erfolgreich aufgebaut')
     logging.debug("Antwort vom Server: " + str(rc))
 
-    client.subscribe([("esp/sensor/mac/#", 1), ("esp/aktuator/mac/#", 1), ("esp/lastwill/mac/#", 1)])
+    client.subscribe([("esp/sensor/mac/#", 1), ("esp/aktor/mac/#", 1), ("esp/lastwill/mac/#", 1)])
 
 def esp_last_will_callback(client, userdata, msg):
     logging.debug('Greetz aus dem last will callback')
@@ -99,9 +99,9 @@ def return_name_callback(client, userdata, msg):
         client.publish(topic_str, esp_new_name, qos=1)
         logging.info('Sensor ' + esp_name + ' erhält den Namen ' + esp_new_name)
     else:
-        topic_str = 'nameClient/aktuator/mac/' + esp_mac_adr
+        topic_str = 'nameClient/aktor/mac/' + esp_mac_adr
         client.publish(topic_str, esp_new_name, qos=1)
-        logging.info('Aktuator ' + esp_name + ' erhält den Namen ' + esp_new_name)
+        logging.info('Aktor ' + esp_name + ' erhält den Namen ' + esp_new_name)
 
 
 def create_table():

@@ -1,5 +1,7 @@
-#include <ESP8266WiFi.h>
-#include <PubSubClient.h>
+#include <ArduinoJson.h> //https://github.com/bblanchon/ArduinoJson
+#include <WiFiManager.h> //https://github.com/tzapu/WiFiManager
+#include <ESP8266WiFi.h> //https://github.com/esp8266/Arduino
+#include <PubSubClient.h> //https://github.com/knolleary/pubsubclient
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
@@ -16,6 +18,7 @@ int mqttServerPort = 1883;
 String type = "Sensor";
 String modulName = "LDR";
 
+
 String essid = "";
 IPAddress ipAdresse;
 String macAdresse = String(WiFi.macAddress());
@@ -28,6 +31,8 @@ String lastWillTopic = "esp/lastwill/mac/" + macAdresse;
 char lastWillTopicArray[100];
 String lastWillPayload = "";
 char lastWillPayloadArray[100];
+
+StaticJsonBuffer<200> jsonBuffer;
 
 
 WiFiClient wifiClient;
@@ -42,30 +47,56 @@ String finalPubTopic = "esp/"+type+"/";
 char finalPubTopicArray[100];
 
 void callback(char* topic, byte* payload, unsigned int length) {
+  char jsonPayload[200];
   Serial.print("[Info] Daten erhalten. Topic: ");
   Serial.print(topic);
   Serial.print(", Payload: ");
   for (unsigned int i = 0; i < length; i++) {
     Serial.print((char) payload[i]);
+    jsonPayload[i] = (char)payload[i];
   }
   Serial.println();
-
-  if(length == modulName.length() + 1){
-    modulName = "";
-    for(int i = 0; i < length; i++){
-      modulName += (char)payload[i];
-    }
-    finalPubTopic += modulName;
-    finalPubTopic.toCharArray(finalPubTopicArray, 100);
-    Serial.println("[Debug] Final Topic: " + String(finalPubTopicArray));
-    topicUpdated = true;
+  
+  JsonObject& root = jsonBuffer.parseObject(jsonPayload); 
+  //falls nicht geparst werden konnte
+  if (!root.success()) {
+    Serial.println("[Error] JSON Parsing fehlgeschlagen..");
   }
-  if(length == modulName.length() + 2){
-    finalPubTopic += (char)payload[1];
-    finalPubTopic.toCharArray(finalPubTopicArray, 100);
-    Serial.println("[Debug] Final Topic: " + finalPubTopic);
-    topicUpdated = true;
+  String identifier = root["identifier"];
+  //sortiere Payload anhang des Identifiers aus
+  if(identifier.equals("name")){
+    Serial.println("[INFO] Idenfitifier: Name");
+    
+  } else if(identifier.equals("config")){
+    Serial.println("[INFO] Idenfitifier: Config");
+    
+  } else if(identifier.equals("data")){
+    Serial.println("[INFO] Idenfitifier: Data");
+    
+  } else if(identifier.equals("status")){
+    Serial.println("[INFO] Idenfitifier: Status");
   }
+  else {
+    Serial.println("[Error] Unbekannter Identifier.");
+  }
+  
+ 
+//  if(length == modulName.length() + 1){
+//    modulName = "";
+//    for(int i = 0; i < length; i++){
+//      modulName += (char)payload[i];
+//    }
+//    finalPubTopic += modulName;
+//    finalPubTopic.toCharArray(finalPubTopicArray, 100);
+//    Serial.println("[Debug] Final Topic: " + String(finalPubTopicArray));
+//    topicUpdated = true;
+//  }
+//  if(length == modulName.length() + 2){
+//    finalPubTopic += (char)payload[1];
+//    finalPubTopic.toCharArray(finalPubTopicArray, 100);
+//    Serial.println("[Debug] Final Topic: " + finalPubTopic);
+//    topicUpdated = true;
+//  }
 }
 
 void connectToWiFi() {

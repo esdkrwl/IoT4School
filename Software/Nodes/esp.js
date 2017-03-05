@@ -425,7 +425,7 @@ module.exports = function(RED) {
         this.broker = config.broker;
         this.brokerConn = RED.nodes.getNode(this.broker);
         var node = this;
-        
+
         if (this.brokerConn) {
             this.status({fill:"red",shape:"ring",text:"Getrennt"});
             
@@ -456,6 +456,8 @@ module.exports = function(RED) {
                                 //Versuche String zu parsen
                                 try {
                                     msg.payload = JSON.parse(msg.payload);
+                                    //msg.payload.data.push(idFlag);
+                                    msg.payload.identifier = "data";
                                     this.brokerConn.publish(msg);
                                 }
                                 catch(e) {
@@ -467,6 +469,8 @@ module.exports = function(RED) {
                                     //versuche objekt zu parsen
                                     try {
                                         msg.payload = JSON.stringify(msg.payload);
+                                        //msg.payload.data.push(idFlag);
+                                        msg.payload.identifier = "data";
                                         this.brokerConn.publish(msg);
                                     }
                                     catch(e) { 

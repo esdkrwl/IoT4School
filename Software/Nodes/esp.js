@@ -368,11 +368,12 @@ module.exports = function(RED) {
                                 node.warn(RED._("json.errors.dropped"));
                             }
                         }
-                        //Falls nicht, leite die Nachricht einfach so weiter
+                        //Falls kein Payload vorhanden, leite die Nachricht einfach so weiter
                         else { 
                             node.send(msg); 
                         }   
                     }
+                    //Falls JSON nicht geparst werden soll, leite die Nachricht einfach weiter
                     else{
                         node.send(msg); 
                     }
@@ -413,12 +414,13 @@ module.exports = function(RED) {
         
         RED.nodes.createNode(this,config);
         
-        //Defaults Params setzen
-        if(config.topic){
-            this.topic = config.topic;
-        } else {
-            this.topic = 'esp/aktor/' + this.name; 
-        }
+        this.name = RED.nodes.getNode(config.name).outputDeviceName;
+        this.count = config.count;
+        
+        this.topic = 'esp/aktor/' + this.name + this.count;
+        
+        this.parseJson = config.parseJson;
+        
         this.qos = config.qos || null;
         this.broker = config.broker;
         this.brokerConn = RED.nodes.getNode(this.broker);
@@ -447,9 +449,46 @@ module.exports = function(RED) {
                 if ( msg.hasOwnProperty("payload")) {
                     //Nachrichtig muss mindestens einen String als Topic enthalten und darf nicht leer sein
                     if (msg.hasOwnProperty("topic") && (typeof msg.topic === "string") && (msg.topic !== "")) {
-                        //Nachricht raus
+                        
+                        //Prüfe, ob uns JSON interessiert
+                        if(node.parseJson){
+                            if (typeof msg.payload === "string") {
+                                //Versuche String zu parsen
+                                try {
+                                    msg.payload = JSON.parse(msg.payload);
+                                    this.brokerConn.publish(msg);
+                                }
+                                catch(e) {
+                                    node.error('Fehler' + e.message,msg); 
+                                }
+                            }
+                            else if (typeof msg.payload === "object") {
+                                if (!Buffer.isBuffer(msg.payload)) {
+                                    //versuche objekt zu parsen
+                                    try {
+                                        msg.payload = JSON.stringify(msg.payload);
+                                        this.brokerConn.publish(msg);
+                                    }
+                                    catch(e) { 
+                                        node.error(RED._("json.errors.dropped-error"));
+                                   }
+                                }
+                                else { 
+                                    node.warn(RED._("json.errors.dropped-object"));
+                                }
+                            }
+                            else { 
+                                node.warn(RED._("json.errors.dropped"));
+                            }
+   
+                    }
+                    //Falls uns JSON nicht interessiert, kann die Nachricht einfach so raus
+                    else{
                         this.brokerConn.publish(msg);
                     }
+                            
+                        }
+                    
                     else { node.warn(RED._("mqtt.errors.invalid-topic")); }
                 }
             });
@@ -472,6 +511,11 @@ module.exports = function(RED) {
     RED.nodes.registerType("Aktor",AktorNode);
     
     
+    function OutputDeviceNode(n) {
+        RED.nodes.createNode(this,n);
+        this.outputDeviceName = n.outputDeviceName;
+    }
+    RED.nodes.registerType("OutputDevice", OutputDeviceNode);
     
     function StatusNode(n){
         RED.nodes.createNode(this,n);

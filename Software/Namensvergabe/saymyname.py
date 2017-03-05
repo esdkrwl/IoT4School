@@ -96,11 +96,13 @@ def return_name_callback(client, userdata, msg):
 
     if esp_type == 'Sensor':
         topic_str = 'nameClient/sensor/mac/' + esp_mac_adr
-        client.publish(topic_str, esp_new_name, qos=1)
+        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'", "topic":"esp/sensor/'+ esp_new_name +'"}'
+        client.publish(topic_str, publish_payload, qos=1)
         logging.info('Sensor ' + esp_name + ' erhält den Namen ' + esp_new_name)
     else:
         topic_str = 'nameClient/aktor/mac/' + esp_mac_adr
-        client.publish(topic_str, esp_new_name, qos=1)
+        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'", "topic":"esp/aktor/' + esp_new_name + '"}'
+        client.publish(topic_str, publish_payload, qos=1)
         logging.info('Aktor ' + esp_name + ' erhält den Namen ' + esp_new_name)
 
 
@@ -123,7 +125,7 @@ client.message_callback_add("esp/lastwill/mac/#", esp_last_will_callback)
 client.message_callback_add("esp/sensor/mac/#", return_name_callback)
 
 try:
-    client.connect("192.168.178.123", 1883, 60)
+    client.connect("192.168.178.23", 1883, 60)
 except Exception as error:
     logging.error('Konnte keine Verbindung zum Broker aufbauen')
 

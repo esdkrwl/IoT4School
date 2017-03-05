@@ -306,80 +306,76 @@ module.exports = function(RED) {
         this.name = RED.nodes.getNode(config.name).inputDeviceName;
         this.count = config.count;
         //default params setzen
-        if(config.topic){
-            this.topic = config.topic;
-        } else {
-            this.topic = 'esp/sensor/' + this.name + this.count;
-        }
+
+        this.topic = 'esp/sensor/' + this.name + this.count;
+
         this.qos = parseInt(config.qos);
         this.broker = config.broker;
         this.brokerConn = RED.nodes.getNode(this.broker);
+        
+        this.parseJson = config.parseJson;
+        
         if (!/^(#$|(\+|[^+#]*)(\/(\+|[^+#]*))*(\/(\+|#|[^+#]*))?$)/.test(this.topic)) {
             return this.warn(RED._("mqtt.errors.invalid-topic"));
         }
         var node = this;
         
         if (this.brokerConn) {
-            
             this.status({fill:"red",shape:"ring",text:"Getrennt"});
-            if (this.topic) {
-                
+            if (this.topic) {              
                 node.brokerConn.register(this);
                 
                 //subscribe beim Broker
-                this.brokerConn.subscribe(node.topic,node.qos,function(topic,payload,packet) {
-                    
+                this.brokerConn.subscribe(node.topic,node.qos,function(topic,payload,packet) {  
                     if (isUtf8(payload)) {
                         payload = payload.toString();
                     }
-                    
                     var msg = {topic:topic, payload:payload, qos: packet.qos, retain: packet.retain};
-                    
                     if ((node.brokerConn.broker === "localhost")||(node.brokerConn.broker === "127.0.0.1")){
                         msg._topic = topic;
                     }
                     
+                    if(node.parseJson){
+                        //Prüfe, ob Nachricht Payload hat
+                        if (msg.hasOwnProperty("payload")) {
+                            if (typeof msg.payload === "string") {
+                                //Versuche String zu parsen
+                                try {
+                                    msg.payload = JSON.parse(msg.payload);
+                                    node.send(msg);
+                                }
+                                catch(e) {
+                                    node.error('Fehler' + e.message,msg); 
+                                }
+                            }
 
-//JSON PARSE
-
-			if (msg.hasOwnProperty("payload")) {
-                		if (typeof msg.payload === "string") {
-                    			try {
-                       	 			msg.payload = JSON.parse(msg.payload);
-                        			node.send(msg);
-                    			}
-                    			catch(e) {
-						node.error('Fehler' + e.message,msg); 
-					}
-                	}
-                	else if (typeof msg.payload === "object") {
-                    		if (!Buffer.isBuffer(msg.payload)) {
-                        		try {
-                            			msg.payload = JSON.stringify(msg.payload);
-                            			node.send(msg);
-                        		}
-                        		catch(e) { 
-						node.error(RED._("json.errors.dropped-error"));
-					}
-                    		}
-                    	else { 
-				node.warn(RED._("json.errors.dropped-object")); }
-                	}
-                	else { 
-				node.warn(RED._("json.errors.dropped")); }
-            		}
-            		else { 
-				node.send(msg); 
-			} // If no payload - just pass it on.
-
-
-//JSON PARSE
-
-
-
-
-
-
+                            else if (typeof msg.payload === "object") {
+                                if (!Buffer.isBuffer(msg.payload)) {
+                                    //versuche objekt zu parsen
+                                    try {
+                                        msg.payload = JSON.stringify(msg.payload);
+                                        node.send(msg);
+                                    }
+                                    catch(e) { 
+                                        node.error(RED._("json.errors.dropped-error"));
+                                   }
+                                }
+                                else { 
+                                    node.warn(RED._("json.errors.dropped-object"));
+                                }
+                            }
+                            else { 
+                                node.warn(RED._("json.errors.dropped"));
+                            }
+                        }
+                        //Falls nicht, leite die Nachricht einfach so weiter
+                        else { 
+                            node.send(msg); 
+                        }   
+                    }
+                    else{
+                        node.send(msg); 
+                    }
                     
                 }, this.id);
                 

@@ -35,6 +35,7 @@
             topic: {value:"",validate: RED.validators.regex(/^(#$|(\+|[^+#]*)(\/(\+|[^+#]*))*(\/(\+|#|[^+#]*))?$)/)},
             qos: {value: "1"},
             broker: {type:"mqtt-broker", required:true},
+            parseJson: {value:true},
         },
         color:"#3FADB5",
         inputs:0,
@@ -42,7 +43,7 @@
         icon: "feed.png",
         label: function() {
             //var testu = RED.nodes.getNode(config.name).inputDeviceName;
-            return nameZ||this.topic||"ClientName";
+            return this.topic||"Sensor";
         },
         labelStyle: function() {
             return this.name?"node_label_italic":"";
@@ -77,7 +78,7 @@
     <div class="form-row">
     
         <label for="node-input-name">
-            <i class="fa fa-tag"></i> 
+            <i class="fa fa-thermometer-3"></i>
             Sensor
         </label>
         
@@ -108,14 +109,24 @@
         
     </div>
     
+    <div class="form-row" id="node-parseJson">
+        <label for="node-input-parseJson">
+            <i class="fa fa-binoculars" aria-hidden="true"></i> 
+            JSON
+        </label>
+
+        <input type="checkbox" id="node-input-parseJson" style="display: inline-block; width: auto; vertical-align: top;">
+
+    </div>
+    
     <div class="form-row">
     
         <label for="node-input-topic">
-            <i class="fa fa-tasks"></i> 
-            <span data-i18n="common.label.topic"></span>
+            <i class="fa fa-label"></i>
+            Name
         </label>
         
-        <input type="text" id="node-input-topic" data-i18n="[placeholder]common.label.topic">
+        <input type="text" id="node-input-topic" placeholder="z.B. Temperatur Flur oder TMP5">
         
     </div>
     

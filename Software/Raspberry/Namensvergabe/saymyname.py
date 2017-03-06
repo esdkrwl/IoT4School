@@ -129,7 +129,7 @@ try:
 except Exception as error:
     logging.error('Konnte keine Verbindung zum Broker aufbauen')
 
-conn = sqlite3.connect('mqttClient.db')
+conn = sqlite3.connect('/var/www/db/mqttClient.db')
 c = conn.cursor()
 create_table()
 

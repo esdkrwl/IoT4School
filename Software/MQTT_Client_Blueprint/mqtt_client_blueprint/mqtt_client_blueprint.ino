@@ -43,7 +43,7 @@ char nameTopicArray[100];
 
 String prePubTopic = "esp/sensor/mac/" + macAdresse;
 
-String finalPubTopic = "esp/"+type+"/";
+//String finalPubTopic = "esp/"+type+"/";
 char finalPubTopicArray[100];
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -65,7 +65,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
   String identifier = root["identifier"];
   //sortiere Payload anhang des Identifiers aus
   if(identifier.equals("name")){
+    
     Serial.println("[INFO] Idenfitifier: Name");
+    String finalPubTopic = root["topic"];
+    finalPubTopic.toCharArray(finalPubTopicArray, 100);
+    Serial.println("[Debug] Final Topic: " + String(finalPubTopicArray));
+    topicUpdated = true;
     
   } else if(identifier.equals("config")){
     Serial.println("[INFO] Idenfitifier: Config");

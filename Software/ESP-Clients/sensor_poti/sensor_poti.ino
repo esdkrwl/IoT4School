@@ -415,11 +415,11 @@ void loop() {
     if(value == 5){
       mqttClient.subscribe("inTopic2");
     }
-    //snprintf (msg, 75, "hello world #%ld", value);
+    snprintf (msg, 75, "hello world");
     Serial.print("Publish message " + String(value) + ": ");
     createPayload(10, 10).toCharArray(dataPayloadArray, 200);
     Serial.println(dataPayloadArray);
-    //Serial.println(msg);
+    Serial.println(msg);
     if(mqttClient.publish("outTopic", dataPayloadArray)){
       Serial.println("Erfolg");
     } else {

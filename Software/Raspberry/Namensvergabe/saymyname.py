@@ -17,7 +17,20 @@ def on_connect(client, userdata, flags, rc):
     logging.info('Verbindung zum Broker erfolgreich aufgebaut')
     logging.debug("Antwort vom Server: " + str(rc))
 
-    client.subscribe([("esp/sensor/mac/#", 1), ("esp/aktor/mac/#", 1), ("esp/lastwill/mac/#", 1)])
+    client.subscribe([("esp/sensor/mac/#", 1), ("esp/aktor/mac/#", 1), ("esp/lastwill/mac/#", 1), ("esp/reconnect", 1)])
+
+def esp_reconnect_callback(client, userdata, msg):
+    logging.debug('Greetz aus dem reconnect callback')
+    logging.info(msg.topic + " " + str(msg.payload) + " " + str(msg.qos))
+
+    reconnect_data = str(msg.payload)[2:len(str(msg.payload)) - 1]
+    reconnect_payload = json.loads(reconnect_data)
+    reconnect_mac_adr = reconnect_payload['Mac']
+
+    c.execute("UPDATE espClients SET status = (?) WHERE mac = (?)", ('Verbunden', reconnect_mac_adr,))
+    conn.commit()
+
+
 
 def esp_last_will_callback(client, userdata, msg):
     logging.debug('Greetz aus dem last will callback')
@@ -123,9 +136,10 @@ client.on_connect = on_connect
 #client.on_message = on_message
 client.message_callback_add("esp/lastwill/mac/#", esp_last_will_callback)
 client.message_callback_add("esp/sensor/mac/#", return_name_callback)
+client.message_callback_add("esp/reconnect", esp_reconnect_callback)
 
 try:
-    client.connect("192.168.178.23", 1883, 60)
+    client.connect("192.168.178.20", 1883, 60)
 except Exception as error:
     logging.error('Konnte keine Verbindung zum Broker aufbauen')
 

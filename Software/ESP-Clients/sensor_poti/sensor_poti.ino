@@ -8,6 +8,11 @@
 #include <Arduino.h>
 
 #define       LED0      2
+#define       potiPin   A0
+
+long lastMsg = 0;
+int value = 0;
+char msg[50];
 
 const char* ssid = "Thunfisch";
 const char* pw = "qwertz123";
@@ -16,38 +21,44 @@ IPAddress mqttServer(192, 168, 178, 20);
 int mqttServerPort = 1883;
 
 String type = "Sensor";
-String modulName = "LDR";
+String modulName = "Poti";
 
 
 String essid = "";
 IPAddress ipAdresse;
 String macAdresse = String(WiFi.macAddress());
 char macCharArray[18];
+//macAdresse.toCharArray(macCharArray, 18);
 long signalQuali = 0;
 int espStatus = 0;
 
 bool topicUpdated = false;
 
 String lastWillTopic = "esp/lastwill/mac/" + macAdresse;
-char lastWillTopicArray[100];
+char lastWillTopicArray[200];
 String lastWillPayload = "";
-char lastWillPayloadArray[100];
+char lastWillPayloadArray[200];
 
 StaticJsonBuffer<200> jsonBuffer;
+
+int potiWert = 0;
+int prePotiWert = 0;
+int threshold = 0.05;
 
 
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
 String nameClientTopic = "nameClient/"+type+"/mac/" + macAdresse;
-char nameTopicArray[100];
+char nameTopicArray[200];
 
 String prePubTopic = "esp/sensor/mac/" + macAdresse;
 
 //String finalPubTopic = "esp/"+type+"/";
-char finalPubTopicArray[100];
+char finalPubTopicArray[200];
 
-char dataPayloadArray[100];
+char dataPayloadArray[200];
+
 
 long lastReconnectAttemptWiFi = 0;
 long lastReconnectAttemptMQTT = 0;
@@ -74,7 +85,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     
     Serial.println("[INFO] Idenfitifier: Name");
     String finalPubTopic = root["topic"];
-    finalPubTopic.toCharArray(finalPubTopicArray, 100);
+    finalPubTopic.toCharArray(finalPubTopicArray, 200);
     Serial.println("[Debug] Final Topic: " + String(finalPubTopicArray));
     topicUpdated = true;
     
@@ -98,13 +109,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
 //      modulName += (char)payload[i];
 //    }
 //    finalPubTopic += modulName;
-//    finalPubTopic.toCharArray(finalPubTopicArray, 100);
+//    finalPubTopic.toCharArray(finalPubTopicArray, 200);
 //    Serial.println("[Debug] Final Topic: " + String(finalPubTopicArray));
 //    topicUpdated = true;
 //  }
 //  if(length == modulName.length() + 2){
 //    finalPubTopic += (char)payload[1];
-//    finalPubTopic.toCharArray(finalPubTopicArray, 100);
+//    finalPubTopic.toCharArray(finalPubTopicArray, 200);
 //    Serial.println("[Debug] Final Topic: " + finalPubTopic);
 //    topicUpdated = true;
 //  }
@@ -130,7 +141,23 @@ void connectToWiFi() {
 }
 
 bool reconnectToWiFi() {
-  if (WiFi.status() != WL_CONNECTED){
+    while (WiFi.status() != WL_CONNECTED) {
+    
+    for(int i = 0; i < 10; i++){
+      digitalWrite(LED0, HIGH);
+      delay(250);
+      digitalWrite(LED0, LOW);
+      delay(250);
+      Serial.print(".");  
+    }
+
+  }
+  Serial.println();
+  digitalWrite(LED0, !HIGH);
+  return true;
+}
+  
+/*  if (WiFi.status() != WL_CONNECTED){
     digitalWrite(LED0, !LOW);
     return false;
   } else {
@@ -138,6 +165,7 @@ bool reconnectToWiFi() {
     digitalWrite(LED0, !HIGH);
   }
 }
+*/
 
 void printWiFiInfo() {
   essid = String(WiFi.SSID());
@@ -160,8 +188,8 @@ void connectToBroker() {
   lastWillTopic.toCharArray(lastWillTopicArray, lastWillTopic.length()+1 );
 
   createLastWillJson();
-  lastWillPayload.toCharArray(lastWillPayloadArray, 100);
-  
+  lastWillPayload.toCharArray(lastWillPayloadArray, 200);
+
   macAdresse.toCharArray(macCharArray, 18);
   Serial.println("[INFO] Verbinde mit MQTT Broker.");
   while (!mqttClient.connected()) {
@@ -239,42 +267,32 @@ String createJson(){
   return statusPayload;
 }
 
+
+String createPayload(int alt, int neu){
+  String dataPayload = "{";
+
+  dataPayload += "\"Identifier\": \"data\", ";
+  
+  dataPayload += "\"alterPotiWert\": ";
+  dataPayload += "\"" + String(alt) + "\", ";
+
+  dataPayload += "\"neuerPotiWert\": ";
+  dataPayload += "\"" + String(neu) + "\" ";
+
+  dataPayload +="}";
+
+  //Serial.println("[Debug] Data-Payload: " + dataPayload);
+  
+ 
+  return dataPayload;
+}
+
 bool reconnectToBroker() {
   if (mqttClient.connect(macCharArray, lastWillTopicArray, 1, false, lastWillPayloadArray)){
     //hier topic subscriben
   }
   return mqttClient.connected();
 }
-
-void initOTA(){
-  // Port defaults to 8266
-  ArduinoOTA.setPort(8266);
-
-  // Hostname defaults to esp8266-[ChipID]
-  ArduinoOTA.setHostname("Blueprint");
-
-  // No authentication by default
-  ArduinoOTA.setPassword((const char *)"123");
-
-  ArduinoOTA.onStart([]() {
-    Serial.println("Start");
-  });
-  ArduinoOTA.onEnd([]() {
-    Serial.println("\nEnd");
-  });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-    else if (error == OTA_END_ERROR) Serial.println("End Failed");
-  });
-}
-
 
 void verifyConnection(){
   //Prüfe, ob WLan nicht verbunden ist,
@@ -324,6 +342,35 @@ void verifyConnection(){
   
 }
 
+void initOTA(){
+  // Port defaults to 8266
+  ArduinoOTA.setPort(8266);
+
+  // Hostname defaults to esp8266-[ChipID]
+  ArduinoOTA.setHostname("Blueprint");
+
+  // No authentication by default
+  ArduinoOTA.setPassword((const char *)"123");
+
+  ArduinoOTA.onStart([]() {
+    Serial.println("Start");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nEnd");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+}
+
 void setup() {
   Serial.begin(115200);
   Serial.println();
@@ -339,20 +386,75 @@ void setup() {
   initOTA();
   ArduinoOTA.begin();
 
-
 }
 
 void loop() {
-  ArduinoOTA.handle();
-  mqttClient.loop();
 
+    potiWert = analogRead(potiPin);
+//  delay(250);
+//  mqttClient.loop();
+//  ArduinoOTA.handle();
+  
+  verifyConnection();
+    
+  
+  //Serial.println("[DEBUG] PotiWert: " + String(potiWert)); 
+  
   if(topicUpdated){
     Serial.println("[DEBUG] Neues Topic wurde geupdated." );
-    mqttClient.unsubscribe(nameTopicArray);
+    //mqttClient.unsubscribe(nameTopicArray);
     mqttClient.subscribe(finalPubTopicArray);
     topicUpdated = false;
   }
 
+  
+  long now = millis();
+  if (now - lastMsg > 500) {
+    lastMsg = now;
+    ++value;
+    if(value == 5){
+      mqttClient.subscribe("inTopic2");
+    }
+    //snprintf (msg, 75, "hello world #%ld", value);
+    Serial.print("Publish message " + String(value) + ": ");
+    createPayload(10, 10).toCharArray(dataPayloadArray, 200);
+    Serial.println(dataPayloadArray);
+    //Serial.println(msg);
+    if(mqttClient.publish("outTopic", dataPayloadArray)){
+      Serial.println("Erfolg");
+    } else {
+      Serial.println("Misserfolg");
+    }
+  }
+
+  
+
+  
+/*
+  if(abs(potiWert-prePotiWert) > 2){
+
+    createPayload(prePotiWert, potiWert).toCharArray(dataPayloadArray, 200);
+
+    if(finalPubTopicArray[0] != 'e'){
+            char pubTopicArray[prePubTopic.length() +1];
+            prePubTopic.toCharArray(pubTopicArray, prePubTopic.length()+1 );
+          if(mqttClient.publish(finalPubTopicArray, dataPayloadArray)){
+            Serial.println("[Info] Payload mit altem Topic erfolgreich versendet.");
+          } else {
+            Serial.println("[Error] Payload mit altem Topic konnte nicht versendet werden."); 
+          } 
+    } else {
+      if(mqttClient.publish(finalPubTopicArray, dataPayloadArray)){
+        Serial.println("[Info] Payload mit neuem Topic erfolgreich versendet.");
+      } else {
+        Serial.println("[Error] Payload mit neuem Topic konnte nicht versendet werden."); 
+      } 
+    }
+    
+  }
+  prePotiWert = potiWert;
+  //Serial.println("[DEBUG] PrePotiWert: " + String(prePotiWert)); 
+*/
 
 }
 

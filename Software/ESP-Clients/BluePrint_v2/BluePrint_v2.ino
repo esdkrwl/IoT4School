@@ -43,8 +43,6 @@ char lastWillTopicArray[200];
 String lastWillPayload = "";
 char lastWillPayloadArray[200];
 
-StaticJsonBuffer<200> jsonBuffer;
-
 
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
@@ -67,6 +65,7 @@ char dataPayloadArray[200];
 
 long lastReconnectAttempt = 0;
 
+
 /*
  * MQTT Callback Methode
  * Wird aufgerufen, wenn Daten empfangen wurden.
@@ -87,34 +86,90 @@ void callback(char* topic, byte* payload, unsigned int length) {
     jsonPayload[i] = (char)payload[i];
   }
   Serial.println();
-  
+  //WICHTIG - Buffer hier anlegen und nicht global!
+  StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(jsonPayload); 
-  //falls nicht geparst werden konnte
+  //Falls kein JSON vorliegt, wird die Nachricht verworfen
   if (!root.success()) {
-    Serial.println("[Error] JSON Parsing fehlgeschlagen..");
+    
+    Serial.println("[ERROR] JSON Parsing fehlgeschlagen..");
+    
+  } else {
+    
+    Serial.println("[INFO] JSON Parsing erfolgreich..");
+    
+    //Prüfe, ob der key identifier vorhanden ist, falls nicht verwerfen
+    if(root.containsKey("identifier")){
+      
+      if(root["identifier"] == "name"){
+        Serial.println("[DEBUG] Identifier gefunden: Name");
+        onName(root);
+
+      } 
+      else if(root["identifier"] == "config"){
+        
+        Serial.println("[DEBUG] Identifier gefunden: Config");
+        onConfig(root);
+        
+      }
+      else if(root["identifier"] == "data"){
+        
+        Serial.println("[DEBUG] Identifier gefunden: Data");
+        onData(root);
+        
+      } 
+      else if(root["identifier"] == "status"){
+        
+        Serial.println("[DEBUG] Identifier gefunden: Status");
+        onStatus(root);
+        
+      } 
+      else {
+        Serial.print("[ERROR] Unbekannter Identifier: ");
+        String identifierString = root["identifier"];
+        Serial.println(identifierString);
+      }
+      
+    } else {
+      Serial.println("[ERROR] Keinen Identifier gefunden");
+    }
   }
-  String identifier = root["identifier"];
-  //sortiere Payload anhang des Identifiers aus
-  if(identifier.equals("name")){
-    
-    Serial.println("[INFO] Idenfitifier: Name");
-    String finalPubTopic = root["topic"];
-    finalPubTopic.toCharArray(finalPubTopicArray, 200);
-    Serial.println("[Debug] Final Topic: " + String(finalPubTopicArray));
-    topicUpdated = true;
-    
-  } else if(identifier.equals("config")){
-    Serial.println("[INFO] Idenfitifier: Config");
-    
-  } else if(identifier.equals("data")){
-    Serial.println("[INFO] Idenfitifier: Data");
-    
-  } else if(identifier.equals("status")){
-    Serial.println("[INFO] Idenfitifier: Status");
-  }
-  else {
-    Serial.println("[Error] Unbekannter Identifier.");
-  }
+}
+/*
+ * Callback Methode, falls der Identifier Name im Payload gefunden wurde
+ */
+void onName(JsonObject& j){
+  Serial.println("[DEBUG] Greetz aus onName");
+  String finalPubTopic = j["topic"];
+  finalPubTopic.toCharArray(finalPubTopicArray, 200);
+  Serial.println("[Debug] Final Topic: " + String(finalPubTopicArray));
+  topicUpdated = true;
+}
+
+/*
+ * Callback Methode, falls der Identifier Config im Payload gefunden wurde
+ */
+void onConfig(JsonObject& j){
+  Serial.println("[DEBUG] Greetz aus onConfig");
+  
+}
+
+/*
+ * Callback Methode, falls der Identifier Data im Payload gefunden wurde
+ */
+void onData(JsonObject& j){
+  Serial.println("[DEBUG] Greetz aus onData");
+  String test = j["b"];
+  Serial.println(test);
+  
+}
+
+/*
+ * Callback Methode, falls der Identifier Status im Payload gefunden wurde
+ */
+void onStatus(JsonObject& j){
+  Serial.println("[DEBUG] Greetz aus onStatus");
+  
 }
 
 /*

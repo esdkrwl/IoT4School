@@ -8,12 +8,16 @@
 #include <Arduino.h>
 
 #define       LED0      2
-#define       potiPin   A0
+#define       PotiPin   A0
 
 //TEST
 long lastMsg = 0;
 char msg[50];
 int value = 0;
+int potiWert = 0;
+int potiWertAlt = 0;
+int threshold = 10;
+int intervall = 100;
 //TEST
 
 const char* ssid = "Thunfisch";
@@ -23,12 +27,7 @@ IPAddress mqttServer(192, 168, 178, 20);
 int mqttServerPort = 1883;
 
 String type = "Sensor";
-String modulName = "Poti";
-
-int potiWert = 0;
-int potiWertAlt = 0;
-int threshold = 10;
-int abfrageIntervall = 50;
+String modulName = "yyyy";
 
 
 String essid = "";
@@ -49,14 +48,11 @@ char lastWillTopicArray[200];
 String lastWillPayload = "";
 char lastWillPayloadArray[200];
 
-//statt staic
-StaticJsonBuffer<500> jsonBuffer;
-
 
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
-int resetStrikes = 0;
+
 
 const char* pythonTopic = "esp/reconnect";
 
@@ -73,6 +69,7 @@ char finalPubTopicArray[200];
 char dataPayloadArray[200];
 
 long lastReconnectAttempt = 0;
+
 
 /*
  * MQTT Callback Methode
@@ -94,44 +91,90 @@ void callback(char* topic, byte* payload, unsigned int length) {
     jsonPayload[i] = (char)payload[i];
   }
   Serial.println();
-  
+  //WICHTIG - Buffer hier anlegen und nicht global!
+  StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(jsonPayload); 
-  //falls nicht geparst werden konnte
+  //Falls kein JSON vorliegt, wird die Nachricht verworfen
   if (!root.success()) {
-    Serial.println("[Error] JSON Parsing fehlgeschlagen..");
-    resetStrikes++;
-    if(resetStrikes == 3){
-      const char* pub= "penis";
-      const char* msg = "bb";
-      mqttClient.publish(pub, msg);
-      ESP.restart();
-    }
-  } else {
-        String identifier = root["identifier"];
-        //sortiere Payload anhang des Identifiers aus
-        if(identifier.equals("name")){
-          
-          Serial.println("[INFO] Idenfitifier: Name");
-          String finalPubTopic = root["topic"];
-          finalPubTopic.toCharArray(finalPubTopicArray, 200);
-          Serial.println("[Debug] Final Topic: " + String(finalPubTopicArray));
-          topicUpdated = true;
-          
-        } else if(identifier.equals("config")){
-          Serial.println("[INFO] Idenfitifier: Config");
-          
-        } else if(identifier.equals("data")){
-          Serial.println("[INFO] Idenfitifier: Data");
-          
-        } else if(identifier.equals("status")){
-          Serial.println("[INFO] Idenfitifier: Status");
-        }
-        else {
-          Serial.println("[Error] Unbekannter Identifier.");
-        }
     
-  }
+    Serial.println("[ERROR] JSON Parsing fehlgeschlagen..");
+    
+  } else {
+    
+    Serial.println("[INFO] JSON Parsing erfolgreich..");
+    
+    //Prüfe, ob der key identifier vorhanden ist, falls nicht verwerfen
+    if(root.containsKey("identifier")){
+      
+      if(root["identifier"] == "name"){
+        Serial.println("[DEBUG] Identifier gefunden: Name");
+        onName(root);
 
+      } 
+      else if(root["identifier"] == "config"){
+        
+        Serial.println("[DEBUG] Identifier gefunden: Config");
+        onConfig(root);
+        
+      }
+      else if(root["identifier"] == "data"){
+        
+        Serial.println("[DEBUG] Identifier gefunden: Data");
+        onData(root);
+        
+      } 
+      else if(root["identifier"] == "status"){
+        
+        Serial.println("[DEBUG] Identifier gefunden: Status");
+        onStatus(root);
+        
+      } 
+      else {
+        Serial.print("[ERROR] Unbekannter Identifier: ");
+        String identifierString = root["identifier"];
+        Serial.println(identifierString);
+      }
+      
+    } else {
+      Serial.println("[ERROR] Keinen Identifier gefunden");
+    }
+  }
+}
+/*
+ * Callback Methode, falls der Identifier Name im Payload gefunden wurde
+ */
+void onName(JsonObject& j){
+  Serial.println("[DEBUG] Greetz aus onName");
+  String finalPubTopic = j["topic"];
+  finalPubTopic.toCharArray(finalPubTopicArray, 200);
+  Serial.println("[Debug] Final Topic: " + String(finalPubTopicArray));
+  topicUpdated = true;
+}
+
+/*
+ * Callback Methode, falls der Identifier Config im Payload gefunden wurde
+ */
+void onConfig(JsonObject& j){
+  Serial.println("[DEBUG] Greetz aus onConfig");
+  
+}
+
+/*
+ * Callback Methode, falls der Identifier Data im Payload gefunden wurde
+ */
+void onData(JsonObject& j){
+  Serial.println("[DEBUG] Greetz aus onData");
+  String test = j["b"];
+  Serial.println(test);
+  
+}
+
+/*
+ * Callback Methode, falls der Identifier Status im Payload gefunden wurde
+ */
+void onStatus(JsonObject& j){
+  Serial.println("[DEBUG] Greetz aus onStatus");
+  
 }
 
 /*
@@ -247,7 +290,7 @@ void connectToBroker() {
       //Python Bescheid sagen, dass man wieder da ist, damit die DB wieder aktualisiert werden kann
       createClientStatusJson().toCharArray(clientStatusArray, 200);
       if(mqttClient.publish(pythonTopic, clientStatusArray)){
-        Serial.println("[DEBUG] Python ist wegen RC informiert");  
+        Serial.println("[DEBUG] Python ist informiert");  
       } else {
         Serial.println("[DEBUG] Python ist nicht informiert");  
       }
@@ -267,12 +310,13 @@ void connectToBroker() {
  */
 void printBrokerInfo() {
   Serial.println();
-  Serial.println("[INFO] Verbindung aufgebaut zu MQTT Broker aufgebaut.");
+  Serial.println("[INFO] Verbindung zum MQTT Broker aufgebaut.");
   Serial.print("[INFO] MQTT Broker IP-Adresse ");
   Serial.println(mqttServer);
 
   Serial.print("[INFO] MQTT Broker Port ");
   Serial.println(mqttServerPort);
+  Serial.println();
 }
 
 
@@ -379,7 +423,6 @@ void initOTA(){
 void verifyConnection(){
 
   if(WiFi.status() != WL_CONNECTED){
-    Serial.println("[ERROR] Verbindung zum WiFi getrennt.");
     connectToWiFi();
   } 
   // da wir nun sicher sind, dass wir mit dem Wlan verbunden sind,
@@ -395,6 +438,7 @@ void verifyConnection(){
       mqttClient.loop();
     } 
     else {
+      Serial.println();
       Serial.println("[ERROR] Verbindung zum Broker getrennt.");
       long now = millis();
       
@@ -405,7 +449,8 @@ void verifyConnection(){
         
         if (reconnectToBroker()) {
           
-          Serial.println("[INFO] Verbindung zum Broker wieder aufgebaut."); 
+          Serial.println("[INFO] Verbindung zum Broker wieder aufgebaut.");
+          Serial.println();
           lastReconnectAttempt = 0;
           
         } else {
@@ -441,65 +486,46 @@ void setup() {
 }
 
 void loop() {
+
+  potiWert = analogRead(PotiPin);
+  delay(3);
   
   verifyConnection();
 
   if(topicUpdated){
     Serial.println("[DEBUG] Neues Topic wurde geupdated." );
     mqttClient.unsubscribe(nameTopicArray);
-    //nur für aktoren
     //mqttClient.subscribe(finalPubTopicArray);
     topicUpdated = false;
     newTopicFlag = true;
   }
 
-  potiWert = analogRead(potiPin);
-  //random DC - 3ms fix
-  delay(3);
 
- 
+/*
+  int potiWert = 0;
+int potiWertAlt = 0;
+int threshold = 10;
+int intervall = 100;
+*/
+  
 //DEBUG ZEUGS
   long now = millis();
-  if (now - lastMsg > abfrageIntervall) {
+  if (now - lastMsg > 2000) {
     lastMsg = now;
-
-    
-
-    
-
-    if(abs(potiWert-potiWertAlt) > threshold){
-      Serial.print("DEBUG: Potentiometerwert: ");
-      Serial.println( potiWert);
-
-      snprintf (msg, 75, "sensorwert #%ld", potiWert);
-
-    if(mqttClient.publish(finalPubTopicArray, msg)){
-      Serial.println("Erfolg");
-    } else {
-      Serial.println("Misserfolg");
-    }
+    ++value;
+    snprintf (msg, 75, "PotiWert #%ld", potiWert);
+    Serial.print("Publish message: ");
+    Serial.println(msg);
+    if(newTopicFlag){
+      if(mqttClient.publish(finalPubTopicArray, msg)){
+        Serial.println("Erfolg");
+      } else {
+        Serial.println("Misserfolg");
+      }
       
     }
 
-    potiWertAlt = potiWert;
   }
-
-    
-    
-/*    ++value;
-    if(value == 5){
-      mqttClient.subscribe("inTopic2");
-    }
-    snprintf (msg, 75, "hello world #%ld", value);
-    Serial.print("Publish message: ");
-    Serial.println(msg);
-    if(mqttClient.publish("outTopic", msg)){
-      Serial.println("Erfolg");
-    } else {
-      Serial.println("Misserfolg");
-    }
-  }
-  */
 //DEBUG ZEUGS
 
 

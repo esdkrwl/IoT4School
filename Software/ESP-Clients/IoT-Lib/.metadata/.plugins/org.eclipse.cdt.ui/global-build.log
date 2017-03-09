@@ -1,0 +1,24 @@
+19:17:13 **** Incremental Build of configuration Debug for project IoT-Library ****
+make all 
+make: Für das Ziel „all“ ist nichts zu tun.
+19:17:57 **** Incremental Build of configuration Debug for project IoT-Library ****
+make all 
+make: Für das Ziel „all“ ist nichts zu tun.
+19:18:08 **** Incremental Build of configuration Debug for project IoT-Library ****
+make all 
+Building file: ../src/IoT-Library.cpp
+Invoking: GCC C++ Compiler
+g++ -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/IoT-Library.d" -MT"src/IoT-Library.o" -o "src/IoT-Library.o" "../src/IoT-Library.cpp"
+Finished building: ../src/IoT-Library.cpp
+ 
+Building target: IoT-Library
+Invoking: GCC C++ Linker
+g++  -o "IoT-Library"  ./src/IoT-Library.o   
+Finished building target: IoT-Library
+ 
+19:18:13 **** Incremental Build of configuration Debug for project IoT-Library ****
+make all 
+make: Für das Ziel „all“ ist nichts zu tun.
+19:18:42 **** Incremental Build of configuration Debug for project IoT-Library ****
+make all 
+make: Für das Ziel „all“ ist nichts zu tun.

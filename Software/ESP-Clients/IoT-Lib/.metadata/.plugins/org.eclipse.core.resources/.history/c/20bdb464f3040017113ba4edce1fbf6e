@@ -1,0 +1,17 @@
+/*
+ * IoT.h
+ *
+ *  Created on: 09.03.2017
+ *      Author: a
+ */
+
+#ifndef IOT_H_
+#define IOT_H_
+
+
+class IoT{
+
+};
+
+
+#endif /* IOT_H_ */

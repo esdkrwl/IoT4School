@@ -1,0 +1,12 @@
+714=1
+Automatically\ import\ libraries=true
+JANTJE.TEMPLATE_USE_DEFAULT=defaultIno
+Last\ Used\ Upload\ port=
+Last\ used\ Board=nodemcuv2
+Last\ used\ Boards\ file=/home/a/Schreibtisch/sloeber/arduinoPlugin/packages/esp8266/hardware/esp8266/2.3.0/boards.txt
+Last\ used\ Examples=
+Private\ Library\ Path=/home/a/Arduino/libraries
+Private\ hardware\ Path=/home/a/Arduino/hardware
+eclipse.preferences.version=1
+last\ Used\ upload\ Protocol=Default
+last\ used\ Board\ custom\ option\ selections=CPUFREQUENCY\=80\nFLASHSIZE\=4M1M\nUPLOADSPEED\=115200

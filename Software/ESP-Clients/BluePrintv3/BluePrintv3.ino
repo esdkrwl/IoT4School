@@ -18,6 +18,9 @@
 long lastMsg = 0;
 char msg[50];
 int value = 0;
+boolean setReset = false;
+bool shouldSaveConfig = false;
+
 //TEST
 
 const char* ssid = "Thunfisch";
@@ -27,7 +30,7 @@ IPAddress mqttServer(192, 168, 178, 20);
 int mqttServerPort = 1883;
 
 char mqtt_server[40];
-char mqtt_port[6] = "8080";
+char mqtt_port[6] = "1883";
 
 String type = "Sensor";
 String modulName = "yyyy";
@@ -69,15 +72,10 @@ char dataPayloadArray[200];
 
 long lastReconnectAttempt = 0;
 
-bool shouldSaveConfig = false;
 
-/*
- * Speicher Callback zum Übernehmen der Webparameter
- */
-void saveConfigCallback() {
-	Serial.println("Should save config");
-	shouldSaveConfig = true;
-}
+int mqttStrikes = 0;
+
+
 
 /*
  * MQTT Callback Methode
@@ -190,40 +188,42 @@ void setupWiFi() {
 	WiFi.begin(ssid, pw);
 }
 
+
+
+/*
+ * Speicher Callback zum Übernehmen der Webparameter vom WiFi Manager zu übernehmen
+ */
+void saveConfigCallback() {
+  Serial.println("Should save config");
+  shouldSaveConfig = true;
+}
+
+/*
+ * Initialisiert und startet den WiFiManager
+ * 
+ */
 void initWifiManager() {
-	// The extra parameters to be configured (can be either global or just in the setup)
-	// After connecting, parameter.getValue() will get you the configured value
-	// id/name placeholder/prompt default length
+    WiFiManager wifiManager;
+  /*
+   * CallBack Funktion, falls Daten gespeichert werden sollen
+   */
+  wifiManager.setSaveConfigCallback(saveConfigCallback);
+  
+	/*
+   * MQTT Server und Port als Extra Params
+	 */
 	WiFiManagerParameter custom_mqtt_server("server", "mqtt server",
 			mqtt_server, 40);
 	WiFiManagerParameter custom_mqtt_port("port", "mqtt port", mqtt_port, 5);
 
-	//WiFiManager
-	//Local intialization. Once its business is done, there is no need to keep it around
-	WiFiManager wifiManager;
-
-	//set config save notify callback
-	wifiManager.setSaveConfigCallback(saveConfigCallback);
-
-	//set static ip
-	//wifiManager.setSTAStaticIPConfig(IPAddress(10, 0, 1, 99),
-	//		IPAddress(10, 0, 1, 1), IPAddress(255, 255, 255, 0));
-
-	//add all your parameters here
 	wifiManager.addParameter(&custom_mqtt_server);
 	wifiManager.addParameter(&custom_mqtt_port);
 
-	//reset settings - for testing
-	//wifiManager.resetSettings();
-
-	//set minimu quality of signal so it ignores AP's under that quality
-	//defaults to 8%
-	//wifiManager.setMinimumSignalQuality();
-
-	//sets timeout until configuration portal gets turned off
-	//useful to make it all retry or go to sleep
-	//in seconds
+	if(setReset){
+	  wifiManager.resetSettings();
+	}
 	//wifiManager.setTimeout(120);
+  
 	if (!wifiManager.autoConnect("AutoConnectAP", "password")) {
 		Serial.println("failed to connect and hit timeout");
 		delay(3000);
@@ -231,17 +231,54 @@ void initWifiManager() {
 		ESP.reset();
 		delay(5000);
 	}
-	//if you get here you have connected to the WiFi
-	Serial.println("connected...yeey :)");
-
-	//read updated parameters
+  //Verbunden
+ digitalWrite(LED0, !HIGH);
+ 
 	strcpy(mqtt_server, custom_mqtt_server.getValue());
 	strcpy(mqtt_port, custom_mqtt_port.getValue());
 
 }
+/*
+ * Metohde zum LEsen der Konfigparameter
+ */
+void readConfigFromFS() {
+  if (SPIFFS.begin()) {
+    Serial.println("[INFO] Datei gefunden.");
+    if (SPIFFS.exists("/config.json")) {
+      //file exists, reading and loading
+      Serial.println("[INFO] Lade Config Datei...");
+      File configFile = SPIFFS.open("/config.json", "r");
+      if (configFile) {
+        Serial.println("[INFO] Lade Config Datei...");
+        size_t size = configFile.size();
+        // Allocate a buffer to store contents of the file.
+        std::unique_ptr<char[]> buf(new char[size]);
 
+        configFile.readBytes(buf.get(), size);
+        DynamicJsonBuffer jsonBuffer;
+        JsonObject& json = jsonBuffer.parseObject(buf.get());
+        json.printTo(Serial);
+        if (json.success()) {
+          Serial.println("\nparsed json");
+
+           strcpy(mqtt_server, json["mqtt_server"]);
+           strcpy(mqtt_port, json["mqtt_port"]);
+
+        } else {
+          Serial.println("[ERROR] Datei gefunden.");
+        }
+      }
+    }
+  } else {
+    Serial.println("[ERROR] Datei nicht gefunden.");
+  }
+}
+
+/*
+ * Methode zum Speichern der Konfigparameter
+ */
 void saveConfigParams() {
-	Serial.println("saving config");
+	Serial.println("[INFO] Speichere Config..");
 	DynamicJsonBuffer jsonBuffer;
 	JsonObject& json = jsonBuffer.createObject();
 	json["mqtt_server"] = mqtt_server;
@@ -249,12 +286,12 @@ void saveConfigParams() {
 
 	File configFile = SPIFFS.open("/config.json", "w");
 	if (!configFile) {
-		Serial.println("failed to open config file for writing");
+		Serial.println("[ERROR] Config Datei konnte nicht geöffnet werden.]");
+	} else {
+    json.printTo(Serial);
+    json.printTo(configFile);
+    Serial.println();
 	}
-
-	json.printTo(Serial);
-	json.printTo(configFile);
-  Serial.println();
 	configFile.close();
 
 }
@@ -332,12 +369,56 @@ void connectToBroker() {
 				lastWillPayloadArray)) {
 
 			mqttClient.subscribe(nameTopicArray);
+      mqttStrikes = 0;
 
 		} else {
 			Serial.print("[ERROR] Verbindung zum fehlgeschlagen. Fehlercode: ");
 			Serial.println(mqttClient.state());
 			delay(5000);
+      mqttStrikes++;
 		}
+    /*
+     * Falls sich nach dem dritten Versuch nicht mit dem Broker verbunden werden konnte,
+     * wird der Webserver erneut gestartet
+     * dort kann man nochmal die Parameter für den Broker überprüfen
+     */
+   if(mqttStrikes == 3){
+    mqttStrikes = 0;
+    WiFiManager wifiManager;
+
+      /*
+       * CallBack Funktion, falls Daten gespeichert werden sollen
+       */
+      wifiManager.setSaveConfigCallback(saveConfigCallback);
+      
+      /*
+       * MQTT Server und Port als Extra Params
+       */
+      WiFiManagerParameter custom_mqtt_server("server", "mqtt server",
+          mqtt_server, 40);
+      WiFiManagerParameter custom_mqtt_port("port", "mqtt port", mqtt_port, 5);
+    
+      wifiManager.addParameter(&custom_mqtt_server);
+      wifiManager.addParameter(&custom_mqtt_port);
+    
+
+    
+    
+    //wifiManager.setTimeout(120);
+    if (!wifiManager.startConfigPortal("MQTT-AP", "password")) {
+      Serial.println("failed to connect and hit timeout");
+      delay(3000);
+      //reset and try again, or maybe put it to deep sleep
+      ESP.reset();
+      delay(5000);
+    } else {
+      strcpy(mqtt_server, custom_mqtt_server.getValue());
+      strcpy(mqtt_port, custom_mqtt_port.getValue());
+      mqttClient.setServer(custom_mqtt_server.getValue(), atoi(custom_mqtt_port.getValue()));
+      saveConfigParams();
+    }
+  
+   }
 
 	}
 }
@@ -457,40 +538,6 @@ String createClientStatusJson() {
 	Serial.println("[Debug] Status-Payload als JSON: " + statusPayload);
 
 	return statusPayload;
-}
-
-void readConfigFromFS() {
-	if (SPIFFS.begin()) {
-		Serial.println("mounted file system");
-		if (SPIFFS.exists("/config.json")) {
-			//file exists, reading and loading
-			Serial.println("reading config file");
-			File configFile = SPIFFS.open("/config.json", "r");
-			if (configFile) {
-				Serial.println("opened config file");
-				size_t size = configFile.size();
-				// Allocate a buffer to store contents of the file.
-				std::unique_ptr<char[]> buf(new char[size]);
-
-				configFile.readBytes(buf.get(), size);
-				DynamicJsonBuffer jsonBuffer;
-				JsonObject& json = jsonBuffer.parseObject(buf.get());
-				json.printTo(Serial);
-				if (json.success()) {
-					Serial.println("\nparsed json");
-
-					 strcpy(mqtt_server, json["mqtt_server"]);
-					 strcpy(mqtt_port, json["mqtt_port"]);
-
-				} else {
-					Serial.println("failed to load json config");
-				}
-			}
-		}
-	} else {
-		Serial.println("failed to mount FS");
-	}
-
 }
 
 /*

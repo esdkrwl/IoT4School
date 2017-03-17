@@ -1,0 +1,82 @@
+[
+    {
+        "id": "6cb045c0.853a5c",
+        "type": "Sensor",
+        "z": "589b141e.aae20c",
+        "name": "c054be2d.11b4",
+        "count": "4",
+        "topic": "Helligkeit",
+        "qos": "1",
+        "broker": "1e52f7a8.af8038",
+        "parseJson": true,
+        "x": 116,
+        "y": 82,
+        "wires": [
+            [
+                "f5db5f11.51649"
+            ]
+        ]
+    },
+    {
+        "id": "f5db5f11.51649",
+        "type": "template",
+        "z": "589b141e.aae20c",
+        "name": "Erzeuge Text",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "IoT-Masterarbeit.\nDie Helligkeit im Raum beträgt: {{payload.helligkeit}} !",
+        "x": 364,
+        "y": 82,
+        "wires": [
+            [
+                "c1636c94.32b6c"
+            ]
+        ]
+    },
+    {
+        "id": "c1636c94.32b6c",
+        "type": "twitter out",
+        "z": "589b141e.aae20c",
+        "twitter": "",
+        "name": "Helligkeitstweet",
+        "x": 580,
+        "y": 82,
+        "wires": []
+    },
+    {
+        "id": "b7ca1833.2fcc98",
+        "type": "comment",
+        "z": "589b141e.aae20c",
+        "name": "Template Bsp",
+        "info": "Erzeugt Text aus Payload und twittert diesen.",
+        "x": 111,
+        "y": 47,
+        "wires": []
+    },
+    {
+        "id": "c054be2d.11b4",
+        "type": "InputDevice",
+        "z": "",
+        "inputDeviceName": "Handy"
+    },
+    {
+        "id": "1e52f7a8.af8038",
+        "type": "mqtt-broker",
+        "z": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    }
+]

@@ -1,0 +1,91 @@
+[
+    {
+        "id": "d32efffc.b06d8",
+        "type": "function",
+        "z": "589b141e.aae20c",
+        "name": "RGB_Payload_to_JSON",
+        "func": "if(msg.payload.includes(\"rgb\")){\n    var rgb = msg.payload.match(/\\d+/g);\n    var red = rgb[0];\n    var green = rgb[1];\n    var blue = rgb[2];\n    \n    var newPayload = '{ \"rot\" : ' +\n    red + ', \"grün\" : ' +\n    green + ', \"blau\" : ' +\n    blue + '}';\n    \n    var newMsg = { payload: newPayload};\n    return newMsg;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 396,
+        "y": 208,
+        "wires": [
+            [
+                "6d1a6d42.3b0e54"
+            ]
+        ]
+    },
+    {
+        "id": "b72dfe69.d53c4",
+        "type": "Sensor",
+        "z": "589b141e.aae20c",
+        "name": "c054be2d.11b4",
+        "count": "2",
+        "topic": "Handy",
+        "qos": "1",
+        "broker": "1e52f7a8.af8038",
+        "parseJson": false,
+        "x": 101,
+        "y": 209,
+        "wires": [
+            [
+                "d32efffc.b06d8"
+            ]
+        ]
+    },
+    {
+        "id": "cc173094.f9e23",
+        "type": "comment",
+        "z": "589b141e.aae20c",
+        "name": "Funktion Beispiel",
+        "info": "Erzeugt aus String einen Payload für eine RGB Steuerung",
+        "x": 115,
+        "y": 171,
+        "wires": []
+    },
+    {
+        "id": "6d1a6d42.3b0e54",
+        "type": "Aktor",
+        "z": "589b141e.aae20c",
+        "broker": "1e52f7a8.af8038",
+        "name": "78386d44.2c07f4",
+        "count": "2",
+        "qos": "1",
+        "parseJson": true,
+        "nodeLabel": "RGB-LED-Büro",
+        "topic": "",
+        "x": 635,
+        "y": 208,
+        "wires": []
+    },
+    {
+        "id": "c054be2d.11b4",
+        "type": "InputDevice",
+        "z": "",
+        "inputDeviceName": "Handy"
+    },
+    {
+        "id": "1e52f7a8.af8038",
+        "type": "mqtt-broker",
+        "z": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    },
+    {
+        "id": "78386d44.2c07f4",
+        "type": "OutputDevice",
+        "z": "",
+        "outputDeviceName": "RGB"
+    }
+]

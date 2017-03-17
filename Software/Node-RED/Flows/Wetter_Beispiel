@@ -1,0 +1,160 @@
+[
+    {
+        "id": "666013e2.81026c",
+        "type": "http request",
+        "z": "589b141e.aae20c",
+        "name": "Openweathermap.org API",
+        "method": "GET",
+        "ret": "obj",
+        "url": "api.openweathermap.org/data/2.5/weather?zip=26123,de&APPID=1e47b187d1c8eb03e20ffc1c83a7fb3d",
+        "tls": "",
+        "x": 305,
+        "y": 540,
+        "wires": [
+            [
+                "faaf5b89.725ad8",
+                "ee21531b.abe32"
+            ]
+        ]
+    },
+    {
+        "id": "457ec4f4.1027bc",
+        "type": "inject",
+        "z": "589b141e.aae20c",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 96,
+        "y": 512,
+        "wires": [
+            [
+                "666013e2.81026c"
+            ]
+        ]
+    },
+    {
+        "id": "19b877f9.6c6b08",
+        "type": "http in",
+        "z": "589b141e.aae20c",
+        "name": "",
+        "url": "/wetter",
+        "method": "get",
+        "swaggerDoc": "",
+        "x": 95,
+        "y": 456,
+        "wires": [
+            [
+                "666013e2.81026c"
+            ]
+        ]
+    },
+    {
+        "id": "ee21531b.abe32",
+        "type": "http response",
+        "z": "589b141e.aae20c",
+        "name": "",
+        "x": 426,
+        "y": 463,
+        "wires": []
+    },
+    {
+        "id": "faaf5b89.725ad8",
+        "type": "function",
+        "z": "589b141e.aae20c",
+        "name": "KtoC",
+        "func": "\nvar kelvin = msg.payload.main.temp;\nvar celcius = parseInt(kelvin) - 273.15;\n\nvar newmsg = {payload: celcius};\n\nreturn newmsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 493,
+        "y": 541,
+        "wires": [
+            [
+                "1e7a4e21.8367f2"
+            ]
+        ]
+    },
+    {
+        "id": "1e7a4e21.8367f2",
+        "type": "template",
+        "z": "589b141e.aae20c",
+        "name": "createTweet",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "IoT Masterarbeit!\nIn Oldenburg sind es {{payload}}°C!",
+        "x": 644,
+        "y": 541,
+        "wires": [
+            [
+                "b5630b0b.bcaf88"
+            ]
+        ]
+    },
+    {
+        "id": "b5630b0b.bcaf88",
+        "type": "twitter out",
+        "z": "589b141e.aae20c",
+        "twitter": "",
+        "name": "Tweet",
+        "x": 798,
+        "y": 541,
+        "wires": []
+    },
+    {
+        "id": "b152e416.328ec8",
+        "type": "Sensor",
+        "z": "589b141e.aae20c",
+        "name": "c054be2d.11b4",
+        "count": "1",
+        "topic": "Handy",
+        "qos": "1",
+        "broker": "1e52f7a8.af8038",
+        "parseJson": true,
+        "x": 91,
+        "y": 573,
+        "wires": [
+            [
+                "666013e2.81026c"
+            ]
+        ]
+    },
+    {
+        "id": "ffe5a1a6.3a017",
+        "type": "comment",
+        "z": "589b141e.aae20c",
+        "name": "Wetter API Call",
+        "info": "",
+        "x": 96,
+        "y": 404,
+        "wires": []
+    },
+    {
+        "id": "c054be2d.11b4",
+        "type": "InputDevice",
+        "z": "",
+        "inputDeviceName": "Handy"
+    },
+    {
+        "id": "1e52f7a8.af8038",
+        "type": "mqtt-broker",
+        "z": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    }
+]

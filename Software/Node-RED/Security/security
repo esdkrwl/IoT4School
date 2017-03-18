@@ -1,0 +1,7 @@
+.node-red wechseln
+
+sudo npm install -g node-red-admin
+
+node-red-admin hash-pw
+
+

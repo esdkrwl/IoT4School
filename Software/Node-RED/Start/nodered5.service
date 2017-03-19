@@ -16,7 +16,7 @@ Environment="NODE_OPTIONS=--max-old-space-size=128"
 # uncomment and edit next line if you need an http proxy
 #Environment="HTTP_PROXY=my.httpproxy.server.address"
 # uncomment the next line for a more verbose log output
-Environment="NODE_RED_OPTIONS=-s /home/pi/.node-red/settings_gruppe5.js ---flowFile flow_5.json"
+Environment="NODE_RED_OPTIONS=-s /home/pi/.node-red/settings_gruppe5.js --flowFile flow_5.json"
 #ExecStart=/usr/bin/env node $NODE_OPTIONS red.js $NODE_RED_OPTIONS
 ExecStart=/usr/bin/env node-red-pi $NODE_OPTIONS $NODE_RED_OPTIONS
 # Use SIGINT to stop

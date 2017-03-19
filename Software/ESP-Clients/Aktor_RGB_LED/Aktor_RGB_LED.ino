@@ -13,9 +13,9 @@
 #include <ESP8266WebServer.h>
 
 #define       LED0      2
-#define       rotPin    6
-#define       blauPin   7
-#define       gruenPin  5
+const int rotPin = 6;
+const int blauPin = 7;
+const int gruenPin = 5;
 
 //TEST
 long lastMsg = 0;
@@ -170,34 +170,22 @@ void onConfig(JsonObject& j) {
 void onData(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onData");
 
-  if (j.containsKey("rot")) {
-    analogWrite();
-  }
-    
+  if (j.containsKey("blau")) {
+    String blauWert = j["blau"];
+    analogWrite(blauPin, blauWert.toInt() );
   }
   if (j.containsKey("gruen")) {
-    analogWrite();
+    String gruenWert = j["gruen"];
+    analogWrite( gruenPin, gruenWert.toInt());
     
   }
-  if (j.containsKey("blau")) {
-    analogWrite(j[blau].toInt());
-    
+  if (j.containsKey("rot")) {
+    String rotWert = j["rot"];
+    analogWrite(rotPin, rotWert.toInt());
   }
-
-      if (root["identifier"] == "name") {
-
-  
-
-
-  '{ "rot" : ' +
-    red + ', "grün" : ' +
-    green + ', "blau" : ' +
-    blue + '}'
-  
-	String test = j["b"];
-	Serial.println(test);
-
 }
+
+
 
 /*
  * Callback Methode, falls der Identifier Status im Payload gefunden wurde

@@ -30,3 +30,5 @@ done
 # Comment this out if you want the current script to
 # just return to the shell.
 wait # for the servers to exit
+
+#http://stackoverflow.com/questions/42880887/start-node-red-silent/42881129#42881129

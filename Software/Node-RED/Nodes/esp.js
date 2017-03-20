@@ -468,7 +468,7 @@ module.exports = function(RED) {
                                 if (!Buffer.isBuffer(msg.payload)) {
                                     //versuche objekt zu parsen
                                     try {
-                                        msg.payload = JSON.stringify(msg.payload);
+                                        //msg.payload = JSON.stringify(msg.payload);
                                         //msg.payload.data.push(idFlag);
                                         msg.payload.identifier = "data";
                                         this.brokerConn.publish(msg);

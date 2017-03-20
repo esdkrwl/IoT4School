@@ -1,24 +1,23 @@
 [
     {
-        "id": "666013e2.81026c",
+        "id": "48cf412e.a9783",
         "type": "http request",
         "z": "589b141e.aae20c",
         "name": "Openweathermap.org API",
         "method": "GET",
         "ret": "obj",
-        "url": "api.openweathermap.org/data/2.5/weather?zip=26123,de&APPID=1e47b187d1c8eb03e20ffc1c83a7fb3d",
+        "url": "api.openweathermap.org/data/2.5/weather?id=2857458&APPID=1e47b187d1c8eb03e20ffc1c83a7fb3d",
         "tls": "",
-        "x": 305,
-        "y": 540,
+        "x": 314,
+        "y": 600,
         "wires": [
             [
-                "faaf5b89.725ad8",
-                "ee21531b.abe32"
+                "70326356.ff98dc"
             ]
         ]
     },
     {
-        "id": "457ec4f4.1027bc",
+        "id": "3eefddf6.5c72b2",
         "type": "inject",
         "z": "589b141e.aae20c",
         "name": "",
@@ -28,57 +27,32 @@
         "repeat": "",
         "crontab": "",
         "once": false,
-        "x": 96,
-        "y": 512,
+        "x": 105,
+        "y": 572,
         "wires": [
             [
-                "666013e2.81026c"
+                "48cf412e.a9783"
             ]
         ]
     },
     {
-        "id": "19b877f9.6c6b08",
-        "type": "http in",
-        "z": "589b141e.aae20c",
-        "name": "",
-        "url": "/wetter",
-        "method": "get",
-        "swaggerDoc": "",
-        "x": 95,
-        "y": 456,
-        "wires": [
-            [
-                "666013e2.81026c"
-            ]
-        ]
-    },
-    {
-        "id": "ee21531b.abe32",
-        "type": "http response",
-        "z": "589b141e.aae20c",
-        "name": "",
-        "x": 426,
-        "y": 463,
-        "wires": []
-    },
-    {
-        "id": "faaf5b89.725ad8",
+        "id": "70326356.ff98dc",
         "type": "function",
         "z": "589b141e.aae20c",
         "name": "KtoC",
-        "func": "\nvar kelvin = msg.payload.main.temp;\nvar celcius = parseInt(kelvin) - 273.15;\n\nvar newmsg = {payload: celcius};\n\nreturn newmsg;",
+        "func": "\nvar kelvin = msg.payload.main.temp;\nvar celcius = (parseInt(kelvin) - 273.15).toFixed(2);\n\nvar newmsg = {payload: celcius};\n\nreturn newmsg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 493,
-        "y": 541,
+        "x": 502,
+        "y": 601,
         "wires": [
             [
-                "1e7a4e21.8367f2"
+                "c9782257.a1755"
             ]
         ]
     },
     {
-        "id": "1e7a4e21.8367f2",
+        "id": "c9782257.a1755",
         "type": "template",
         "z": "589b141e.aae20c",
         "name": "createTweet",
@@ -86,27 +60,27 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "IoT Masterarbeit!\nIn Oldenburg sind es {{payload}}°C!",
-        "x": 644,
-        "y": 541,
+        "template": "IoT Masterarbeit!\nIn Oldenburg sind es {{payload}}°C!\nJetzt auch mit nur 2 Nachkommastellen.",
+        "x": 653,
+        "y": 601,
         "wires": [
             [
-                "b5630b0b.bcaf88"
+                "ddf35719.2ef578"
             ]
         ]
     },
     {
-        "id": "b5630b0b.bcaf88",
+        "id": "ddf35719.2ef578",
         "type": "twitter out",
         "z": "589b141e.aae20c",
         "twitter": "",
         "name": "Tweet",
-        "x": 798,
-        "y": 541,
+        "x": 849,
+        "y": 597,
         "wires": []
     },
     {
-        "id": "b152e416.328ec8",
+        "id": "4e964294.307cfc",
         "type": "Sensor",
         "z": "589b141e.aae20c",
         "name": "c054be2d.11b4",
@@ -115,22 +89,22 @@
         "qos": "1",
         "broker": "1e52f7a8.af8038",
         "parseJson": true,
-        "x": 91,
-        "y": 573,
+        "x": 100,
+        "y": 633,
         "wires": [
             [
-                "666013e2.81026c"
+                "48cf412e.a9783"
             ]
         ]
     },
     {
-        "id": "ffe5a1a6.3a017",
+        "id": "11d3ff43.b22671",
         "type": "comment",
         "z": "589b141e.aae20c",
         "name": "Wetter API Call",
         "info": "",
-        "x": 96,
-        "y": 404,
+        "x": 105,
+        "y": 464,
         "wires": []
     },
     {

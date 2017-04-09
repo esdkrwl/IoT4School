@@ -243,6 +243,8 @@ void onStatus(JsonObject& j) {
  * Konfiguriert den Button und die Callback Methoden
  */
  void setupButton(){
+  button.setClickTicks(ticks);
+  button.setPressTicks(pressTicks);
   button.attachClick(onSingleClick);
   button.attachDoubleClick(onDoubleClick);
   button.attachLongPressStart(onLongClick);

@@ -136,6 +136,7 @@ client.on_connect = on_connect
 #client.on_message = on_message
 client.message_callback_add("esp/lastwill/mac/#", esp_last_will_callback)
 client.message_callback_add("esp/sensor/mac/#", return_name_callback)
+client.message_callback_add("esp/aktor/mac/#", return_name_callback)
 client.message_callback_add("esp/reconnect", esp_reconnect_callback)
 
 try:

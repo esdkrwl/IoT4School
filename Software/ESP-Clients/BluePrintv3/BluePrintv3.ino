@@ -23,7 +23,7 @@ bool shouldSaveConfig = false;
 
 //TEST
 
-const char* ssid = "Thunfisch";
+const char* ssid = "Thunfisch1";
 const char* pw = "qwertz123";
 
 IPAddress mqttServer(192, 168, 178, 20);
@@ -71,6 +71,7 @@ char finalPubTopicArray[200];
 char dataPayloadArray[200];
 
 long lastReconnectAttempt = 0;
+long lastPublishAttempt = 0;
 
 
 int mqttStrikes = 0;
@@ -224,7 +225,7 @@ void initWifiManager() {
 	}
 	//wifiManager.setTimeout(120);
   
-	if (!wifiManager.autoConnect("AutoConnectAP", "password")) {
+	if (!wifiManager.autoConnect("IoT2School", "IoT-PW")) {
 		Serial.println("failed to connect and hit timeout");
 		delay(3000);
 		//reset and try again, or maybe put it to deep sleep
@@ -636,11 +637,6 @@ void setup() {
 
 	printWiFiInfo();
 
-	//setupWiFi();
-
-	//connectToWiFi();
-
-
 	setupMqtt();
 	connectToBroker();
 	printBrokerInfo();
@@ -649,18 +645,28 @@ void setup() {
 
 	initOTA();
 	ArduinoOTA.begin();
+  Serial.println("[INFO] Warte auf Namen....");
+  while(!topicUpdated){
+    verifyConnection();
+    long now = millis();
+    if (now - lastPublishAttempt > 5000) {
+      Serial.println("[ERROR] Timeout.. Sende Netzwerkdaten erneut!.");
+      lastPublishAttempt = now;
+      publishNetworkSettings();
+    }
+  }
+  Serial.println("[DEBUG] Neues Topic wurde geupdated.");
+  mqttClient.unsubscribe(nameTopicArray);
+  newTopicFlag = true;
+  if(type == "Sensor"){
+    mqttClient.subscribe(finalPubTopicArray);
+  }
+  
 }
 
 void loop() {
+  
 	verifyConnection();
-
-	if (topicUpdated) {
-		Serial.println("[DEBUG] Neues Topic wurde geupdated.");
-		mqttClient.unsubscribe(nameTopicArray);
-		mqttClient.subscribe(finalPubTopicArray);
-		topicUpdated = false;
-		newTopicFlag = true;
-	}
 
 //DEBUG ZEUGS
 	long now = millis();

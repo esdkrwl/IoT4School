@@ -14,7 +14,7 @@
 #include <ESP8266WebServer.h>
 
 #define       LED0      2
-#define       ButtonPin D0
+#define       ButtonPin 10
 
 //Zeit in ms bevor Klick registriert wird
 int ticks = 600;

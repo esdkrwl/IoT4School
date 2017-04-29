@@ -13,9 +13,9 @@
 #include <ESP8266WebServer.h>
 
 #define       LED0      2
-const int rotPin = 6;
-const int blauPin = 7;
-const int gruenPin = 5;
+const int rotPin = 14;
+const int blauPin = 12;
+const int gruenPin = 13;
 
 //TEST
 long lastMsg = 0;
@@ -35,8 +35,8 @@ int mqttServerPort = 1883;
 char mqtt_server[40];
 char mqtt_port[6] = "1883";
 
-String type = "Sensor";
-String modulName = "yyyy";
+String type = "Aktor";
+String modulName = "RGB-LED";
 
 String essid = "";
 IPAddress ipAdresse;
@@ -172,16 +172,26 @@ void onData(JsonObject& j) {
 
   if (j.containsKey("blau")) {
     String blauWert = j["blau"];
-    analogWrite(blauPin, blauWert.toInt() );
+    analogWrite(blauPin, map(blauWert.toInt(), 0, 255, 0, 1023));
   }
   if (j.containsKey("gruen")) {
     String gruenWert = j["gruen"];
-    analogWrite( gruenPin, gruenWert.toInt());
+    analogWrite( gruenPin, map(gruenWert.toInt(), 0, 255, 0, 1023));
     
   }
   if (j.containsKey("rot")) {
     String rotWert = j["rot"];
-    analogWrite(rotPin, rotWert.toInt());
+    analogWrite(rotPin, map(rotWert.toInt(), 0, 255, 0, 1023) );
+  }
+
+  if(j.containsKey("an")){
+    Serial.println("AN");
+    analogWrite(rotPin, 1023);
+    Serial.println("AN2");
+  }
+
+  if(j.containsKey("aus")){
+    analogWrite(rotPin, 0);
   }
 }
 

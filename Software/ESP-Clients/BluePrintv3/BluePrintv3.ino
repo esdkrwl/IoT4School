@@ -645,6 +645,7 @@ void setup() {
 
 	initOTA();
 	ArduinoOTA.begin();
+  lastPublishAttempt = millis();
   Serial.println("[INFO] Warte auf Namen....");
   while(!topicUpdated){
     verifyConnection();

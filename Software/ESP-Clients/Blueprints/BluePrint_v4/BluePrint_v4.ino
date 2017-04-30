@@ -549,7 +549,7 @@ void initOTA() {
 	ArduinoOTA.setPort(8266);
   char newNameArray[50];
   nameString.toCharArray(newNameArray, 50);
-	// Mac Adresse des Gerätes ist der OTA Name
+	// Name des Gerätes ist der OTA Name
 	ArduinoOTA.setHostname(newNameArray);
 
 	// OTA Passwort

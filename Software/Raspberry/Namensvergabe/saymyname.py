@@ -3,9 +3,13 @@ import paho.mqtt.client as mqtt
 import logging
 import json
 import os
+import configparser
+import sys
 
 logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s - %(message)s')
 logging.debug('Starte Programm')
+
+cfg = configparser.ConfigParser()
 
 
 # cfg_path = os.path.join(os.path.dirname(__file__), '../config.ini')
@@ -13,12 +17,14 @@ logging.debug('Starte Programm')
 # logging.error('Fehler')
 # logging.warning('Warnung')
 
+# wird aufgerufen, sobald sich saymyname mit dem Broker verbunden hat
 def on_connect(client, userdata, flags, rc):
     logging.info('Verbindung zum Broker erfolgreich aufgebaut')
     logging.debug("Antwort vom Server: " + str(rc))
 
-    client.subscribe([("sensor/mac/#", 1), ("aktor/mac/#", 1), ("esp/lastwill/mac/#", 1), ("esp/reconnect", 1)])
+    client.subscribe([("Sensor/mac/#", 1), ("Aktor/mac/#", 1), ("esp/lastwill/mac/#", 1), ("esp/reconnect", 1)])
 
+# wird aufgerufen, sobald sich ein Modul nach einem Verbindungsabbruch wieder verbindet
 def esp_reconnect_callback(client, userdata, msg):
     logging.debug('Greetz aus dem reconnect callback')
     logging.info(msg.topic + " " + str(msg.payload) + " " + str(msg.qos))
@@ -30,8 +36,7 @@ def esp_reconnect_callback(client, userdata, msg):
     c.execute("UPDATE espClients SET status = (?) WHERE mac = (?)", ('Verbunden', reconnect_mac_adr,))
     conn.commit()
 
-
-
+# wird aufgerufen, sobald ein Modul unerwartet die Verbindung verloren hat
 def esp_last_will_callback(client, userdata, msg):
     logging.debug('Greetz aus dem last will callback')
     logging.info(msg.topic + " " + str(msg.payload) + " " + str(msg.qos))
@@ -45,7 +50,7 @@ def esp_last_will_callback(client, userdata, msg):
     logging.info("Status von " + last_will_mac_adr + ": Getrennt.")
     conn.commit()
 
-
+# wird aufgerufen, sobald sich ein Modul anmeldet und einen Namen haben möchte
 def return_name_callback(client, userdata, msg):
     logging.debug('Greetz aus dem return name callback')
     logging.info(msg.topic + " " + str(msg.payload) + " " + str(msg.qos))
@@ -66,6 +71,8 @@ def return_name_callback(client, userdata, msg):
         esp_status = 'Verbunden'
     except Exception as error:
         logging.error("JSON Fehler: " + str(error))
+        logging.info("Verwerfe Paket")
+        return
 
 
     #Prüfe, ob client mit der mac schon in db gelistet
@@ -94,7 +101,7 @@ def return_name_callback(client, userdata, msg):
     else:
         logging.info('Client ' + esp_name + ' anhand der Mac-Adresse wiedererkannt.')
         #Setze Status auf Verbunden
-        c.execute("UPDATE espClients SET status = (?) WHERE mac = (?)", ('Verbunden', esp_mac_adr,))
+        c.execute("UPDATE espClients SET status = (?), IP = (?) WHERE mac = (?)", ('Verbunden', esp_ip_adr,  esp_mac_adr,))
         conn.commit()
         #Suche den Namen aus der DB
         logging.debug('Mac Adresse ' + esp_mac_adr + ' gefunden.')
@@ -107,13 +114,13 @@ def return_name_callback(client, userdata, msg):
 #    c.close()
  #   conn.close()
 
-    if esp_type == 'sensor':
-        topic_str = 'nameClient/sensor/mac/' + esp_mac_adr
+    if esp_type == 'Sensor':
+        topic_str = 'nameClient/Sensor/mac/' + esp_mac_adr
         publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'"}'
         client.publish(topic_str, publish_payload, qos=1)
         logging.info('Sensor ' + esp_name + ' erhält den Namen ' + esp_new_name)
     else:
-        topic_str = 'nameClient/aktor/mac/' + esp_mac_adr
+        topic_str = 'nameClient/Aktor/mac/' + esp_mac_adr
         publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'"}'
         client.publish(topic_str, publish_payload, qos=1)
         logging.info('Aktor ' + esp_name + ' erhält den Namen ' + esp_new_name)
@@ -122,11 +129,21 @@ def return_name_callback(client, userdata, msg):
 def create_table():
     c.execute('CREATE TABLE IF NOT EXISTS espClients( status TEXT, mac TEXT, IP TEXT, type TEXT, name TEXT )')
 
+# Hilfsmethode zum Lesen der Config Datei
+def ConfigSectionMap(section):
+    dict1 = {}
+    options = cfg.options(section)
+    for option in options:
+        try:
+            dict1[option] = cfg.get(section, option)
+            if dict1[option] == -1:
+                logging.info("skip: %s" % option)
+        except:
+            logging.error("exception on %s!" % option)
+            dict1[option] = None
+    return dict1
 
-
-
-
-client = mqtt.Client(client_id='name_client123', clean_session=True)
+client = mqtt.Client(client_id='name_client123', clean_session=False)
 logging.debug('Client initialisiert')
 
 client.will_set("test/log", payload="Ich bin raus leute", qos=1, retain=False)
@@ -135,19 +152,29 @@ logging.debug('Last will gesetzt')
 client.on_connect = on_connect
 #client.on_message = on_message
 client.message_callback_add("esp/lastwill/mac/#", esp_last_will_callback)
-client.message_callback_add("sensor/mac/#", return_name_callback)
-client.message_callback_add("aktor/mac/#", return_name_callback)
+client.message_callback_add("Sensor/mac/#", return_name_callback)
+client.message_callback_add("Aktor/mac/#", return_name_callback)
 client.message_callback_add("esp/reconnect", esp_reconnect_callback)
 
+#Lese Config-Datei aus
+
 try:
-    client.connect("192.168.178.20", 1883, 60)
+    cfg.read("cfg.ini")
+except FileNotFoundError as error:
+    logging.error("Config-Datei nicht gefunden.")
+    sys.exit()
+
+brokerIP = ConfigSectionMap("Broker-Settings")['ip']
+brokerPort = ConfigSectionMap("Broker-Settings")['port']
+pathToDB = ConfigSectionMap("DB-Settings")['pathtodb']
+
+try:
+    client.connect(brokerIP, int(brokerPort), 60)
 except Exception as error:
     logging.error('Konnte keine Verbindung zum Broker aufbauen')
 
-conn = sqlite3.connect('/var/www/db/mqttClient.db')
+conn = sqlite3.connect(pathToDB)
 c = conn.cursor()
 create_table()
-
-# client.loop_start()
 
 client.loop_forever()

@@ -17,7 +17,7 @@ def on_connect(client, userdata, flags, rc):
     logging.info('Verbindung zum Broker erfolgreich aufgebaut')
     logging.debug("Antwort vom Server: " + str(rc))
 
-    client.subscribe([("esp/sensor/mac/#", 1), ("esp/aktor/mac/#", 1), ("esp/lastwill/mac/#", 1), ("esp/reconnect", 1)])
+    client.subscribe([("sensor/mac/#", 1), ("aktor/mac/#", 1), ("esp/lastwill/mac/#", 1), ("esp/reconnect", 1)])
 
 def esp_reconnect_callback(client, userdata, msg):
     logging.debug('Greetz aus dem reconnect callback')
@@ -107,14 +107,14 @@ def return_name_callback(client, userdata, msg):
 #    c.close()
  #   conn.close()
 
-    if esp_type == 'Sensor':
+    if esp_type == 'sensor':
         topic_str = 'nameClient/sensor/mac/' + esp_mac_adr
-        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'}'
+        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'"}'
         client.publish(topic_str, publish_payload, qos=1)
         logging.info('Sensor ' + esp_name + ' erhält den Namen ' + esp_new_name)
     else:
         topic_str = 'nameClient/aktor/mac/' + esp_mac_adr
-        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'}'
+        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'"}'
         client.publish(topic_str, publish_payload, qos=1)
         logging.info('Aktor ' + esp_name + ' erhält den Namen ' + esp_new_name)
 
@@ -135,8 +135,8 @@ logging.debug('Last will gesetzt')
 client.on_connect = on_connect
 #client.on_message = on_message
 client.message_callback_add("esp/lastwill/mac/#", esp_last_will_callback)
-client.message_callback_add("esp/sensor/mac/#", return_name_callback)
-client.message_callback_add("esp/aktor/mac/#", return_name_callback)
+client.message_callback_add("sensor/mac/#", return_name_callback)
+client.message_callback_add("aktor/mac/#", return_name_callback)
 client.message_callback_add("esp/reconnect", esp_reconnect_callback)
 
 try:

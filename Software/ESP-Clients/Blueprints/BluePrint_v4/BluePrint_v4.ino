@@ -1,5 +1,4 @@
 #include <FS.h>
-
 #include <ArduinoJson.h> //https://github.com/bblanchon/ArduinoJson
 #include <WiFiManager.h> //https://github.com/tzapu/WiFiManager
 #include <ESP8266WiFi.h> //https://github.com/esp8266/Arduino
@@ -8,75 +7,68 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include <Arduino.h>
-
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 
+//Board-LED
 #define       LED0      2
 
-//TEST
+// Typ des Moduls - Sensor oder Aktor
+String type = "Sensor";
+// Name des Moduls - z.B. RGB-LED, Smart-Button etc..
+String modulName = "yyyy";
+
+// ------ HIER RELEVANTER MODUL PARAMETER SAMMELN ------
+
+// -----------------------------------------------------
+
+
+// Char Arrays um MQTT-Daten aus dem EEPROM zwischen zu speichern
+char mqtt_server[40];
+char mqtt_port[6];
+
+// Netzwerkzeugs
+IPAddress ipAdresse;
+String macAdresse = String(WiFi.macAddress());
+char macCharArray[18];
+
+//wird nur noch benötigt, um MQTT Client zu initialisieren
+WiFiClient wifiClient;
+PubSubClient mqttClient(wifiClient);
+
+// Topic: esp/lastwill/mac/MAC_ADR
+char lastWillTopicArray[200];
+// enthält die Meldung, dass der Client die Verbindung zum Broker verloren hat
+char lastWillPayloadArray[200];
+
+//Topic um dem Python Skript zu sagen, dass der Client wieder verbunden ist nach kurzem Verbindungsverlust
+const char* pythonTopic = "esp/reconnect";
+//Topic esp/TYPE/mac/MAC_ADR
+char nameTopicArray[200];
+// wird vom Python Skript benötigt: enthält Infos über IP, Mac und Gerätenamen
+char clientStatusArray[200];
+
+// über diese Topics kommuniziert das Modul mit Node-Red. Das Suffix wurde vom Python-Skript zugeteilt
+// pub/TYPE/NAME+SUFFIX
+char finalPubTopicArray[200];
+// sub/TYPE/NAME+SUFFIX
+char finalSubTopicArray[200];
+
+// millis Timestamp um festzustellen, ob 5 Sekunden seit dem letzten Reconnect zum Broker vergangen sind.
+long lastReconnectAttempt = 0;
+// millis Timestamp um festzustellen, ob 5 Sekunden seit dem letzten Versuch einen Namen zu erhalten vergangen sind.
+long lastPublishAttempt = 0;
+// Zähler um misslungene Versuche sich mit dem Broker zu verbinden zu zählen
+int mqttStrikes = 0;
+// Flag um festzustellen, ob das Modul bereits den neuen Namen vom Python Skript erhalten hat
+bool topicUpdated = false;
+
+// TESTZEUGS 
 long lastMsg = 0;
 char msg[50];
 int value = 0;
 boolean setReset = false;
 bool shouldSaveConfig = false;
-
-//TEST
-
-const char* ssid = "Thunfisch1";
-const char* pw = "qwertz123";
-
-IPAddress mqttServer(192, 168, 178, 20);
-int mqttServerPort = 1883;
-
-char mqtt_server[40];
-char mqtt_port[6] = "1883";
-
-String type = "Sensor";
-String modulName = "yyyy";
-
-String essid = "";
-IPAddress ipAdresse;
-
-String macAdresse = String(WiFi.macAddress());
-char macCharArray[18];
-
-long signalQuali = 0;
-int espStatus = 0;
-
-bool topicUpdated = false;
-bool newTopicFlag = false;
-
-String lastWillTopic = "esp/lastwill/mac/" + macAdresse;
-char lastWillTopicArray[200];
-
-String lastWillPayload = "";
-char lastWillPayloadArray[200];
-
-WiFiClient wifiClient;
-PubSubClient mqttClient(wifiClient);
-
-const char* pythonTopic = "esp/reconnect";
-
-String nameClientTopic = "nameClient/" + type + "/mac/" + macAdresse;
-char nameTopicArray[200];
-
-char clientStatusArray[200];
-
-String prePubTopic = "esp/sensor/mac/" + macAdresse;
-char prePubTopicArray[200];
-
-char finalPubTopicArray[200];
-
-char dataPayloadArray[200];
-
-long lastReconnectAttempt = 0;
-long lastPublishAttempt = 0;
-
-
-int mqttStrikes = 0;
-
-
 
 /*
  * MQTT Callback Methode
@@ -90,7 +82,7 @@ int mqttStrikes = 0;
  */
 void callback(char* topic, byte* payload, unsigned int length) {
 	char jsonPayload[200];
-	Serial.print("[Info] Daten erhalten. Topic: ");
+	Serial.print("[INFO] Daten erhalten. Topic: ");
 	Serial.print(topic);
 	Serial.print(", Payload: ");
 	for (unsigned int i = 0; i < length; i++) {
@@ -147,11 +139,23 @@ void callback(char* topic, byte* payload, unsigned int length) {
  * Callback Methode, falls der Identifier Name im Payload gefunden wurde
  */
 void onName(JsonObject& j) {
-	Serial.println("[DEBUG] Greetz aus onName");
-	String finalPubTopic = j["topic"];
-	finalPubTopic.toCharArray(finalPubTopicArray, 200);
-	Serial.println("[Debug] Final Topic: " + String(finalPubTopicArray));
-	topicUpdated = true;
+
+  Serial.println("[DEBUG] Greetz aus onName");
+  
+  if(j.containsKey( "new_name" )){
+    String newName = j["new_name"];
+    String finalSubTopic = "sub/"+ type +"/"+newName;
+    String finalPubTopic = "pub/"+ type +"/"+newName;
+    
+    finalPubTopic.toCharArray(finalPubTopicArray, 200);
+    finalSubTopic.toCharArray(finalSubTopicArray, 200);
+    Serial.println("[DEBUG] Final Sub Topic: " + String(finalSubTopicArray));
+    Serial.println("[DEBUG] Final Pub Topic: " + String(finalPubTopicArray));
+  }
+  
+
+  topicUpdated = true;
+
 }
 
 /*
@@ -179,17 +183,6 @@ void onStatus(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onStatus");
 
 }
-
-/*
- * Setzt ESP Modul in den Station Mode
- * und setzt Logindaten des Netzwerkes
- */
-void setupWiFi() {
-	WiFi.mode(WIFI_STA);
-	WiFi.begin(ssid, pw);
-}
-
-
 
 /*
  * Speicher Callback zum Übernehmen der Webparameter vom WiFi Manager zu übernehmen
@@ -223,7 +216,7 @@ void initWifiManager() {
 	if(setReset){
 	  wifiManager.resetSettings();
 	}
-	//wifiManager.setTimeout(120);
+	wifiManager.setTimeout(180);
   
 	if (!wifiManager.autoConnect("IoT2School", "IoT-PW")) {
 		Serial.println("failed to connect and hit timeout");
@@ -240,7 +233,7 @@ void initWifiManager() {
 
 }
 /*
- * Metohde zum LEsen der Konfigparameter
+ * Metohde zum Lssen der Konfigparameter
  */
 void readConfigFromFS() {
   if (SPIFFS.begin()) {
@@ -250,7 +243,6 @@ void readConfigFromFS() {
       Serial.println("[INFO] Lade Config Datei...");
       File configFile = SPIFFS.open("/config.json", "r");
       if (configFile) {
-        Serial.println("[INFO] Lade Config Datei...");
         size_t size = configFile.size();
         // Allocate a buffer to store contents of the file.
         std::unique_ptr<char[]> buf(new char[size]);
@@ -324,9 +316,9 @@ bool connectToWiFi() {
  * einige Informationen über das Netzwerk aus
  */
 void printWiFiInfo() {
-	essid = String(WiFi.SSID());
+	String essid = String(WiFi.SSID());
 	ipAdresse = WiFi.localIP();
-	signalQuali = WiFi.RSSI();
+	long signalQuali = WiFi.RSSI();
 
   Serial.println();
 	Serial.println("[INFO] Verbindung aufgebaut zu " + essid);
@@ -347,13 +339,12 @@ void setupMqtt() {
   //mqttClient.setServer(mqttServer, mqttServerPort);
 	mqttClient.setServer(mqtt_server, atoi(mqtt_port));
 	mqttClient.setCallback(callback);
-
+  String nameClientTopic = "nameClient/" + type + "/mac/" + macAdresse;
 	nameClientTopic.toCharArray(nameTopicArray, nameClientTopic.length() + 1);
-
+  String lastWillTopic = "esp/lastwill/mac/" + macAdresse;
 	lastWillTopic.toCharArray(lastWillTopicArray, lastWillTopic.length() + 1);
 
-	createLastWillJson();
-	lastWillPayload.toCharArray(lastWillPayloadArray, 200);
+	createLastWillJson().toCharArray(lastWillPayloadArray, 200);
 
 	macAdresse.toCharArray(macCharArray, 18);
 }
@@ -368,12 +359,13 @@ void connectToBroker() {
 		Serial.print(".");
 		if (mqttClient.connect(macCharArray, lastWillTopicArray, 1, false,
 				lastWillPayloadArray)) {
-
+       Serial.println("blalbla");
+      Serial.println(nameTopicArray);
 			mqttClient.subscribe(nameTopicArray);
       mqttStrikes = 0;
 
 		} else {
-			Serial.print("[ERROR] Verbindung zum fehlgeschlagen. Fehlercode: ");
+			Serial.print("[ERROR] Verbindung zum Broker fehlgeschlagen. Fehlercode: ");
 			Serial.println(mqttClient.state());
 			delay(5000);
       mqttStrikes++;
@@ -405,7 +397,7 @@ void connectToBroker() {
 
     
     
-    //wifiManager.setTimeout(120);
+    wifiManager.setTimeout(180);
     if (!wifiManager.startConfigPortal("MQTT-AP", "password")) {
       Serial.println("failed to connect and hit timeout");
       delay(3000);
@@ -446,9 +438,9 @@ bool reconnectToBroker() {
 		 * alte Topics wieder subscriben
 		 * falls man schon das neue Topic hat, muss man das alte nicht erneut subscriben
 		 */
-		if (newTopicFlag) {
-			// esp/xxxx/yyyy
-			mqttClient.subscribe(finalPubTopicArray);
+		if (topicUpdated) {
+			// esp/TYPE/NAME
+			mqttClient.subscribe(finalSubTopicArray);
 			//Python Bescheid sagen, dass man wieder da ist, damit die DB wieder aktualisiert werden kann
 			createClientStatusJson().toCharArray(clientStatusArray, 200);
 			if (mqttClient.publish(pythonTopic, clientStatusArray)) {
@@ -474,10 +466,10 @@ void printBrokerInfo() {
 	Serial.println();
 	Serial.println("[INFO] Verbindung zum MQTT Broker aufgebaut.");
 	Serial.print("[INFO] MQTT Broker IP-Adresse ");
-	Serial.println(mqttServer);
+	Serial.println(mqtt_server);
 
 	Serial.print("[INFO] MQTT Broker Port ");
-	Serial.println(mqttServerPort);
+	Serial.println(mqtt_port);
   Serial.println();
 }
 
@@ -487,19 +479,21 @@ void printBrokerInfo() {
  * Mac IP Typ und Name des Moduls
  */
 void publishNetworkSettings() {
-
+  // über dieses Topic kommuziert das Modul mit dem Python Skript
+  String prePubTopic = type + "/mac/" + macAdresse;
+  char prePubTopicArray[200];
 	prePubTopic.toCharArray(prePubTopicArray, 200);
 
-	Serial.println("[DEBUG] Topic String: " + prePubTopic);
-	Serial.println("[DEBUG] Topic Array: " + String(prePubTopicArray));
+	//Serial.println("[DEBUG] Topic String: " + prePubTopic);
+	//Serial.println("[DEBUG] Topic Array: " + String(prePubTopicArray));
 
 	createClientStatusJson().toCharArray(clientStatusArray, 200);
 
 	if (mqttClient.publish(prePubTopicArray, clientStatusArray)) {
-		Serial.println("[Info] Status - Payload erfolgreich versendet.");
+		Serial.println("[INFO] Status - Payload erfolgreich versendet.");
 	} else {
 		Serial.println(
-				"[Error] Status - Payload konnte nicht versendet werden.");
+				"[ERROR] Status - Payload konnte nicht versendet werden.");
 	}
 }
 
@@ -507,7 +501,8 @@ void publishNetworkSettings() {
  * String im JSON Format
  * wird versendet, wenn der Client die Verbindung zum Broker verliert.
  */
-void createLastWillJson() {
+String createLastWillJson() {
+  String lastWillPayload;
 	lastWillPayload += "{";
 
 	lastWillPayload += "\"Mac\": ";
@@ -515,6 +510,8 @@ void createLastWillJson() {
 
 	lastWillPayload += "\"Message\": ";
 	lastWillPayload += "\"Verbindung verloren.\"}";
+
+ return lastWillPayload;
 }
 
 /*
@@ -531,12 +528,13 @@ String createClientStatusJson() {
 	statusPayload += "\"" + ipAdresse.toString() + "\", ";
 
 	statusPayload += "\"Typ\": ";
-	statusPayload += "\"" + type + "\", ";
-
+  statusPayload += "\"" + type + "\", ";
+ 
 	statusPayload += "\"Name\": ";
 	statusPayload += "\"" + modulName + "\"}";
 
-	Serial.println("[Debug] Status-Payload als JSON: " + statusPayload);
+	Serial.println("[DEBUG] Status-Payload als JSON: " + statusPayload);
+  Serial.println();
 
 	return statusPayload;
 }
@@ -545,13 +543,13 @@ String createClientStatusJson() {
  * Konfiguration der OTA Schnittstelle
  */
 void initOTA() {
-	// Port defaults to 8266
+	// Standard Port
 	ArduinoOTA.setPort(8266);
 
-	// Hostname defaults to esp8266-[ChipID]
-	ArduinoOTA.setHostname("Blueprint");
+	// Mac Adresse des Gerätes ist der OTA Name
+	ArduinoOTA.setHostname(macCharArray);
 
-	// No authentication by default
+	// OTA Passwort
 	ArduinoOTA.setPassword((const char *) "123");
 
 	ArduinoOTA.onStart([]() {
@@ -565,11 +563,11 @@ void initOTA() {
 	});
 	ArduinoOTA.onError([](ota_error_t error) {
 		Serial.printf("Error[%u]: ", error);
-		if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-		else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-		else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-		else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-		else if (error == OTA_END_ERROR) Serial.println("End Failed");
+		if (error == OTA_AUTH_ERROR) Serial.println("[ERROR] Auth Failed");
+		else if (error == OTA_BEGIN_ERROR) Serial.println("[ERROR] Begin Failed");
+		else if (error == OTA_CONNECT_ERROR) Serial.println("[ERROR] Connect Failed");
+		else if (error == OTA_RECEIVE_ERROR) Serial.println("[ERROR] Receive Failed");
+		else if (error == OTA_END_ERROR) Serial.println("[ERROR] End Failed");
 	});
 }
 
@@ -650,18 +648,16 @@ void setup() {
   while(!topicUpdated){
     verifyConnection();
     long now = millis();
-    if (now - lastPublishAttempt > 5000) {
+    if (now - lastPublishAttempt > 10000) {
       Serial.println("[ERROR] Timeout.. Sende Netzwerkdaten erneut!.");
+      Serial.println();
       lastPublishAttempt = now;
       publishNetworkSettings();
     }
   }
   Serial.println("[DEBUG] Neues Topic wurde geupdated.");
   mqttClient.unsubscribe(nameTopicArray);
-  newTopicFlag = true;
-  if(type == "Sensor"){
-    mqttClient.subscribe(finalPubTopicArray);
-  }
+  mqttClient.subscribe(finalSubTopicArray);
   
 }
 

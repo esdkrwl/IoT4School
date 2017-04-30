@@ -69,6 +69,7 @@ char msg[50];
 int value = 0;
 boolean setReset = false;
 bool shouldSaveConfig = false;
+String nameString;
 
 /*
  * MQTT Callback Methode
@@ -144,6 +145,7 @@ void onName(JsonObject& j) {
   
   if(j.containsKey( "new_name" )){
     String newName = j["new_name"];
+    nameString = newName;
     String finalSubTopic = "sub/"+ type +"/"+newName;
     String finalPubTopic = "pub/"+ type +"/"+newName;
     
@@ -545,9 +547,10 @@ String createClientStatusJson() {
 void initOTA() {
 	// Standard Port
 	ArduinoOTA.setPort(8266);
-
+  char newNameArray[50];
+  nameString.toCharArray(newNameArray, 50);
 	// Mac Adresse des Gerätes ist der OTA Name
-	ArduinoOTA.setHostname(macCharArray);
+	ArduinoOTA.setHostname(newNameArray);
 
 	// OTA Passwort
 	ArduinoOTA.setPassword((const char *) "123");
@@ -557,6 +560,7 @@ void initOTA() {
 	});
 	ArduinoOTA.onEnd([]() {
 		Serial.println("\nEnd");
+    ESP.restart();
 	});
 	ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
 		Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
@@ -587,8 +591,6 @@ void verifyConnection() {
 	// kann geprüft werden, ob wir mit dem Broker verbunden sind.
 	// Falls nicht führe auch hier alle 5 Sekunden einen Reconnect durch
 	else {
-
-		ArduinoOTA.handle();
 
 		if (mqttClient.connected()) {
 			mqttClient.loop();
@@ -641,8 +643,7 @@ void setup() {
 
 	publishNetworkSettings();
 
-	initOTA();
-	ArduinoOTA.begin();
+
   lastPublishAttempt = millis();
   Serial.println("[INFO] Warte auf Namen....");
   while(!topicUpdated){
@@ -658,11 +659,14 @@ void setup() {
   Serial.println("[DEBUG] Neues Topic wurde geupdated.");
   mqttClient.unsubscribe(nameTopicArray);
   mqttClient.subscribe(finalSubTopicArray);
+
+  initOTA();
+  ArduinoOTA.begin();
   
 }
 
 void loop() {
-  
+  ArduinoOTA.handle();
 	verifyConnection();
 
 //DEBUG ZEUGS

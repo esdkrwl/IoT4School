@@ -634,7 +634,7 @@ void verifyConnection() {
 	// Falls nicht führe auch hier alle 5 Sekunden einen Reconnect durch
 	else {
 
-		ArduinoOTA.handle();
+		
 
 		if (mqttClient.connected()) {
 			mqttClient.loop();
@@ -708,7 +708,7 @@ void setup() {
 }
 
 void loop() {
-  
+  ArduinoOTA.handle();
 	verifyConnection();
 
 

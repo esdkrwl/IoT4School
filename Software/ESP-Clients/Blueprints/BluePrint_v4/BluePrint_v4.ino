@@ -14,9 +14,9 @@
 #define       LED0      2
 
 // Typ des Moduls - Sensor oder Aktor
-String type = "Sensor";
+String type = "Aktor";
 // Name des Moduls - z.B. RGB-LED, Smart-Button etc..
-String modulName = "yyyy";
+String modulName = "Steckdose";
 
 // ------ HIER RELEVANTER MODUL PARAMETER SAMMELN ------
 

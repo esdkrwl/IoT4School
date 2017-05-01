@@ -11,27 +11,19 @@
 #include <ESP8266WebServer.h>
 
 //Board-LED
-#define       LED0      2
-
-#define gruenPin       14
-#define rotPin         12
-#define blauPin        13
+#define       LED      13
+#define       OUT      12
+#define       BUTTON   0
 
 // Typ des Moduls - Sensor oder Aktor
 String type = "Aktor";
 // Name des Moduls - z.B. RGB-LED, Smart-Button etc..
-String modulName = "RGB-LED";
+String modulName = "Steckdose";
 
 // ------ HIER RELEVANTER MODUL PARAMETER SAMMELN ------
-enum modus { AN, AUS, PULSE, PARTY };
+enum modus { AN, AUS};
+int steckdosenmodus = AUS;
 
-int mode_led = AUS;
-int prevRedValue = 0;
-int redValue = 0;
-int prevGreenValue = 0;
-int greenValue = 0;
-int prevBlueValue = 0;
-int blueValue = 0;
 // -----------------------------------------------------
 
 
@@ -75,14 +67,13 @@ int mqttStrikes = 0;
 // Flag um festzustellen, ob das Modul bereits den neuen Namen vom Python Skript erhalten hat
 bool topicUpdated = false;
 
-String nameString;
-
 // TESTZEUGS 
 long lastMsg = 0;
 char msg[50];
 int value = 0;
 boolean setReset = false;
 bool shouldSaveConfig = false;
+String nameString;
 
 /*
  * MQTT Callback Methode
@@ -186,41 +177,32 @@ void onConfig(JsonObject& j) {
  */
 void onData(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onData");
-
-
-  if (j.containsKey("blau")) {
-    String blauWert = j["blau"];
-    prevBlueValue = blueValue;
-    blueValue = blauWert.toInt();
-    analogWrite( blauPin , map(blueValue, 0, 255, 0, 1023));
-  }
-  if (j.containsKey("gruen")) {
-    String gruenWert = j["gruen"];
-    prevGreenValue = greenValue;
-    greenValue = gruenWert.toInt();
-    analogWrite( gruenPin, map(greenValue, 0, 255, 0, 1023));
-  }
-  if (j.containsKey("rot")) {
-    String rotWert = j["rot"];
-    prevRedValue = redValue;
-    redValue = rotWert.toInt();
-    analogWrite( rotPin , map(redValue, 0, 255, 0, 1023) );
-  }
-
-  if(j.containsKey("an")){
-    Serial.println("AN");
-    analogWrite(rotPin, map(redValue, 0, 255, 0, 1023));
-    analogWrite(gruenPin, map(greenValue, 0, 255, 0, 1023));
-    analogWrite(blauPin, map(blueValue, 0, 255, 0, 1023));
-    mode_led = AN;
+  if(j.containsKey( "modus" )){
+    if(j["modus"] == "an"){
+      digitalWrite(OUT, HIGH);
+      digitalWrite(LED, !HIGH);
+      steckdosenmodus = AN;
+    }
+    if(j["modus"] == "aus"){
+      digitalWrite(OUT, LOW);
+      digitalWrite(LED, !LOW);
+      steckdosenmodus = AUS;
+      
+    }
+    if(j["modus"] == "toggle"){
+      if(steckdosenmodus == AUS){
+        digitalWrite(OUT, HIGH);
+        digitalWrite(LED, !HIGH);
+        steckdosenmodus = AN;        
+      } else {
+        digitalWrite(OUT, LOW);
+        digitalWrite(LED, !LOW);
+        steckdosenmodus = AUS;   
+      }
+      
+    }
   }
 
-  if(j.containsKey("aus")){
-    analogWrite(rotPin, 0);
-    analogWrite(gruenPin, 0);
-    analogWrite(blauPin, 0);
-    mode_led = AUS;
-  }
 }
 
 /*
@@ -228,6 +210,22 @@ void onData(JsonObject& j) {
  */
 void onStatus(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onStatus");
+  String payload;
+  if(steckdosenmodus == AN){
+    payload = "{\"identifier\":\"status\",\"modus\":\"an\"}";
+  } else {
+    payload = "{\"identifier\":\"status\",\"modus\":\"aus\"}";
+  }
+ 
+  char payloadArray[200];
+  payload.toCharArray(payloadArray, 200);
+
+  if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
+    Serial.println("[INFO] Status Payload erfolgreich versendet.");
+  } else {
+    Serial.println("[ERROR] Status Payload nicht versendet.");
+  }
+  Serial.println();
 
 }
 
@@ -273,7 +271,7 @@ void initWifiManager() {
 		delay(5000);
 	}
   //Verbunden
- digitalWrite(LED0, !HIGH);
+ digitalWrite(LED, !LOW);
  
 	strcpy(mqtt_server, custom_mqtt_server.getValue());
 	strcpy(mqtt_port, custom_mqtt_port.getValue());
@@ -345,16 +343,16 @@ bool connectToWiFi() {
 	while (WiFi.status() != WL_CONNECTED) {
 
 		for (int i = 0; i < 10; i++) {
-			digitalWrite(LED0, HIGH);
+			digitalWrite(LED, HIGH);
 			delay(250);
-			digitalWrite(LED0, LOW);
+			digitalWrite(LED, LOW);
 			delay(250);
 			Serial.print(".");
 		}
 
 	}
 	Serial.println();
-	digitalWrite(LED0, !HIGH);
+	digitalWrite(LED, !LOW);
 	return true;
 }
 
@@ -386,10 +384,8 @@ void setupMqtt() {
   //mqttClient.setServer(mqttServer, mqttServerPort);
 	mqttClient.setServer(mqtt_server, atoi(mqtt_port));
 	mqttClient.setCallback(callback);
- 
   String nameClientTopic = "nameClient/" + type + "/mac/" + macAdresse;
 	nameClientTopic.toCharArray(nameTopicArray, nameClientTopic.length() + 1);
-  
   String lastWillTopic = "esp/lastwill/mac/" + macAdresse;
 	lastWillTopic.toCharArray(lastWillTopicArray, lastWillTopic.length() + 1);
 
@@ -594,11 +590,10 @@ String createClientStatusJson() {
 void initOTA() {
 	// Standard Port
 	ArduinoOTA.setPort(8266);
-
   char newNameArray[50];
   nameString.toCharArray(newNameArray, 50);
-  // Name des Gerätes ist der OTA Name
-  ArduinoOTA.setHostname(newNameArray);
+	// Name des Gerätes ist der OTA Name
+	ArduinoOTA.setHostname(newNameArray);
 
 	// OTA Passwort
 	ArduinoOTA.setPassword((const char *) "123");
@@ -676,11 +671,10 @@ void setup() {
 
 	Serial.begin(115200);
 	Serial.println();
-	pinMode(LED0, OUTPUT);
-  pinMode(gruenPin, OUTPUT);
-  pinMode(rotPin, OUTPUT);
-  pinMode(blauPin, OUTPUT);
-	digitalWrite(LED0, !LOW);
+	pinMode(LED, OUTPUT);
+  pinMode(OUT, OUTPUT);
+  digitalWrite(OUT, LOW);
+  pinMode(BUTTON, INPUT);
 
 	readConfigFromFS();
 	initWifiManager();
@@ -719,6 +713,5 @@ void setup() {
 void loop() {
   
 	verifyConnection();
-
 
 }

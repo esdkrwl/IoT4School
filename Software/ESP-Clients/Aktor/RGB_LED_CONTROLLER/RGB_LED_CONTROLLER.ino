@@ -34,8 +34,8 @@ int prevBlueValue = 0;
 int blueValue = 0;
 
 float hue = 0;
-int saturation = 0; 
-int lightness = 0;
+float saturation = 0; 
+float lightness = 0;
 // -----------------------------------------------------
 
 
@@ -274,6 +274,57 @@ void saturationCalculation(float delta){
     saturation = delta / (1- abs(2*lightness - 1));
   }
 }
+
+float mod(float a, int b){
+  int i = 0;
+  while(a > i*b){
+    i++;
+  }
+  float aModB = a - (i-1)*b;
+  return aModB;
+}
+
+void HSL2RGB(){
+  float c = (1-abs(2*lightness-1)*saturation);
+  float hv = mod(hue/60,2)-1;
+  float x = c*(1-abs(hv));
+  float m = lightness - c/2;
+
+  float r=0;
+  float g=0;
+  float b=0;
+
+  if(0<=hue and hue<60){
+    r = c;
+    g = x;
+    b = 0;
+  } else if(60<=hue and hue<120){
+    r = x;
+    g = c;
+    b = 0;
+  } else if(120<=hue and hue<180){
+    r = 0;
+    g = c;
+    b = x;
+  } else if(180<=hue and hue<240){
+    r = 0;
+    g = x;
+    b = c;  
+  } else if(240<=hue and hue<300){
+    r = x;
+    g = 0;
+    b = c;   
+  } else {
+    r = c;
+    g = 0;
+    b = x;  
+  }
+  
+  redValue = (int)((r+m)*255);
+  greenValue = (int)((g+m)*255);
+  blueValue = (int)((b+m)*255);
+}
+
 
 
 /*

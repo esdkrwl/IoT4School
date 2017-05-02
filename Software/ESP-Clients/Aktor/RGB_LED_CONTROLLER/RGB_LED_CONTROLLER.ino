@@ -191,7 +191,7 @@ void onConfig(JsonObject& j) {
 void onData(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onData");
   // Togglen der Lampe
-  if(j.containsKey("toogle")){
+  if(j.containsKey("toggle")){
     if(mode_led == ON){
       analogWrite(rotPin, 0);
       analogWrite(gruenPin, 0);
@@ -205,34 +205,47 @@ void onData(JsonObject& j) {
     }  
   }
   if(j.containsKey("set_pwr")){
-    if(j["set_pwr"] == "ON" and mode_led == OFF){
+    if(j["set_pwr"] == "on" and mode_led == OFF){
       analogWrite( rotPin , map(redValue, 0, 255, 0, 1023) );
       analogWrite(gruenPin, map(greenValue, 0, 255, 0, 1023));
       analogWrite( blauPin , map(blueValue, 0, 255, 0, 1023));
       mode_led = ON;
     }
-    if(j["set_pwr"] == "OFF" and mode_led == ON){
+    if(j["set_pwr"] == "off" and mode_led == ON){
       analogWrite(rotPin, 0);
       analogWrite(gruenPin, 0);
       analogWrite(blauPin, 0);
       mode_led = OFF;
     }
   }
+  if(j.containsKey("set_brightness")){
+    if(mode_led == ON){
+      String helligkeit = j["set_brightness"];
+      int h = helligkeit.toInt();
+      RGB2HSL();
+      lightness = h/100.0;
+      HSL2RGB();
+      analogWrite( rotPin , map(redValue, 0, 255, 0, 1023));
+      analogWrite( gruenPin, map(greenValue, 0, 255, 0, 1023));
+      analogWrite( blauPin , map(blueValue, 0, 255, 0, 1023));
+      
+    }
+  }
 
 
-  if (j.containsKey("blau")) {
+  if (j.containsKey("blau") and mode_led == ON) {
     String blauWert = j["blau"];
     prevBlueValue = blueValue;
     blueValue = blauWert.toInt();
     analogWrite( blauPin , map(blueValue, 0, 255, 0, 1023));
   }
-  if (j.containsKey("gruen")) {
+  if (j.containsKey("gruen") and mode_led == ON) {
     String gruenWert = j["gruen"];
     prevGreenValue = greenValue;
     greenValue = gruenWert.toInt();
     analogWrite( gruenPin, map(greenValue, 0, 255, 0, 1023));
   }
-  if (j.containsKey("rot")) {
+  if (j.containsKey("rot") and mode_led == ON) {
     String rotWert = j["rot"];
     prevRedValue = redValue;
     redValue = rotWert.toInt();
@@ -249,10 +262,10 @@ void onStatus(JsonObject& j) {
 
 }
 
-void RGG2HSL(){
-  float r = (float)redValue/255;
-  float g = (float)greenValue/255;
-  float b = (float)blueValue/255;
+void RGB2HSL(){
+  float r = (float)redValue/255.0;
+  float g = (float)greenValue/255.0;
+  float b = (float)blueValue/255.0;
   
   float c_max = max(max(r,g),b);
   float c_min = min(min(r,g),b);
@@ -260,7 +273,7 @@ void RGG2HSL(){
   float delta = c_max - c_min;
   
   hueCalculation(r,g,b,c_max,delta);
-  lightness = (c_min+c_max)/2;
+  lightness = (c_max+c_min)/2.0;
   saturationCalculation(delta);
   
 }
@@ -284,7 +297,7 @@ void saturationCalculation(float delta){
   if(delta == 0){
     saturation = 0;
   } else {
-    saturation = delta / (1- abs(2*lightness - 1));
+    saturation = delta / (1- abs((2*lightness) - 1));
   }
 }
 
@@ -299,11 +312,11 @@ float mod(float a, int b){
 
 void HSL2RGB(){
   float c = (1-abs(2*lightness-1))*saturation;
-  //Serial.println("C: " + String(c));
-  float x = c*(1-abs( mod(hue/60,2)-1 ));
-  //Serial.println("x: " + String(x));
-  float m = lightness - (c/2);
-  //Serial.println("m: " + String(m));
+  Serial.println("C: " + String(c));
+  float x = c*(1-abs( mod(hue/60.0,2)-1 ));
+  Serial.println("x: " + String(x));
+  float m = lightness - (c/2.0);
+  Serial.println("m: " + String(m));
 
   float r=0;
   float g=0;

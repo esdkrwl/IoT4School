@@ -32,6 +32,10 @@ int prevGreenValue = 0;
 int greenValue = 0;
 int prevBlueValue = 0;
 int blueValue = 0;
+
+float hue = 0;
+int saturation = 0; 
+int lightness = 0;
 // -----------------------------------------------------
 
 
@@ -153,24 +157,24 @@ void callback(char* topic, byte* payload, unsigned int length) {
  * Callback Methode, falls der Identifier Name im Payload gefunden wurde
  */
 void onName(JsonObject& j) {
-
   Serial.println("[DEBUG] Greetz aus onName");
   
   if(j.containsKey( "new_name" )){
     String newName = j["new_name"];
     nameString = newName;
-    String finalSubTopic = "sub/"+ type +"/"+newName;
-    String finalPubTopic = "pub/"+ type +"/"+newName;
+  }
+  if(j.containsKey("suffix")){
+    String suffix = j["suffix"];
+    
+    String finalSubTopic = "sub/"+ type +"/"+modulName+"/"+suffix;
+    String finalPubTopic = "pub/"+ type +"/"+modulName+"/"+suffix;
     
     finalPubTopic.toCharArray(finalPubTopicArray, 200);
     finalSubTopic.toCharArray(finalSubTopicArray, 200);
     Serial.println("[DEBUG] Final Sub Topic: " + String(finalSubTopicArray));
     Serial.println("[DEBUG] Final Pub Topic: " + String(finalPubTopicArray));
   }
-  
-
   topicUpdated = true;
-
 }
 
 /*
@@ -206,6 +210,7 @@ void onData(JsonObject& j) {
     redValue = rotWert.toInt();
     analogWrite( rotPin , map(redValue, 0, 255, 0, 1023) );
   }
+  
 
   if(j.containsKey("an")){
     Serial.println("AN");
@@ -230,6 +235,46 @@ void onStatus(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onStatus");
 
 }
+
+void RGG2HSL(){
+  float r = (float)redValue/255;
+  float g = (float)greenValue/255;
+  float b = (float)blueValue/255;
+  
+  float c_max = max(max(r,g),b);
+  float c_min = min(min(r,g),b);
+  
+  float delta = c_max - c_min;
+  
+  hueCalculation(r,g,b,c_max,delta);
+  lightness = (c_min+c_max)/2;
+  saturationCalculation(delta);
+  
+}
+
+void hueCalculation(float r, float g, float b, float c_max, float delta){
+  if(delta == 0){
+    hue = 0;
+  } else if(c_max == r){
+    hue = 60 * (( (g-b)/delta ) + 0);
+  } else if(c_max == g){
+    hue = 60 * (( (b-r)/delta ) + 2);
+  } else {
+    hue = 60 * (( (r-g)/delta ) + 4);
+  }
+  if(hue <  0){
+    hue += 360;
+  }
+}
+
+void saturationCalculation(float delta){
+  if(delta == 0){
+    saturation = 0;
+  } else {
+    saturation = delta / (1- abs(2*lightness - 1));
+  }
+}
+
 
 /*
  * Speicher Callback zum Übernehmen der Webparameter vom WiFi Manager zu übernehmen

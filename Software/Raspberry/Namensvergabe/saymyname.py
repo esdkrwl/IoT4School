@@ -90,6 +90,7 @@ def return_name_callback(client, userdata, msg):
         logging.debug(str(anzahl) + ' Einträge gefunden.')
         #Lege neuen DB Eintrag an
         esp_new_name = esp_name + str(anzahl)
+        suffix = anzahl
         logging.debug('Neuer Name für Client: ' + esp_new_name)
         logging.info('Lege neuen DB Eintrag für ' + esp_new_name + ' an.')
         c.execute("INSERT INTO espClients (status, mac, IP, type, name) VALUES (? , ? , ?, ?, ? )",
@@ -108,6 +109,7 @@ def return_name_callback(client, userdata, msg):
 
         logging.debug('Name des Clients in der DB: ' + data[0])
         esp_new_name = data[0]
+        suffix = esp_new_name[len(esp_new_name)-1]
 
 
 
@@ -116,12 +118,12 @@ def return_name_callback(client, userdata, msg):
 
     if esp_type == 'Sensor':
         topic_str = 'nameClient/Sensor/mac/' + esp_mac_adr
-        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'"}'
+        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'", "suffix":"'+suffix+'"}'
         client.publish(topic_str, publish_payload, qos=1)
         logging.info('Sensor ' + esp_name + ' erhält den Namen ' + esp_new_name)
     else:
         topic_str = 'nameClient/Aktor/mac/' + esp_mac_adr
-        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'"}'
+        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'", "suffix":"'+suffix+'"}'
         client.publish(topic_str, publish_payload, qos=1)
         logging.info('Aktor ' + esp_name + ' erhält den Namen ' + esp_new_name)
 

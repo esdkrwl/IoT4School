@@ -146,20 +146,21 @@ void onName(JsonObject& j) {
   if(j.containsKey( "new_name" )){
     String newName = j["new_name"];
     nameString = newName;
-    String finalSubTopic = "sub/"+ type +"/"+newName;
-    String finalPubTopic = "pub/"+ type +"/"+newName;
+  }
+  if(j.containsKey("suffix")){
+    String suffix = j["suffix"];
+    
+    String finalSubTopic = "sub/"+ type +"/"+modulName+"/"+suffix;
+    String finalPubTopic = "pub/"+ type +"/"+modulName+"/"+suffix;
     
     finalPubTopic.toCharArray(finalPubTopicArray, 200);
     finalSubTopic.toCharArray(finalSubTopicArray, 200);
     Serial.println("[DEBUG] Final Sub Topic: " + String(finalSubTopicArray));
     Serial.println("[DEBUG] Final Pub Topic: " + String(finalPubTopicArray));
   }
-  
-
   topicUpdated = true;
 
 }
-
 /*
  * Callback Methode, falls der Identifier Config im Payload gefunden wurde
  */

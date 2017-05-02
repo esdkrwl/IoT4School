@@ -307,7 +307,7 @@ module.exports = function(RED) {
         this.brokerConn = RED.nodes.getNode(this.broker);
         this.sensor = RED.nodes.getNode(config.sensor).IoTSensorName;
         this.number = config.number;
-        this.topic = 'esp/sensor/' + this.sensor + this.number;
+        this.topic = 'pub/Sensor/' + this.sensor + '/' + this.number;
         this.qos = parseInt(config.qos);
         this.name=config.name;
         
@@ -339,7 +339,10 @@ module.exports = function(RED) {
                             //Versuche String zu parsen
                             try {
                                 msg.payload = JSON.parse(msg.payload);
-                                node.send(msg);
+                                if(msg.payload.identifier == 'data'){
+                                    node.send(msg);
+                                }
+                                
                             }
                             catch(e) {
                                 node.error('Fehler ' + e.message,msg); 
@@ -391,7 +394,7 @@ module.exports = function(RED) {
         this.brokerConn = RED.nodes.getNode(this.broker);
         this.aktor = RED.nodes.getNode(config.aktor).IoTAktorName;
         this.number = config.number;
-        this.topic = 'esp/aktor/' + this.aktor + this.number;
+        this.topic = 'sub/Aktor/' + this.aktor + '/' + this.number;
         this.qos = parseInt(config.qos);
         this.name = config.name;
         this.retain = config.retain;
@@ -472,5 +475,15 @@ module.exports = function(RED) {
         this.IoTAktorName = n.IoTAktorName;
     }
     RED.nodes.registerType("IoT-Aktor", IoTAktorNode);
+    
+    function KonfigurationsNode(config){
+        RED.nodes.createNode(this,config);
+    }
+    RED.nodes.registerType("Konfiguration", KonfigurationsNode);
+    
+    function ConfigNode(config){
+        RED.nodes.createNode(this,config);
+    }
+    RED.nodes.registerType("Config", ConfigNode);
     
 };

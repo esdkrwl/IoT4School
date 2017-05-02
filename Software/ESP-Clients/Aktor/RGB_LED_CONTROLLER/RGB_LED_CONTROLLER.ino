@@ -26,11 +26,9 @@ String modulName = "RGB-LED";
 enum power { ON, OFF };
 
 int mode_led = OFF;
-int prevRedValue = 0;
+
 int redValue = 0;
-int prevGreenValue = 0;
 int greenValue = 0;
-int prevBlueValue = 0;
 int blueValue = 0;
 
 float hue = 0;
@@ -218,7 +216,7 @@ void onData(JsonObject& j) {
       mode_led = OFF;
     }
   }
-  if(j.containsKey("set_brightness")){
+  if(j.containsKey("set_brightness") and mode_led == ON){
     if(mode_led == ON){
       String helligkeit = j["set_brightness"];
       int h = helligkeit.toInt();
@@ -228,26 +226,28 @@ void onData(JsonObject& j) {
       analogWrite( rotPin , map(redValue, 0, 255, 0, 1023));
       analogWrite( gruenPin, map(greenValue, 0, 255, 0, 1023));
       analogWrite( blauPin , map(blueValue, 0, 255, 0, 1023));
-      
     }
   }
-
-
+  if(j.containsKey("set_rgb") and mode_led == ON){
+    redValue = j["set_rgb"][0];
+    greenValue = j["set_rgb"][1];
+    blueValue = j["set_rgb"][2];
+    analogWrite( rotPin , map(redValue, 0, 255, 0, 1023));
+    analogWrite( gruenPin, map(greenValue, 0, 255, 0, 1023));
+    analogWrite( blauPin , map(blueValue, 0, 255, 0, 1023));
+  }
   if (j.containsKey("blau") and mode_led == ON) {
     String blauWert = j["blau"];
-    prevBlueValue = blueValue;
     blueValue = blauWert.toInt();
     analogWrite( blauPin , map(blueValue, 0, 255, 0, 1023));
   }
   if (j.containsKey("gruen") and mode_led == ON) {
     String gruenWert = j["gruen"];
-    prevGreenValue = greenValue;
     greenValue = gruenWert.toInt();
     analogWrite( gruenPin, map(greenValue, 0, 255, 0, 1023));
   }
   if (j.containsKey("rot") and mode_led == ON) {
     String rotWert = j["rot"];
-    prevRedValue = redValue;
     redValue = rotWert.toInt();
     analogWrite( rotPin , map(redValue, 0, 255, 0, 1023) );
   }

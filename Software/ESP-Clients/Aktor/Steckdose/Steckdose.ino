@@ -21,8 +21,8 @@ String type = "Aktor";
 String modulName = "Steckdose";
 
 // ------ HIER RELEVANTER MODUL PARAMETER SAMMELN ------
-enum modus { AN, AUS};
-int steckdosenmodus = AUS;
+enum power { ON, OFF };
+int steckdosenmodus = OFF;
 
 // -----------------------------------------------------
 
@@ -144,24 +144,24 @@ void callback(char* topic, byte* payload, unsigned int length) {
  * Callback Methode, falls der Identifier Name im Payload gefunden wurde
  */
 void onName(JsonObject& j) {
-
   Serial.println("[DEBUG] Greetz aus onName");
   
   if(j.containsKey( "new_name" )){
     String newName = j["new_name"];
     nameString = newName;
-    String finalSubTopic = "sub/"+ type +"/"+newName;
-    String finalPubTopic = "pub/"+ type +"/"+newName;
+  }
+  if(j.containsKey("suffix")){
+    String suffix = j["suffix"];
+    
+    String finalSubTopic = "sub/"+ type +"/"+modulName+"/"+suffix;
+    String finalPubTopic = "pub/"+ type +"/"+modulName+"/"+suffix;
     
     finalPubTopic.toCharArray(finalPubTopicArray, 200);
     finalSubTopic.toCharArray(finalSubTopicArray, 200);
     Serial.println("[DEBUG] Final Sub Topic: " + String(finalSubTopicArray));
     Serial.println("[DEBUG] Final Pub Topic: " + String(finalPubTopicArray));
   }
-  
-
   topicUpdated = true;
-
 }
 
 /*
@@ -177,32 +177,31 @@ void onConfig(JsonObject& j) {
  */
 void onData(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onData");
-  if(j.containsKey( "modus" )){
-    if(j["modus"] == "an"){
-      digitalWrite(OUT, HIGH);
-      digitalWrite(LED, !HIGH);
-      steckdosenmodus = AN;
-    }
-    if(j["modus"] == "aus"){
-      digitalWrite(OUT, LOW);
-      digitalWrite(LED, !LOW);
-      steckdosenmodus = AUS;
-      
-    }
-    if(j["modus"] == "toggle"){
-      if(steckdosenmodus == AUS){
+  
+  if(j.containsKey("toogle")){
+      if(steckdosenmodus == OFF){
         digitalWrite(OUT, HIGH);
         digitalWrite(LED, !HIGH);
-        steckdosenmodus = AN;        
+        steckdosenmodus = ON;        
       } else {
         digitalWrite(OUT, LOW);
         digitalWrite(LED, !LOW);
-        steckdosenmodus = AUS;   
+        steckdosenmodus = OFF;   
       }
-      
+  }
+  if(j.containsKey("set_pwr")){
+    if(j["set_pwr"] == "on" and steckdosenmodus == OFF){
+      digitalWrite(OUT, HIGH);
+      digitalWrite(LED, !HIGH);
+      steckdosenmodus = ON;
+    }
+    if(j["set_pwr"] == "off" and steckdosenmodus == ON){
+      digitalWrite(OUT, LOW);
+      digitalWrite(LED, !LOW);
+      steckdosenmodus = OFF;
     }
   }
-
+  
 }
 
 /*
@@ -211,7 +210,7 @@ void onData(JsonObject& j) {
 void onStatus(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onStatus");
   String payload;
-  if(steckdosenmodus == AN){
+  if(steckdosenmodus == ON){
     payload = "{\"identifier\":\"status\",\"modus\":\"an\"}";
   } else {
     payload = "{\"identifier\":\"status\",\"modus\":\"aus\"}";

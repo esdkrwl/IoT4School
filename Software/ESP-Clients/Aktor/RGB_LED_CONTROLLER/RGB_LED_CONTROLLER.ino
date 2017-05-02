@@ -23,9 +23,9 @@ String type = "Aktor";
 String modulName = "RGB-LED";
 
 // ------ HIER RELEVANTER MODUL PARAMETER SAMMELN ------
-enum modus { AN, AUS, PULSE, PARTY };
+enum power { ON, OFF };
 
-int mode_led = AUS;
+int mode_led = OFF;
 int prevRedValue = 0;
 int redValue = 0;
 int prevGreenValue = 0;
@@ -190,6 +190,34 @@ void onConfig(JsonObject& j) {
  */
 void onData(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onData");
+  // Togglen der Lampe
+  if(j.containsKey("toogle")){
+    if(mode_led == ON){
+      analogWrite(rotPin, 0);
+      analogWrite(gruenPin, 0);
+      analogWrite(blauPin, 0);
+      mode_led = OFF;
+    } else {
+      analogWrite( rotPin , map(redValue, 0, 255, 0, 1023) );
+      analogWrite(gruenPin, map(greenValue, 0, 255, 0, 1023));
+      analogWrite( blauPin , map(blueValue, 0, 255, 0, 1023));
+      mode_led = ON;
+    }  
+  }
+  if(j.containsKey("set_pwr")){
+    if(j["set_pwr"] == "ON" and mode_led == OFF){
+      analogWrite( rotPin , map(redValue, 0, 255, 0, 1023) );
+      analogWrite(gruenPin, map(greenValue, 0, 255, 0, 1023));
+      analogWrite( blauPin , map(blueValue, 0, 255, 0, 1023));
+      mode_led = ON;
+    }
+    if(j["set_pwr"] == "OFF" and mode_led == ON){
+      analogWrite(rotPin, 0);
+      analogWrite(gruenPin, 0);
+      analogWrite(blauPin, 0);
+      mode_led = OFF;
+    }
+  }
 
 
   if (j.containsKey("blau")) {
@@ -211,21 +239,6 @@ void onData(JsonObject& j) {
     analogWrite( rotPin , map(redValue, 0, 255, 0, 1023) );
   }
   
-
-  if(j.containsKey("an")){
-    Serial.println("AN");
-    analogWrite(rotPin, map(redValue, 0, 255, 0, 1023));
-    analogWrite(gruenPin, map(greenValue, 0, 255, 0, 1023));
-    analogWrite(blauPin, map(blueValue, 0, 255, 0, 1023));
-    mode_led = AN;
-  }
-
-  if(j.containsKey("aus")){
-    analogWrite(rotPin, 0);
-    analogWrite(gruenPin, 0);
-    analogWrite(blauPin, 0);
-    mode_led = AUS;
-  }
 }
 
 /*
@@ -285,10 +298,12 @@ float mod(float a, int b){
 }
 
 void HSL2RGB(){
-  float c = (1-abs(2*lightness-1)*saturation);
-  float hv = mod(hue/60,2)-1;
-  float x = c*(1-abs(hv));
-  float m = lightness - c/2;
+  float c = (1-abs(2*lightness-1))*saturation;
+  //Serial.println("C: " + String(c));
+  float x = c*(1-abs( mod(hue/60,2)-1 ));
+  //Serial.println("x: " + String(x));
+  float m = lightness - (c/2);
+  //Serial.println("m: " + String(m));
 
   float r=0;
   float g=0;
@@ -314,10 +329,10 @@ void HSL2RGB(){
     r = x;
     g = 0;
     b = c;   
-  } else {
+  } else if(300<=hue and hue<360){
     r = c;
     g = 0;
-    b = x;  
+    b = x;
   }
   
   redValue = (int)((r+m)*255);

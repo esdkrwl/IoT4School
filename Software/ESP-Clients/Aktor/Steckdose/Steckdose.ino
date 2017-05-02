@@ -178,7 +178,7 @@ void onConfig(JsonObject& j) {
 void onData(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onData");
   
-  if(j.containsKey("toogle")){
+  if(j.containsKey("toggle")){
       if(steckdosenmodus == OFF){
         digitalWrite(OUT, HIGH);
         digitalWrite(LED, !HIGH);

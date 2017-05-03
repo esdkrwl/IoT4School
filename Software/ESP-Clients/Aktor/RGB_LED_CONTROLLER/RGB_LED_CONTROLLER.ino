@@ -33,7 +33,7 @@ int blueValue = 0;
 
 float hue = 0;
 float saturation = 0; 
-float lightness = 0;
+float value = 0;
 // -----------------------------------------------------
 
 
@@ -79,10 +79,6 @@ bool topicUpdated = false;
 
 String nameString;
 
-// TESTZEUGS 
-long lastMsg = 0;
-char msg[50];
-int value = 0;
 boolean setReset = false;
 bool shouldSaveConfig = false;
 
@@ -216,18 +212,6 @@ void onData(JsonObject& j) {
       mode_led = OFF;
     }
   }
-  if(j.containsKey("set_brightness") and mode_led == ON){
-    if(mode_led == ON){
-      String helligkeit = j["set_brightness"];
-      int h = helligkeit.toInt();
-      RGB2HSL();
-      lightness = h/100.0;
-      HSL2RGB();
-      analogWrite( rotPin , map(redValue, 0, 255, 0, 1023));
-      analogWrite( gruenPin, map(greenValue, 0, 255, 0, 1023));
-      analogWrite( blauPin , map(blueValue, 0, 255, 0, 1023));
-    }
-  }
   if(j.containsKey("set_rgb") and mode_led == ON){
     redValue = j["set_rgb"][0];
     greenValue = j["set_rgb"][1];
@@ -251,6 +235,18 @@ void onData(JsonObject& j) {
     redValue = rotWert.toInt();
     analogWrite( rotPin , map(redValue, 0, 255, 0, 1023) );
   }
+  if(j.containsKey("set_brightness") and mode_led == ON){
+    if(mode_led == ON){
+      String helligkeit = j["set_brightness"];
+      int h = helligkeit.toInt();
+      RGB2HSV();
+      value = h/100.0;
+      HSV2RGB();
+      analogWrite( rotPin , map(redValue, 0, 255, 0, 1023));
+      analogWrite( gruenPin, map(greenValue, 0, 255, 0, 1023));
+      analogWrite( blauPin , map(blueValue, 0, 255, 0, 1023));
+    }
+  }
   
 }
 
@@ -262,7 +258,7 @@ void onStatus(JsonObject& j) {
 
 }
 
-void RGB2HSL(){
+void RGB2HSV(){
   float r = (float)redValue/255.0;
   float g = (float)greenValue/255.0;
   float b = (float)blueValue/255.0;
@@ -273,8 +269,8 @@ void RGB2HSL(){
   float delta = c_max - c_min;
   
   hueCalculation(r,g,b,c_max,delta);
-  lightness = (c_max+c_min)/2.0;
-  saturationCalculation(delta);
+  value = c_max;
+  saturationCalculation(delta, c_max);
   
 }
 
@@ -293,11 +289,11 @@ void hueCalculation(float r, float g, float b, float c_max, float delta){
   }
 }
 
-void saturationCalculation(float delta){
+void saturationCalculation(float delta, float c_max){
   if(delta == 0){
     saturation = 0;
   } else {
-    saturation = delta / (1- abs((2*lightness) - 1));
+    saturation = delta / c_max;
   }
 }
 
@@ -310,13 +306,10 @@ float mod(float a, int b){
   return aModB;
 }
 
-void HSL2RGB(){
-  float c = (1-abs(2*lightness-1))*saturation;
-  Serial.println("C: " + String(c));
-  float x = c*(1-abs( mod(hue/60.0,2)-1 ));
-  Serial.println("x: " + String(x));
-  float m = lightness - (c/2.0);
-  Serial.println("m: " + String(m));
+void HSV2RGB(){
+  float c = value * saturation;
+  float x = c*(1-abs( mod(hue/60,2)-1 ));
+  float m = value - c;
 
   float r=0;
   float g=0;

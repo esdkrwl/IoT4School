@@ -118,12 +118,12 @@ def return_name_callback(client, userdata, msg):
 
     if esp_type == 'Sensor':
         topic_str = 'nameClient/Sensor/mac/' + esp_mac_adr
-        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'", "suffix":"'+suffix+'"}'
+        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'", "suffix":"'+str(suffix)+'"}'
         client.publish(topic_str, publish_payload, qos=1)
         logging.info('Sensor ' + esp_name + ' erhält den Namen ' + esp_new_name)
     else:
         topic_str = 'nameClient/Aktor/mac/' + esp_mac_adr
-        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'", "suffix":"'+suffix+'"}'
+        publish_payload = '{"identifier":"name", "new_name":"'+ esp_new_name +'", "suffix":"'+str(suffix)+'"}'
         client.publish(topic_str, publish_payload, qos=1)
         logging.info('Aktor ' + esp_name + ' erhält den Namen ' + esp_new_name)
 

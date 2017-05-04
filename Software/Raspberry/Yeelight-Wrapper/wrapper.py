@@ -18,13 +18,12 @@ logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s - 
 
 cfg = configparser.ConfigParser()
 bulbs = {}
-bulb = {}
-bulb['ip'] = '192.168.178.31'
-bulb['pwr'] = 'off'
-bulb['brightness'] = '100'
-bulb['rgb'] = '324234'
+bulb_count = 0
 
-bulbs['Yeelight0'] = [bulb]
+loops = 0
+
+foundBulbs = []
+
 broadcast_IP = '239.255.255.250'
 broadcast_Port = 1982
 command_id = 0
@@ -57,7 +56,27 @@ def bulbs_detection_loop1():
     while True:
         if time_elapsed == search_interval:
             time_elapsed = 0
+            global loops
+            loops += 1
+            #Prüfe, ob die Anzahl der Birnen in foundBulbs der Anzahl der Birnen im Dict entspricht
+            global  foundBulbs
+            print('anzahl elemente')
+            print(len(foundBulbs))
+            print(len(bulbs))
+            if foundBulbs:
+                if len(bulbs) > len(foundBulbs):
+                    # für alle Elemente im Dict
+                    for b in bulbs:
+                        # falls Yeelight b nicht in foundBulbs ist
+                        if b not in foundBulbs and bulbs[b][0]['status'] == 'online':
+                            bulbs[b][0]['status'] = 'offline'
+                            #muss der DB Eintrag aktualisiert werden
+                            c.execute("UPDATE espClients SET status = (?) WHERE name = (?)",
+                                      ('Getrennt',b ,))
+                            conn.commit()
+            foundBulbs = []
             sendSearchBroadcast()
+
 
         # scanner
         while True:
@@ -163,44 +182,85 @@ def sendCmdBrightness(ip, brightness):
 # GET IP FROM RESPONSE
 def parseResponse(response):
     response = response.decode()
-    #print(response)
     location_re = re.compile("Location.*yeelight[^0-9]*([0-9]{1,3}(\.[0-9]{1,3}){3}):([0-9]*)")
     match = location_re.search(response)
     if match == None:
         logging.error("Antwort konnte nicht ausgewertet werden: " + response)
         return
+
     bulb_name = getBulbParams(response, "name")
-    #prüfe, ob die gefundene Birne bereits in der Liste steht
-    if bulb_name in bulbs:
-        #falls ja muss nichts mehr gemacht werden
-        return
-    else:
-        #prüfe, ob die Birne
-        return
-    #for b in bulbs:
+    bulb_ip = match.group(1)
+    #Prüfe, ob dict leer ist oder die Lampe evtl einen ganz anderen Namen an
+    if bulb_name == '' or 'Yeelight' not in bulb_name :
+        logging.debug("Füge Lampe der Datenbank hinzu")
+        #Prüfe, ob IP schon in der Datenbank steht
+        c.execute("SELECT name FROM espClients WHERE IP = (?)", (bulb_ip,))
+        data = c.fetchone()
+        if data is None:
+            #Prüfe, wie oft Yeelight schon in der DB steht
+            c.execute("SELECT name FROM espClients WHERE type = (?)", ('Aktor',))
+            anzahl = 0
+            for row in c.fetchall():
+                if 'Yeelight' in row[0]:
+                    anzahl = anzahl + 1
+            new_name = 'Yeelight' + str(anzahl)
+            logging.debug(str(anzahl) + ' Einträge gefunden.')
+            #lege Datenbankeintrag für die neue Lampe an
+            c.execute("INSERT INTO espClients (status, mac, IP, type, name) VALUES (? , ? , ?, ?, ? )",
+                      ('Verbunden', 'NULL', bulb_ip, 'Aktor', new_name))
+            conn.commit()
+            #gebe der Lampe ebenfall den Namen
+            sendCmdName(bulb_ip, new_name)
+            #trage die Lampe nun ebenfalls ins Dict ein
+            bulb = {}
+            bulb['ip'] = bulb_ip
+            bulb['pwr'] = getBulbParams(response, "power")
+            bulb['brightness'] = getBulbParams(response, "bright")
+            bulb['rgb'] = createRGB(getBulbParams(response, "rgb"))
+            bulb['status'] = 'online'
+            bulbs[new_name] = [bulb]
+            return
+
+    if bulb_name not in bulbs and bulb_name != '' and 'Yeelight' in bulb_name:
+        logging.debug('Füge Lampe der lokalen Liste hinzu')
+        bulb = {}
+        bulb['ip'] = bulb_ip
+        bulb['pwr'] = getBulbParams(response, "power")
+        bulb['brightness'] = getBulbParams(response, "bright")
+        bulb['rgb'] = createRGB(getBulbParams(response, "rgb"))
+        bulb['status'] = 'online'
+
+        bulbs[bulb_name] = [bulb]
+        #Da die Lampe einen Yeelight+Ziffer Namen hat, prüfe, ob der Datenbankeintrag bezüglich der IP noch akutell ist
+        c.execute("SELECT IP FROM espClients WHERE name = (?)", (bulb_name,))
+        data = c.fetchone()
+        print(data)
+        #Falls die IP nicht mit der in der Datenbank übereinstimmt, aktualisiere die DB
+        if bulb_ip not in data:
+            c.execute("UPDATE espClients SET IP = (?), status = (?) WHERE name = (?)", (bulb_ip, 'Verbunden', bulb_name,))
+            conn.commit()
+        else:
+            c.execute("UPDATE espClients SET status = (?) WHERE name = (?)", ('Verbunden', bulb_name,))
+            conn.commit()
+
+    #da die Lampe bereits in der Liste ist, aktualisiere alle Parameter, falls später der Status abgefragt wird
+    if bulb_name != '' and bulb_name in bulbs:
+        logging.debug('Aktualisiere Parameter')
+        bulbs[bulb_name][0]['pwr'] = getBulbParams(response, "power")
+        bulbs[bulb_name][0]['brightness'] = getBulbParams(response, "bright")
+        bulbs[bulb_name][0]['rgb'] = createRGB(getBulbParams(response, "rgb"))
+
+        if(bulbs[bulb_name][0]['status'] == 'offline'):
+            bulbs[bulb_name][0]['status'] == 'online'
+            c.execute("UPDATE espClients SET status = (?) WHERE name = (?)", ('Verbunden', bulb_name,))
+            conn.commit()
+
+        print(bulbs)
+        if bulb_name not in foundBulbs:
+            foundBulbs.append(bulb_name)
+            print(foundBulbs)
 
 
-
-
-
-    #Prüfe, ob eine Lampe noch keinen Namen hat
-    #if bulb_name == '':
-    #    bulb = {}
-    #    bulb['ip'] = match.group(1)
-    #    bulb['pwr'] = getBulbParams(response, "power")
-    #    bulb['brightness'] = getBulbParams(response, "bright")
-    #    bulb['rgb'] = createRGB(getBulbParams(response, "rgb"))
-
-
-
-
-    #name = 'yeelight'
-
-    #bulbs[name] = [bulb]
-    #bulbs['yeelight2'] = {'penis':True}
-    #print(bulbs['yeelight'][0]['pwr'])
-    #print('Anzahl Birnen: ', len(bulbs))
-    #print('Birnen Params', bulbs)
 
 # GET STATUS PARAMS FROM RESPONSE
 def getBulbParams(response, param):
@@ -313,7 +373,6 @@ client = mqtt.Client(client_id='yeelight_wrapper', clean_session=False)
 client.on_connect = on_connect
 client.message_callback_add("sub/Aktor/Yeelight/#", handleNodeRedCmd)
 
-
 try:
     cfg.read("cfg.ini")
 except FileNotFoundError as error:
@@ -332,6 +391,9 @@ except Exception as error:
 conn = sqlite3.connect(pathToDB)
 c = conn.cursor()
 create_table()
+
+#sendCmdName('192.168.178.31', '')
+#sendCmdName('192.168.178.33', '')
 
 sendSearchBroadcast()
 

@@ -63,17 +63,29 @@ def bulbs_detection_loop1():
             print('anzahl elemente')
             print(len(foundBulbs))
             print(len(bulbs))
+            #falls im letzten durchgang Lampen gefunden wurden, prüfe, ob es weniger sind als ingesamt in der Liste
             if foundBulbs:
                 if len(bulbs) > len(foundBulbs):
                     # für alle Elemente im Dict
                     for b in bulbs:
                         # falls Yeelight b nicht in foundBulbs ist
                         if b not in foundBulbs and bulbs[b][0]['status'] == 'online':
+                            logging.debug('Update setze STatus der Lampe auf Getrennt')
                             bulbs[b][0]['status'] = 'offline'
                             #muss der DB Eintrag aktualisiert werden
                             c.execute("UPDATE espClients SET status = (?) WHERE name = (?)",
                                       ('Getrennt',b ,))
                             conn.commit()
+            if not foundBulbs:
+                for b in bulbs:
+                    if bulbs[b][0]['status'] == 'online':
+                        logging.debug('Update setze STatus der Lampe auf Getrennt')
+                        bulbs[b][0]['status'] = 'offline'
+                        # muss der DB Eintrag aktualisiert werden
+                        c.execute("UPDATE espClients SET status = (?) WHERE name = (?)",
+                                  ('Getrennt', b,))
+                        conn.commit()
+
             foundBulbs = []
             sendSearchBroadcast()
 
@@ -221,6 +233,7 @@ def parseResponse(response):
             bulbs[new_name] = [bulb]
             return
 
+    #Yeelight steht also schon im Lampennamen - also prüfe ob die IP noch stimmt
     if bulb_name not in bulbs and bulb_name != '' and 'Yeelight' in bulb_name:
         logging.debug('Füge Lampe der lokalen Liste hinzu')
         bulb = {}
@@ -233,13 +246,20 @@ def parseResponse(response):
         bulbs[bulb_name] = [bulb]
         #Da die Lampe einen Yeelight+Ziffer Namen hat, prüfe, ob der Datenbankeintrag bezüglich der IP noch akutell ist
         c.execute("SELECT IP FROM espClients WHERE name = (?)", (bulb_name,))
-        data = c.fetchone()
-        print(data)
-        #Falls die IP nicht mit der in der Datenbank übereinstimmt, aktualisiere die DB
-        if bulb_ip not in data:
+        sqlRes = c.fetchone()
+        print(sqlRes)
+        #Falls kein Datenbankeintrag vorhanden ist, lege einen neuen an
+        if sqlRes is None:
+            logging.debug('Lege neuen DB-Eintrag an. Name bereits bekannt.')
+            c.execute("INSERT INTO espClients (status, mac, IP, type, name) VALUES (? , ? , ?, ?, ? )",
+                      ('Verbunden', 'NULL', bulb_ip, 'Aktor', bulb_name))
+            conn.commit()
+        elif bulb_ip not in sqlRes:
+            logging.debug('Update IP-Adresse der Lampe')
             c.execute("UPDATE espClients SET IP = (?), status = (?) WHERE name = (?)", (bulb_ip, 'Verbunden', bulb_name,))
             conn.commit()
         else:
+            logging.debug('Update Status der Lampe auf Verbunden')
             c.execute("UPDATE espClients SET status = (?) WHERE name = (?)", ('Verbunden', bulb_name,))
             conn.commit()
 
@@ -251,7 +271,7 @@ def parseResponse(response):
         bulbs[bulb_name][0]['rgb'] = createRGB(getBulbParams(response, "rgb"))
 
         if(bulbs[bulb_name][0]['status'] == 'offline'):
-            bulbs[bulb_name][0]['status'] == 'online'
+            bulbs[bulb_name][0]['status'] = 'online'
             c.execute("UPDATE espClients SET status = (?) WHERE name = (?)", ('Verbunden', bulb_name,))
             conn.commit()
 

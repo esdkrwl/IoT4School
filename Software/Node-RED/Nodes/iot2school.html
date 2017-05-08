@@ -318,25 +318,167 @@
 
 
 
+
+<script type="text/javascript">
+    RED.nodes.registerType('Konfiguration',{
+        category: 'input',
+        color:"#a6bbcf",
+        defaults: {
+            broker: {type:"mqtt-broker", required:true},
+            aktor: {type:"IoT-Aktor"},
+            sensor: {type:"IoT-Sensor"},
+            number: {value:"", required:true, validate:RED.validators.number()},
+            qos: {value: "1"},
+            name: {value:""},
+            topic:{value:""},
+            retain: {value:true},
+
+        },
+        inputs:0,
+        outputs:0,
+        icon: "inject.png",
+        label: function() {
+            return this.name||"Konfiguration";      
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        button: {
+            onclick: function() {
+                var label = "test";
+                $.ajax({
+                    url: "inject/"+this.id,
+                    type:"POST",
+                    success: function(resp) {
+                        RED.notify(node._("inject.success",{label:label}),"success");
+                    },
+                    error: function(jqXHR,textStatus,errorThrown) {
+                        if (jqXHR.status == 404) {
+                            RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.not-deployed")}),"error");
+                        } else if (jqXHR.status == 500) {
+                            RED.notify(node._("common.notification.error",{message:node._("inject.errors.failed")}),"error");
+                        } else if (jqXHR.status == 0) {
+                            RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.no-response")}),"error");
+                        } else {
+                            RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.unexpected",{status:jqXHR.status,message:textStatus})}),"error");
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+</script>
+
+
+<script type="text/x-red" data-template-name="Konfiguration">
+
+    <div class="form-row">
+    
+        <label for="node-input-broker">
+            <i class="fa fa-globe"></i> 
+            <span data-i18n="mqtt.label.broker"></span>
+        </label>
+        
+        <input type="text" id="node-input-broker">
+        
+    </div>
+    
+    <div class="form-row">
+    
+        <label for="node-input-aktor">
+            <i class="fa fa-gears"></i>
+            Aktor
+        </label>
+        
+        <input type="text" id="node-input-aktor">
+     </div>
+     
+    <div class="form-row">
+    
+        <label for="node-input-sensor">
+            <i class="fa fa-gears"></i>
+            Sensor
+        </label>
+        
+        <input type="text" id="node-input-sensor">
+     </div>
+     
+    <div class="form-row">
+        <label for="node-input-number">
+            <i class="fa fa-hashtag"></i> 
+            Nummer
+        </label>
+     
+        <input type="text" id="node-input-number" placeholder="z.B. 7">
+        
+    </div>
+    
+    <div class="form-row">
+    
+        <label for="node-input-qos">
+            <i class="fa fa-empire"></i>
+            <span data-i18n="mqtt.label.qos"></span>
+        </label>
+        <select id="node-input-qos" style="width:125px !important">
+            <option value="0">0</option>
+            <option value="1">1</option>
+        </select>
+        
+    </div>
+    
+    <div class="form-row" id="node-retain">
+        <label for="node-input-retain">
+            <i class="fa fa-cloud" aria-hidden="true"></i>
+            Retained
+        </label>
+
+        <input type="checkbox" id="node-input-retain" style="display: inline-block; width: auto; vertical-align: top;">
+
+    </div>
+    
+    <div class="form-row">
+    
+        <label for="node-input-name">
+            <i class="fa fa-tag"></i>
+            Name
+        </label>
+        
+        <input type="text" id="node-input-name" placeholder="z.B. LED-Strip oder Servo7">
+        
+    </div>
+    
+    
+    <div class="form-tips">HIER KÖNNTE IHR TIPP STEHEN</span></div>
+</script>
+
+
+<script type="text/x-red" data-help-name="Konfiguration">
+    <p>bla</p>
+</script>
+
+
+
+
 <script type="text/javascript">
     RED.nodes.registerType('Config',{
         category: 'output',
         defaults: {
             
             broker: {type:"mqtt-broker", required:true},
-            aktor: {type:"IoT-Aktor"},
-            sensor: {type:"IoT-Sensor"},
+            aktor: {type:"IoT-Aktor", required:true},
+            sensor: {type:"IoT-Sensor", required:true},
             number: {value:"", required:true, validate:RED.validators.number()},
             qos: {value: "1"},
-            toConfig: {value: "", required:true},
+            toConfig: {value: "Sensor", required:true},
             name: {value:""},
             topic:{value:""},
-            retain: {value:false},
+            retain: {value:true},
 
         },
         color:"#3FADB5",
         inputs:1,
-        outputs:1,
+        outputs:0,
         icon: "feed.png",
         align: "right",
         label: function() {
@@ -345,32 +487,6 @@
         //----//
         labelStyle: function() {
             return this.name?"node_label_italic":"";
-        },
-        oneditprepare: function(){
-            var updateOptions = function(){
-                var typ = $("#node-input-to_Config").val();
-                if(typ == "Sensor"){
-                    $("#inject-IoT-Devices-Aktor").hide();
-                    $("#inject-IoT-Devices-Sensor").show();
-                } else {
-                    this.toConfig = "Aktor";
-                    $("#inject-IoT-Devices-Aktor").show();
-                    $("#inject-IoT-Devices-Sensor").hide();
-                }          
-            };
-            updateOptions();
-            $("#node-input-to_Config").change(updateOptions);
-            $("#node-input-aktor").change(updateOptions);
-            $("#node-input-sensor").change(updateOptions);
-            
-        },
-        oneditsave: function() {
-            var typ = $("#node-input-to_Config").val();
-            if(typ == "Sensor"){
-                this.toConfig = "Sensor";
-            } else {
-                this.toConfig = "Aktor";
-            }
         }
 /*
             $(".inject-IoT-Devices").hide();
@@ -413,7 +529,7 @@
         
     </div>
     
-    <div class="form-row hidden" id="inject-IoT-Devices-Aktor">
+    <div class="form-row inject-IoT-Devices hidden" id="inject-IoT-Devices-Aktor">
     
         <label for="node-input-aktor">
             <i class="fa fa-gears"></i>
@@ -423,7 +539,7 @@
         <input type="text" id="node-input-aktor">
      </div>
      
-    <div class="form-row hidden" id="inject-IoT-Devices-Sensor">
+    <div class="form-row inject-IoT-Devices hidden" id="inject-IoT-Devices-Sensor">
     
         <label for="node-input-sensor">
             <i class="fa fa-thermometer-3"></i>
@@ -480,6 +596,14 @@
     
     <div class="form-tips">HIER KÖNNTE IHR TIPP STEHEN</span></div>
 </script>
+<style>
+    .inject-IoT-Devices {
+        padding-left: 0px;
+    }
+    .inject-IoT-Devices select {
+        margin: 3px 0;
+    }
+</style>
 
 <!--
  MQTT Ausgang: Hilfe Text
@@ -492,347 +616,16 @@
 
 
 
-<! AN -->
-
-<script type="text/x-red" data-template-name="An">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Power On">
-    </div>
-</script>
 
 
-<!-- Next, some simple help text is provided for the node.                   -->
-<script type="text/x-red" data-help-name="An">
-   <p>Dieser Node wandelt einen beliebigen Eingang in ein Einschalten-Befehl um.</p>
-</script>
-
-<!-- Finally, the node type is registered along with all of its properties   -->
-<!-- The example below shows a small subset of the properties that can be set-->
-<script type="text/javascript">
-    RED.nodes.registerType('An',{
-        category: 'IoT2School',      // the palette category
-        defaults: {             // defines the editable properties of the node
-            name: {value:""},   //  along with default values.
-        },
-	    color:"#91F5D7",
-        inputs:1,               // set the number of inputs - only 0 or 1
-        outputs:1,              // set the number of outputs - 0 to n
-        // set the icon (held in icons dir below where you save the node)
-        icon: "light.png",     // saved in  icons/myicon.png
-        label: function() {     // sets the default label contents
-            return this.name||"AN";
-        },
-        labelStyle: function() { // sets the class to apply to the label
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
-
-<! AUS -->
-
-<script type="text/x-red" data-template-name="Aus">
-   <!-- data-template-name identifies the node type this is for              -->
-
-   <!-- Each of the following divs creates a field in the edit dialog.       -->
-   <!-- Generally, there should be an input for each property of the node.   -->
-   <!-- The for and id attributes identify the corresponding property        -->
-   <!-- (with the 'node-input-' prefix).                                     -->
-   <!-- The available icon classes are defined Font Awesome Icons (FA Icons) -->
-
-    <br/>
-    <!-- By convention, most nodes have a 'name' property. The following div -->
-    <!-- provides the necessary field. Should always be the last option      -->
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Power Off">
-    </div>
-</script>
 
 
-<!-- Next, some simple help text is provided for the node.                   -->
-<script type="text/x-red" data-help-name="Aus">
-   <!-- data-help-name identifies the node type this help is for             -->
-   <!-- This content appears in the Info sidebar when a node is selected     -->
-   <!-- The first <p> is used as the pop-up tool tip when hovering over a    -->
-   <!-- node in the palette.                                                 -->
-   <p>Simple sample input node. Just sends a single message when it starts up.
-   This is not very useful.</p>
-   <p>Outputs an object called <code>msg</code> containing <code>msg.topic</code> and
-   <code>msg.payload</code>. msg.payload is a String.</p>
-</script>
-
-<!-- Finally, the node type is registered along with all of its properties   -->
-<!-- The example below shows a small subset of the properties that can be set-->
-<script type="text/javascript">
-    RED.nodes.registerType('Aus',{
-        category: 'IoT2School',      // the palette category
-        defaults: {             // defines the editable properties of the node
-            name: {value:""},   //  along with default values.
-        },
-	color:"#3FADB5",
-        inputs:1,               // set the number of inputs - only 0 or 1
-        outputs:1,              // set the number of outputs - 0 to n
-        // set the icon (held in icons dir below where you save the node)
-        icon: "myicon.png",     // saved in  icons/myicon.png
-        label: function() {     // sets the default label contents
-            return this.name||"AUS";
-        },
-        labelStyle: function() { // sets the class to apply to the label
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
 
 
-<! TOGGLE -->
-
-<script type="text/x-red" data-template-name="Toggle">
-   <!-- data-template-name identifies the node type this is for              -->
-
-   <!-- Each of the following divs creates a field in the edit dialog.       -->
-   <!-- Generally, there should be an input for each property of the node.   -->
-   <!-- The for and id attributes identify the corresponding property        -->
-   <!-- (with the 'node-input-' prefix).                                     -->
-   <!-- The available icon classes are defined Font Awesome Icons (FA Icons) -->
-
-    <br/>
-    <!-- By convention, most nodes have a 'name' property. The following div -->
-    <!-- provides the necessary field. Should always be the last option      -->
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Toggle Power">
-    </div>
-</script>
 
 
-<!-- Next, some simple help text is provided for the node.                   -->
-<script type="text/x-red" data-help-name="Toggle">
-   <!-- data-help-name identifies the node type this help is for             -->
-   <!-- This content appears in the Info sidebar when a node is selected     -->
-   <!-- The first <p> is used as the pop-up tool tip when hovering over a    -->
-   <!-- node in the palette.                                                 -->
-   <p>Simple sample input node. Just sends a single message when it starts up.
-   This is not very useful.</p>
-   <p>Outputs an object called <code>msg</code> containing <code>msg.topic</code> and
-   <code>msg.payload</code>. msg.payload is a String.</p>
-</script>
-
-<!-- Finally, the node type is registered along with all of its properties   -->
-<!-- The example below shows a small subset of the properties that can be set-->
-<script type="text/javascript">
-    RED.nodes.registerType('Toggle',{
-        category: 'IoT2School',      // the palette category
-        defaults: {             // defines the editable properties of the node
-        name: {value:""},   //  along with default values.
-        },
-	   color:"#3FADB5",
-        inputs:1,               // set the number of inputs - only 0 or 1
-        outputs:1,              // set the number of outputs - 0 to n
-        // set the icon (held in icons dir below where you save the node)
-        icon: "myicon.png",     // saved in  icons/myicon.png
-        label: function() {     // sets the default label contents
-            return this.name||"Toggli";
-        },
-        labelStyle: function() { // sets the class to apply to the label
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
-
-<! RGB -->
-
-<script type="text/x-red" data-template-name="RGB">
-   <!-- data-template-name identifies the node type this is for              -->
-
-   <!-- Each of the following divs creates a field in the edit dialog.       -->
-   <!-- Generally, there should be an input for each property of the node.   -->
-   <!-- The for and id attributes identify the corresponding property        -->
-   <!-- (with the 'node-input-' prefix).                                     -->
-   <!-- The available icon classes are defined Font Awesome Icons (FA Icons) -->
-
- 
-    <!-- By convention, most nodes have a 'name' property. The following div -->
-    <!-- provides the necessary field. Should always be the last option      -->
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-
-    <div class="form-row">
-        <label for="node-input-rot"><i class="fa fa-tag"></i> Rot</label>
-        <input type="text" id="node-input-rot" placeholder="0..255">
-    </div>
-
-    <div class="form-row">
-        <label for="node-input-gruen"><i class="fa fa-tag"></i> Grün</label>
-        <input type="text" id="node-input-gruen" placeholder="0..255">
-    </div>
-
-    <div class="form-row">
-        <label for="node-input-blau"><i class="fa fa-tag"></i> Blau</label>
-        <input type="text" id="node-input-blau" placeholder="0..255">
-    </div>
-</script>
 
 
-<!-- Next, some simple help text is provided for the node.                   -->
-<script type="text/x-red" data-help-name="RGB">
-   <!-- data-help-name identifies the node type this help is for             -->
-   <!-- This content appears in the Info sidebar when a node is selected     -->
-   <!-- The first <p> is used as the pop-up tool tip when hovering over a    -->
-   <!-- node in the palette.                                                 -->
-   <p>Simple sample input node. Just sends a single message when it starts up.
-   This is not very useful.</p>
-   <p>Outputs an object called <code>msg</code> containing <code>msg.topic</code> and
-   <code>msg.payload</code>. msg.payload is a String.</p>
-</script>
-
-<!-- Finally, the node type is registered along with all of its properties   -->
-<!-- The example below shows a small subset of the properties that can be set-->
-<script type="text/javascript">
-    RED.nodes.registerType('RGB',{
-        category: 'IoT2School',      // the palette category
-        defaults: {             // defines the editable properties of the node
-	    rot: {value:"0",validate:RED.validators.number(), required:true},
-	    gruen: {value:"0", validate:RED.validators.number(), required:true},
-	    blau: {value:"0",validate:RED.validators.number(), required:true},
-            name: {value:""},   //  along with default values.
-        },
-	   color:"#3FADB5",
-        inputs:1,               // set the number of inputs - only 0 or 1
-        outputs:1,              // set the number of outputs - 0 to n
-        // set the icon (held in icons dir below where you save the node)
-        icon: "myicon.png",     // saved in  icons/myicon.png
-        label: function() {     // sets the default label contents
-	    var rgb_name = "rgb(" + this.rot + ","+ this.gruen + ","+ this.blau+")";
-            return this.name||rgb_name ;
-		//'['this.rot+','+this.gruen+','+ this.blau +']';
-        },
-        labelStyle: function() { // sets the class to apply to the label
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
-
-<! BRIGHTNESS -->
-
-<script type="text/x-red" data-template-name="Brightness">
-   <!-- data-template-name identifies the node type this is for              -->
-
-   <!-- Each of the following divs creates a field in the edit dialog.       -->
-   <!-- Generally, there should be an input for each property of the node.   -->
-   <!-- The for and id attributes identify the corresponding property        -->
-   <!-- (with the 'node-input-' prefix).                                     -->
-   <!-- The available icon classes are defined Font Awesome Icons (FA Icons) -->
-
-    <br/>
-    <!-- By convention, most nodes have a 'name' property. The following div -->
-    <!-- provides the necessary field. Should always be the last option      -->
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-row">
-        <label for="node-input-brightness"><i class="fa fa-tag"></i> Helligkeit</label>
-        <input type="text" id="node-input-brightness" placeholder="0..100">
-    </div>
-</script>
-
-
-<!-- Next, some simple help text is provided for the node.                   -->
-<script type="text/x-red" data-help-name="Brightness">
-   <!-- data-help-name identifies the node type this help is for             -->
-   <!-- This content appears in the Info sidebar when a node is selected     -->
-   <!-- The first <p> is used as the pop-up tool tip when hovering over a    -->
-   <!-- node in the palette.                                                 -->
-   <p>Simple sample input node. Just sends a single message when it starts up.
-   This is not very useful.</p>
-   <p>Outputs an object called <code>msg</code> containing <code>msg.topic</code> and
-   <code>msg.payload</code>. msg.payload is a String.</p>
-</script>
-
-<!-- Finally, the node type is registered along with all of its properties   -->
-<!-- The example below shows a small subset of the properties that can be set-->
-<script type="text/javascript">
-    RED.nodes.registerType('Brightness',{
-        category: 'IoT2School',      // the palette category
-        defaults: {             // defines the editable properties of the node
-	       brightness: {value:"0",validate:RED.validators.number(),           required:true},
-            name: {value:""},   //  along with default values.
-        },
-	    color:"#91F5D7",
-        inputs:1,               // set the number of inputs - only 0 or 1
-        outputs:1,              // set the number of outputs - 0 to n
-        // set the icon (held in icons dir below where you save the node)
-        icon: "myicon.png",     // saved in  icons/myicon.png
-        label: function() {     // sets the default label contents
-            return this.name||this.brightness||"Helligkeit";
-        },
-        labelStyle: function() { // sets the class to apply to the label
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
-
-
-<! Click -->
-
-<script type="text/x-red" data-template-name="Click">
-   <!-- data-template-name identifies the node type this is for              -->
-
-   <!-- Each of the following divs creates a field in the edit dialog.       -->
-   <!-- Generally, there should be an input for each property of the node.   -->
-   <!-- The for and id attributes identify the corresponding property        -->
-   <!-- (with the 'node-input-' prefix).                                     -->
-   <!-- The available icon classes are defined Font Awesome Icons (FA Icons) -->
-
-    <br/>
-    <!-- By convention, most nodes have a 'name' property. The following div -->
-    <!-- provides the necessary field. Should always be the last option      -->
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-
-</script>
-
-
-<!-- Next, some simple help text is provided for the node.                   -->
-<script type="text/x-red" data-help-name="Click">
-   <!-- data-help-name identifies the node type this help is for             -->
-   <!-- This content appears in the Info sidebar when a node is selected     -->
-   <!-- The first <p> is used as the pop-up tool tip when hovering over a    -->
-   <!-- node in the palette.                                                 -->
-   <p>Simple sample input node. Just sends a single message when it starts up.
-   This is not very useful.</p>
-   <p>Outputs an object called <code>msg</code> containing <code>msg.topic</code> and
-   <code>msg.payload</code>. msg.payload is a String.</p>
-</script>
-
-<!-- Finally, the node type is registered along with all of its properties   -->
-<!-- The example below shows a small subset of the properties that can be set-->
-<script type="text/javascript">
-    RED.nodes.registerType("Click",{
-        category: 'IoT2School',      // the palette category
-        defaults: {             // defines the editable properties of the node
-	       brightness: {value:"0",validate:RED.validators.number(),           required:true},
-            name: {value:""},   //  along with default values.
-        },
-	    color:"#91F5D7",
-        inputs:1,               // set the number of inputs - only 0 or 1
-        outputs:4,              // set the number of outputs - 0 to n
-        outputLabels: ["singleClick","doubleClick","longPress","longRelease"],
-        // set the icon (held in icons dir below where you save the node)
-        icon: "myicon.png",     // saved in  icons/myicon.png
-        label: function() {     // sets the default label contents
-            return this.name||this.brightness||"Helligkeit";
-        },
-        labelStyle: function() { // sets the class to apply to the label
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
 
 
 

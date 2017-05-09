@@ -642,6 +642,7 @@ void setup() {
 	Serial.begin(115200);
 	Serial.println();
   pinMode(PIR_PIN, INPUT);
+  digitalWrite(PIR_PIN, LOW);
 	pinMode(LED0, OUTPUT);
 	digitalWrite(LED0, !LOW);
 
@@ -687,7 +688,7 @@ void loop() {
  
   currentAlarm = millis();
 
-  if(digitalRead(PIR_PIN) == LOW){
+  if(digitalRead(PIR_PIN) == HIGH){
     if(abs(lastAlarm - currentAlarm) > debounceTime && alarmModus==ON){
   
       lastAlarm = currentAlarm;

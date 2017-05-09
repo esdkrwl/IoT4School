@@ -12,6 +12,7 @@
 
 //Board-LED
 #define       LED0      2
+#define       PIR_PIN       10
 
 // Typ des Moduls - Sensor oder Aktor
 String type = "Sensor";
@@ -19,7 +20,18 @@ String type = "Sensor";
 String modulName = "PIR";
 
 // ------ HIER RELEVANTER MODUL PARAMETER SAMMELN ------
+//komplatibel zu set_pwr. Statt anschalten alarm aktivieren. Wenn deaktiviert, sendet der Sensor nichts mehr.
+enum alarm { ON, OFF};
+int alarmModus = ON;
+// erst nach 10 Sekunden wieder Bewegung feststellen
+int debounceTime = 10000;
 
+//Zeitstempel
+long currentAlarm = 0;
+long lastAlarm = 0;
+
+//Alarmzähler
+long alarmCounter = 0;
 // -----------------------------------------------------
 
 
@@ -629,6 +641,7 @@ void setup() {
 
 	Serial.begin(115200);
 	Serial.println();
+  pinMode(PIR_PIN, INPUT);
 	pinMode(LED0, OUTPUT);
 	digitalWrite(LED0, !LOW);
 
@@ -663,30 +676,38 @@ void setup() {
 
   initOTA();
   ArduinoOTA.begin();
+
+  //attachInterrupt(digitalPinToInterrupt(PIR), motionDetected, RISING);
   
 }
 
 void loop() {
   ArduinoOTA.handle();
 	verifyConnection();
+ 
+  currentAlarm = millis();
 
-//DEBUG ZEUGS
-	long now = millis();
-	if (now - lastMsg > 2000) {
-		lastMsg = now;
-		++value;
-		if (value == 5) {
-			mqttClient.subscribe("inTopic2");
-		}
-		snprintf (msg, 75, "hello world #%ld", value);
-		Serial.print("Publish message: ");
-		Serial.println(msg);
-		if (mqttClient.publish("outTopic", msg)) {
-			Serial.println("Erfolg");
-		} else {
-			Serial.println("Misserfolg");
-		}
-	}
-//DEBUG ZEUGS
+  if(digitalRead(PIR_PIN) == LOW){
+    if(abs(lastAlarm - currentAlarm) > debounceTime && alarmModus==ON){
+  
+      lastAlarm = currentAlarm;
+      
+      String payload = "{\"identifier\":\"data\",\"motionDetected\":true}";
+      char payloadArray[200];
+      payload.toCharArray(payloadArray, 200);
+      
+      if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
+        Serial.println("[INFO] Alarm-Payload erfolgreich versendet.");
+        alarmCounter++;
+      } else {
+        Serial.println("[ERROR] Alarm-Payload konnte nicht versendet werden.");
+    }
+    
+  }
+    
+  }
+  delay(5);
+  
 
+  
 }

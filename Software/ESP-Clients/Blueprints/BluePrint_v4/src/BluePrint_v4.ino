@@ -63,7 +63,7 @@ int mqttStrikes = 0;
 // Flag um festzustellen, ob das Modul bereits den neuen Namen vom Python Skript erhalten hat
 bool topicUpdated = false;
 
-// TESTZEUGS 
+// TESTZEUGS
 long lastMsg = 0;
 char msg[50];
 int value = 0;
@@ -142,17 +142,17 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void onName(JsonObject& j) {
 
   Serial.println("[DEBUG] Greetz aus onName");
-  
+
   if(j.containsKey( "new_name" )){
     String newName = j["new_name"];
     nameString = newName;
   }
   if(j.containsKey("suffix")){
     String suffix = j["suffix"];
-    
+
     String finalSubTopic = "sub/"+ type +"/"+modulName+"/"+suffix;
     String finalPubTopic = "pub/"+ type +"/"+modulName+"/"+suffix;
-    
+
     finalPubTopic.toCharArray(finalPubTopicArray, 200);
     finalSubTopic.toCharArray(finalSubTopicArray, 200);
     Serial.println("[DEBUG] Final Sub Topic: " + String(finalSubTopicArray));
@@ -197,7 +197,7 @@ void saveConfigCallback() {
 
 /*
  * Initialisiert und startet den WiFiManager
- * 
+ *
  */
 void initWifiManager() {
     WiFiManager wifiManager;
@@ -205,7 +205,7 @@ void initWifiManager() {
    * CallBack Funktion, falls Daten gespeichert werden sollen
    */
   wifiManager.setSaveConfigCallback(saveConfigCallback);
-  
+
 	/*
    * MQTT Server und Port als Extra Params
 	 */
@@ -220,7 +220,7 @@ void initWifiManager() {
 	  wifiManager.resetSettings();
 	}
 	wifiManager.setTimeout(180);
-  
+
 	if (!wifiManager.autoConnect("IoT2School", "IoT-PW")) {
 		Serial.println("failed to connect and hit timeout");
 		delay(3000);
@@ -230,7 +230,7 @@ void initWifiManager() {
 	}
   //Verbunden
  digitalWrite(LED0, !HIGH);
- 
+
 	strcpy(mqtt_server, custom_mqtt_server.getValue());
 	strcpy(mqtt_port, custom_mqtt_port.getValue());
 
@@ -386,20 +386,20 @@ void connectToBroker() {
        * CallBack Funktion, falls Daten gespeichert werden sollen
        */
       wifiManager.setSaveConfigCallback(saveConfigCallback);
-      
+
       /*
        * MQTT Server und Port als Extra Params
        */
       WiFiManagerParameter custom_mqtt_server("server", "mqtt server",
           mqtt_server, 40);
       WiFiManagerParameter custom_mqtt_port("port", "mqtt port", mqtt_port, 5);
-    
+
       wifiManager.addParameter(&custom_mqtt_server);
       wifiManager.addParameter(&custom_mqtt_port);
-    
 
-    
-    
+
+
+
     wifiManager.setTimeout(180);
     if (!wifiManager.startConfigPortal("MQTT-AP", "password")) {
       Serial.println("failed to connect and hit timeout");
@@ -413,7 +413,7 @@ void connectToBroker() {
       mqttClient.setServer(custom_mqtt_server.getValue(), atoi(custom_mqtt_port.getValue()));
       saveConfigParams();
     }
-  
+
    }
 
 	}
@@ -532,7 +532,7 @@ String createClientStatusJson() {
 
 	statusPayload += "\"Typ\": ";
   statusPayload += "\"" + type + "\", ";
- 
+
 	statusPayload += "\"Name\": ";
 	statusPayload += "\"" + modulName + "\"}";
 
@@ -663,12 +663,13 @@ void setup() {
 
   initOTA();
   ArduinoOTA.begin();
-  
+
 }
 
 void loop() {
   ArduinoOTA.handle();
 	verifyConnection();
+	
 
 //DEBUG ZEUGS
 	long now = millis();

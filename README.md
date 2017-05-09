@@ -1,6 +1,6 @@
 # IoT2School
 Masterarbeit 2017
-Internet der Dinge in der Schule
+Die Entwicklung einer exemplarischen Internet of Things Infrastruktur für den Einsatz im Informatikunterricht
 
 ## Aufbau
 Im Rahmen meiner Masterarbeit habe ich mich damit beschäftigt, wie man das Internet der Dinge in das Klassenzimmer bringen kann. Um dies zu erreichen wurden Hardwaremodule, kurz Dinge, entwickelt und mit einer Firmware ausgestattet, die es ohne viel Vorbereitung im Unterricht verwendet werden können.

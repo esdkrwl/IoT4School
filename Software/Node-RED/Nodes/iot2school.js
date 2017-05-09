@@ -385,6 +385,190 @@ module.exports = function(RED) {
         this.IoTSensorName = n.IoTSensorName;
     }
     RED.nodes.registerType("IoT-Sensor",IoTSensorNode);
+    
+    function SensorStatusNode(config){
+        RED.nodes.createNode(this,config);
+        
+        this.broker = config.broker;
+        this.brokerConn = RED.nodes.getNode(this.broker);
+        this.sensor = RED.nodes.getNode(config.sensor).IoTSensorName;
+        this.number = config.number;
+        this.topic = 'pub/Sensor/' + this.sensor + '/' + this.number;
+        this.qos = parseInt(config.qos);
+        this.name=config.name;
+        
+        var node = this;
+        
+        if (this.brokerConn) {
+            this.status({fill:"red",shape:"ring",text:"Getrennt"});
+            if (this.topic) {
+                
+                node.brokerConn.register(this);
+                
+                //subscribe beim Broker
+                this.brokerConn.subscribe(node.topic,node.qos,function(topic,payload,packet) {  
+                    if (isUtf8(payload)) {
+                        payload = payload.toString();
+                    }
+                    var msg = {topic:topic, payload:payload, qos: packet.qos, retain: packet.retain};
+                    if ((node.brokerConn.broker === "localhost")||(node.brokerConn.broker === "127.0.0.1")){
+                        msg._topic = topic;
+                    }
+                    //Prüfe, ob Nachricht Payload hat
+                    if (msg.hasOwnProperty("payload")) {
+
+                        if (typeof msg.payload === "string") {
+                            //Versuche String zu parsen
+                            try {
+                                msg.payload = JSON.parse(msg.payload);
+                                if(msg.payload.identifier == 'status'){
+                                    node.send(msg);
+                                }
+                                
+                            }
+                            catch(e) {
+                                node.error('Fehler ' + e.message,msg); 
+                            }
+                        }
+                        else { 
+                            node.warn(RED._("json.errors.dropped"));
+                        }
+                    }
+                    //Falls kein Payload vorhanden, leite die Nachricht einfach so weiter
+                    else { 
+                        node.send(msg); 
+                    }
+
+                    
+                }, this.id);
+                
+                if (this.brokerConn.connected) {
+                    node.status({fill:"green",shape:"dot",text:"Verbunden"});
+                }
+            }
+            else {
+                this.error(RED._("mqtt.errors.not-defined"));
+            }
+            
+            this.on('input', function (msg) {
+                msg.qos = node.qos;
+                msg.retain = 0;
+                msg.topic = 'sub/Sensor/' + this.sensor + '/' + this.number;
+                msg.payload = '{"identifier:"status"}';
+                this.brokerConn.publish(msg);
+                
+            });
+            
+            
+            
+            
+            this.on('close', function(done) {
+                if (node.brokerConn) {
+                    node.brokerConn.unsubscribe(node.topic,node.id);
+                    node.brokerConn.deregister(node,done);
+                }
+            });
+            
+        } else {
+            this.error(RED._("mqtt.errors.missing-config"));
+        }
+        
+        
+    }
+    RED.nodes.registerType("SensorStatus", SensorStatusNode);
+    
+
+function AktorStatusNode(config){
+        RED.nodes.createNode(this,config);
+        
+        this.broker = config.broker;
+        this.brokerConn = RED.nodes.getNode(this.broker);
+        this.sensor = RED.nodes.getNode(config.sensor).IoTSensorName;
+        this.number = config.number;
+        this.topic = 'pub/Aktor/' + this.aktor + '/' + this.number;
+        this.qos = parseInt(config.qos);
+        this.name=config.name;
+        
+        var node = this;
+        
+        if (this.brokerConn) {
+            this.status({fill:"red",shape:"ring",text:"Getrennt"});
+            if (this.topic) {
+                
+                node.brokerConn.register(this);
+                
+                //subscribe beim Broker
+                this.brokerConn.subscribe(node.topic,node.qos,function(topic,payload,packet) {  
+                    if (isUtf8(payload)) {
+                        payload = payload.toString();
+                    }
+                    var msg = {topic:topic, payload:payload, qos: packet.qos, retain: packet.retain};
+                    if ((node.brokerConn.broker === "localhost")||(node.brokerConn.broker === "127.0.0.1")){
+                        msg._topic = topic;
+                    }
+                    //Prüfe, ob Nachricht Payload hat
+                    if (msg.hasOwnProperty("payload")) {
+
+                        if (typeof msg.payload === "string") {
+                            //Versuche String zu parsen
+                            try {
+                                msg.payload = JSON.parse(msg.payload);
+                                if(msg.payload.identifier == 'status'){
+                                    node.send(msg);
+                                }
+                                
+                            }
+                            catch(e) {
+                                node.error('Fehler ' + e.message,msg); 
+                            }
+                        }
+                        else { 
+                            node.warn(RED._("json.errors.dropped"));
+                        }
+                    }
+                    //Falls kein Payload vorhanden, leite die Nachricht einfach so weiter
+                    else { 
+                        node.send(msg); 
+                    }
+
+                    
+                }, this.id);
+                
+                if (this.brokerConn.connected) {
+                    node.status({fill:"green",shape:"dot",text:"Verbunden"});
+                }
+            }
+            else {
+                this.error(RED._("mqtt.errors.not-defined"));
+            }
+            
+            this.on('input', function (msg) {
+                msg.qos = node.qos;
+                msg.retain = 0;
+                msg.topic = 'sub/Aktor/' + this.aktor + '/' + this.number;
+                msg.payload = '{"identifier:"status"}';
+                this.brokerConn.publish(msg);
+                
+            });
+            
+            
+            
+            
+            this.on('close', function(done) {
+                if (node.brokerConn) {
+                    node.brokerConn.unsubscribe(node.topic,node.id);
+                    node.brokerConn.deregister(node,done);
+                }
+            });
+            
+        } else {
+            this.error(RED._("mqtt.errors.missing-config"));
+        }
+        
+        
+    }
+    RED.nodes.registerType("AktorStatus", AktorStatusNode);
+
 
     function AktorNode(config) {
         
@@ -827,7 +1011,7 @@ module.exports = function(RED) {
         });
         
     }
-    RED.nodes.registerType("Brightness",brightnessNode);
+    RED.nodes.registerType("Helligkeit",brightnessNode);
     
     function clickNode(n) {
         // Create a RED node
@@ -850,13 +1034,10 @@ module.exports = function(RED) {
                     }
 
                     }
-                
-            
-
         });
         
     }
-    RED.nodes.registerType("Click",clickNode);
+    RED.nodes.registerType("Klick-Dekodierer",clickNode);
     
     
     

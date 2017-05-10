@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# http://stackoverflow.com/questions/42880887/start-node-red-silent
 # You don't actually need this, but its nice to have
 die() {
     echo "$@" 1>&2

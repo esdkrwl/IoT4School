@@ -12,6 +12,7 @@
 
 //Board-LED
 #define       LED0      2
+#define       MICRO     10
 
 // Typ des Moduls - Sensor oder Aktor
 String type = "Sensor";
@@ -19,6 +20,14 @@ String type = "Sensor";
 String modulName = "Klatsch";
 
 // ------ HIER RELEVANTER MODUL PARAMETER SAMMELN ------
+enum alarm { ON, OFF};
+int alarmModus = ON;
+int clapCounter = 0;
+
+//Zeitstempel
+long cur1 = 0;
+long cur2 = 0;
+long last1 = 0;
 
 // -----------------------------------------------------
 
@@ -630,6 +639,8 @@ void setup() {
 	Serial.begin(115200);
 	Serial.println();
 	pinMode(LED0, OUTPUT);
+  pinMode(MICRO, INPUT);
+  //digitalWrite(MICRO, LOW);
 	digitalWrite(LED0, !LOW);
 
 	readConfigFromFS();
@@ -663,30 +674,76 @@ void setup() {
 
   initOTA();
   ArduinoOTA.begin();
-  
+  //attachInterrupt(digitalPinToInterrupt(MICRO), clap, RISING);
 }
 
 void loop() {
   ArduinoOTA.handle();
 	verifyConnection();
 
-//DEBUG ZEUGS
-	long now = millis();
-	if (now - lastMsg > 2000) {
-		lastMsg = now;
-		++value;
-		if (value == 5) {
-			mqttClient.subscribe("inTopic2");
-		}
-		snprintf (msg, 75, "hello world #%ld", value);
-		Serial.print("Publish message: ");
-		Serial.println(msg);
-		if (mqttClient.publish("outTopic", msg)) {
-			Serial.println("Erfolg");
-		} else {
-			Serial.println("Misserfolg");
-		}
-	}
-//DEBUG ZEUGS
+  if(digitalRead(MICRO)){
+    cur1 = millis();
+    if(abs(cur1 - last1) > 250 && alarmModus == ON){
+      last1 = millis();
+    
+      if(clapCounter == 0){
+        clapCounter = 1;
+        cur2 = cur1;
+        return;
+      }
+      if(clapCounter == 1){
+        if(abs(cur1 - cur2) < 1000){
+            clapCounter = 0;
+            String payload = "{\"identifier\":\"data\",\"clapDetected\":true}";
+            char payloadArray[200];
+            payload.toCharArray(payloadArray, 200);
+            
+            if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
+              Serial.println("[INFO] Alarm-Payload erfolgreich versendet.");
+            } else {
+              Serial.println("[ERROR] Alarm-Payload konnte nicht versendet werden.");
+            } 
+          
+        }
+      }   
+    }
+  }
+ 
+  if(clapCounter == 1){
+    long timeout = millis();
+    if(abs(cur2 - timeout) > 1000){
+      clapCounter = 0;
+    }
+  }
 
 }
+
+/*void clap(){
+  cur1 = millis();
+  if(abs(cur1 - last1) > 250 && alarmModus == ON){
+    last1 = millis();
+  
+    if(clapCounter == 0){
+      clapCounter = 1;
+      cur2 = cur1;
+      return;
+    }
+    if(clapCounter == 1){
+      if(abs(cur1 - cur2) < 1000){
+          clapCounter = 0;
+          String payload = "{\"identifier\":\"data\",\"clapDetected\":true}";
+          char payloadArray[200];
+          payload.toCharArray(payloadArray, 200);
+          
+          if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
+            Serial.println("[INFO] Alarm-Payload erfolgreich versendet.");
+          } else {
+            Serial.println("[ERROR] Alarm-Payload konnte nicht versendet werden.");
+          } 
+        
+      }
+    }
+  }
+  
+}*/
+

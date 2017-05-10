@@ -637,7 +637,7 @@ void verifyConnection() {
 
 }
 
-void motionDetected(){
+/*void motionDetected(){
   currentAlarm = millis();
   
   if(abs(lastAlarm - currentAlarm) > debounceTime && alarmModus==ON){
@@ -655,7 +655,7 @@ void motionDetected(){
         Serial.println("[ERROR] Alarm-Payload konnte nicht versendet werden.");
     }   
   }
-}
+}*/
 
 void setup() {
 
@@ -698,11 +698,33 @@ void setup() {
   initOTA();
   ArduinoOTA.begin();
 
-  attachInterrupt(digitalPinToInterrupt(PIR_PIN), motionDetected, RISING);
+  //attachInterrupt(digitalPinToInterrupt(PIR_PIN), motionDetected, RISING);
   
 }
 
 void loop() {
   ArduinoOTA.handle();
-	verifyConnection();  
+	verifyConnection();
+  currentAlarm = millis();
+  if(digitalRead(PIR_PIN)){
+    if(abs(lastAlarm - currentAlarm) > debounceTime && alarmModus==ON){
+    
+        lastAlarm = currentAlarm;
+        
+        String payload = "{\"identifier\":\"data\",\"motionDetected\":true}";
+        char payloadArray[200];
+        payload.toCharArray(payloadArray, 200);
+        
+        if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
+          Serial.println("[INFO] Alarm-Payload erfolgreich versendet.");
+          alarmCounter++;
+        } else {
+          Serial.println("[ERROR] Alarm-Payload konnte nicht versendet werden.");
+      }   
+    }
+    
+  }
+
+
+ 
 }

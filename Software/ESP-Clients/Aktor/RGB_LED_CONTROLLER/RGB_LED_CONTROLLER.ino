@@ -256,6 +256,23 @@ void onData(JsonObject& j) {
 void onStatus(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onStatus");
 
+  String payload;
+  if(mode_led == ON){
+    payload = "{\"identifier\":\"status\",\"modus\":\"an\", \"rgb\":["+String(map(redValue, 0, 255, 0, 1023))+","+ String(map(greenValue, 0, 255, 0, 1023)) + ","+ String(map(blueValue, 0, 255, 0, 1023)) +"]}";
+  } else {
+    payload = "{\"identifier\":\"status\",\"modus\":\"an\", \"rgb\":["+String(map(redValue, 0, 255, 0, 1023))+","+ String(map(greenValue, 0, 255, 0, 1023)) + ","+ String(map(blueValue, 0, 255, 0, 1023)) +"]}";
+  }
+ 
+  char payloadArray[200];
+  payload.toCharArray(payloadArray, 200);
+
+  if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
+    Serial.println("[INFO] Status Payload erfolgreich versendet.");
+  } else {
+    Serial.println("[ERROR] Status Payload nicht versendet.");
+  }
+  Serial.println();
+
 }
 
 void RGB2HSV(){

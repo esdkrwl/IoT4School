@@ -178,6 +178,19 @@ void onName(JsonObject& j) {
  */
 void onConfig(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onConfig");
+  
+  if( j.containsKey("set_pwr") ) {
+    if(j["set_pwr"] == "on" and alarmModus == OFF){
+      alarmModus = ON;
+    }
+    if(j["set_pwr"] == "off" and alarmModus == ON){
+      alarmModus = OFF;
+    }
+  }
+  if( j.containsKey("set_debounceTime") ) {
+    debounceTime = j["set_debounceTime"];
+    debounceTime = debounceTime * 1000;
+  }
 
 }
 
@@ -196,6 +209,22 @@ void onData(JsonObject& j) {
  */
 void onStatus(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onStatus");
+  String payload;
+  if(alarmModus == ON){
+    payload = "{\"identifier\":\"status\",\"modus\":\"an\", \"debounceTime\":"+String(debounceTime/1000)+",\"alarms:\""+String(alarmCounter)+"}";
+  } else {
+    payload = "{\"identifier\":\"status\",\"modus\":\"aus\", \"debounceTime\":"+String(debounceTime/1000)+",\"alarms:\""+String(alarmCounter)+"}";
+  }
+  
+  char payloadArray[200];
+  payload.toCharArray(payloadArray, 200);
+
+  if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
+    Serial.println("[INFO] Status Payload erfolgreich versendet.");
+  } else {
+    Serial.println("[ERROR] Status Payload nicht versendet.");
+  }
+  Serial.println();
 
 }
 

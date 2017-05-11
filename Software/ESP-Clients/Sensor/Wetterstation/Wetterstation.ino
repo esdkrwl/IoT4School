@@ -199,7 +199,12 @@ void onName(JsonObject& j) {
  */
 void onConfig(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onConfig");
-
+  if(j.containsKey("set_deepSleepTimer")){
+    deepSleepDuration = j["set_deepSleepDuration"];  
+  }
+  if(j.containsKey("set_messurementTimer")){
+    messureDuration = j["set_deepSleepDuration"];  
+  }
 }
 
 /*
@@ -207,9 +212,6 @@ void onConfig(JsonObject& j) {
  */
 void onData(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onData");
-	String test = j["b"];
-	Serial.println(test);
-
 }
 
 /*
@@ -217,7 +219,19 @@ void onData(JsonObject& j) {
  */
 void onStatus(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onStatus");
+  String payload;
+  payload = "{\"identifier\":\"status\",\"deepSleepDuration\":"+ String(deepSleepDuration)+", \"messurementDuration\":"+ String(messureDuration)+"}";
 
+ 
+  char payloadArray[200];
+  payload.toCharArray(payloadArray, 200);
+
+  if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
+    Serial.println("[INFO] Status Payload erfolgreich versendet.");
+  } else {
+    Serial.println("[ERROR] Status Payload nicht versendet.");
+  }
+  Serial.println();
 }
 
 /*
@@ -717,12 +731,12 @@ void loop() {
     if(abs(timestamp1-timestamp2) > 2000 && messCounter < sampleSize){
       timestamp2 = millis();
       ldrValue = analogRead(A0);
-      Serial.println("ldr: "+ String(ldrValue));
       humidity = dht.readHumidity();
-      Serial.println("hum: "+ String(humidity));
+      delay(250);
       temperature = dht.readTemperature();
-      Serial.println("temp: "+ String(temperature));
+      delay(250);
       heatIndex = dht.computeHeatIndex(temperature, humidity, false);
+      delay(250);
       if(isnan(humidity) || isnan(temperature)){
         Serial.println("[ERROR] Temperatur oder Feuchtigkeit nicht messbar");
       } else{

@@ -192,8 +192,23 @@ void onData(JsonObject& j) {
  * Callback Methode, falls der Identifier Status im Payload gefunden wurde
  */
 void onStatus(JsonObject& j) {
-	Serial.println("[DEBUG] Greetz aus onStatus");
+  Serial.println("[DEBUG] Greetz aus onStatus");
+  String payload;
+  if(alarmModus == ON){
+    payload = "{\"identifier\":\"status\",\"modus\":\"an\", \"clapCounter\":"+String(clapCounter)+"}";
+  } else {
+    payload = "{\"identifier\":\"status\",\"modus\":\"aus\", \"clapCounter\":"+String(clapCounter)+"}";
+  }
+  
+  char payloadArray[200];
+  payload.toCharArray(payloadArray, 200);
 
+  if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
+    Serial.println("[INFO] Status Payload erfolgreich versendet.");
+  } else {
+    Serial.println("[ERROR] Status Payload nicht versendet.");
+  }
+  Serial.println();
 }
 
 /*

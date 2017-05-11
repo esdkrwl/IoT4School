@@ -359,7 +359,7 @@ def handleNodeRedCmd(client, userdata, msg):
         if yeelight in bulbs:
 
             if identifier == 'data':
-                if 'toogle' in nodeRedPayload:
+                if 'toggle' in nodeRedPayload:
                     sendCmdToggle(bulbs[yeelight][0]['ip'])
                 if 'set_pwr' in nodeRedPayload:
                     sendCmdPower(bulbs[yeelight][0]['ip'], nodeRedPayload['set_pwr'])

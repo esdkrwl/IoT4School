@@ -740,7 +740,7 @@ void loop() {
     averageLdrValue = averageLdrValue/3.0;
     averageHeatIndex = averageHeatIndex/3.0;
     
-    String payload = "{\"identifier\":\"data\",\"Temp\": \""+String(averageTemperature)+"\", \"Hum\":\""+String(averageHumidity)+"\",\"LDR\":\""+String(averageLdrValue)+"\", \"HIC\":\""+String(averageHeatIndex)+"\"}";
+    String payload = "{\"identifier\":\"data\",\"Temp\": \""+String(averageTemperature)+"\", \"Hum\":\""+String(averageHumidity)+"\",\"LDR\":\""+String(averageLdrValue)+"\", \"HI\":\""+String(averageHeatIndex)+"\"}";
     char payloadArray[200];
     
     payload.toCharArray(payloadArray, 200);

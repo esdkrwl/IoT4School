@@ -454,7 +454,7 @@ module.exports = function(RED) {
                 msg.qos = node.qos;
                 msg.retain = 0;
                 msg.topic = 'sub/Sensor/' + this.sensor + '/' + this.number;
-                msg.payload = '{"identifier:"status"}';
+                msg.payload = '{"identifier":"status"}';
                 this.brokerConn.publish(msg);
                 
             });
@@ -546,7 +546,7 @@ function AktorStatusNode(config){
                 msg.qos = node.qos;
                 msg.retain = 0;
                 msg.topic = 'sub/Aktor/' + this.aktor + '/' + this.number;
-                msg.payload = '{"identifier:"status"}';
+                msg.payload = '{"identifier":"status"}';
                 this.brokerConn.publish(msg);
                 
             });
@@ -686,6 +686,10 @@ function AktorStatusNode(config){
         
         // respond to inputs....
         this.on('input', function (msg) {
+            var newMsg = {};
+            newMsg.payload = JSON.parse('{"set_pwr":"on"}');
+            node.send(newMsg);  
+            /*
 	
             if(typeof msg.payload === "object"){
                 if(!Buffer.isBuffer(msg.payload)){
@@ -706,7 +710,7 @@ function AktorStatusNode(config){
                msg.payload = JSON.parse(msg.payload);
                 // in this example just send it straight on... should process it here really
                 node.send(msg);    
-            }
+            }*/
         });
 
         this.on("close", function() {
@@ -735,7 +739,10 @@ function AktorStatusNode(config){
         
         // respond to inputs....
         this.on('input', function (msg) {
-            
+            var newMsg = {};
+            newMsg.payload = JSON.parse('{"set_pwr":"off"}');
+            node.send(newMsg);  
+            /*
             if(typeof msg.payload === "object"){
                 if(!Buffer.isBuffer(msg.payload)){
                     try{
@@ -755,7 +762,7 @@ function AktorStatusNode(config){
                msg.payload = JSON.parse(msg.payload);
                 // in this example just send it straight on... should process it here really
                 node.send(msg);    
-            }
+            }*/
         });
 
         this.on("close", function() {
@@ -787,7 +794,10 @@ function AktorStatusNode(config){
         
         // respond to inputs....
         this.on('input', function (msg) {
-	
+            var newMsg = {};
+            newMsg.payload = JSON.parse('{"toggle":1}');
+            node.send(newMsg);  
+	       /*
             if(typeof msg.payload === "object"){
                 if(!Buffer.isBuffer(msg.payload)){
                     try{
@@ -807,7 +817,7 @@ function AktorStatusNode(config){
                msg.payload = JSON.parse(msg.payload);
                 // in this example just send it straight on... should process it here really
                 node.send(msg);    
-            }
+            }*/
         });
     }
     
@@ -1038,6 +1048,40 @@ function AktorStatusNode(config){
         
     }
     RED.nodes.registerType("Klick-Dekodierer",clickNode);
+
+    function wetterNode(n) {
+        // Create a RED node
+        RED.nodes.createNode(this,n);
+
+        var node = this;
+        this.on('input', function (msg) {
+            if(typeof msg.payload === 'object' && msg.payload.identifier == "data"){
+                var temp = 0;
+                var hum = 0;
+                var ldr = 0;
+                var hi = 0;
+                var msg1;
+                var msg2;
+                var msg3;
+                var msg4;
+                if(msg.payload.hasOwnProperty('Temp')){
+                    msg1 = { payload: parseFloat(msg.payload.Temp)};
+                }
+                if(msg.payload.hasOwnProperty('Hum')){
+                    msg2 = { payload: parseFloat(msg.payload.Hum)};
+                }
+                if(msg.payload.hasOwnProperty('LDR')){
+                    msg3 ={ payload: parseInt(msg.payload.LDR)};
+                }
+                if(msg.payload.hasOwnProperty('HI')){
+                   msg4 = { payload: parseFloat(msg.payload.HI)};
+                }
+                node.send([msg1, msg2, msg3, msg4]);
+               }
+        });
+        
+    }
+    RED.nodes.registerType("Wetter-Dekodierer",wetterNode);
     
     
     

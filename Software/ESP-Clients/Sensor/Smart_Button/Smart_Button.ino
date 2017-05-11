@@ -219,7 +219,7 @@ void onData(JsonObject& j) {
  */
 void onStatus(JsonObject& j) {
 	Serial.println("[DEBUG] Greetz aus onStatus");
-  String payload = "{\"identifier\":\"status\",\"ticks\":"+ String(ticks) + "\"pressTicks\":" + String(pressTicks) + "\"totalClicks\":" + String(totalClickCount) +"}";
+  String payload = "{\"identifier\":\"status\",\"ticks\":"+ String(ticks) + ",\"pressTicks\":" + String(pressTicks) + ",\"totalClicks\":" + String(totalClickCount) +"}";
   
   char payloadArray[200];
   payload.toCharArray(payloadArray, 200);

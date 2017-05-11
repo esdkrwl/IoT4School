@@ -1,4 +1,6 @@
-
+<script type="text/x-red" data-help-name="IoT-Sensor">
+    <p>Merkt sich die gespeicherten Sensoren.</p>
+</script>
 
 <script type="text/javascript">
 
@@ -969,7 +971,46 @@
     });
 </script>
 
+<! Wetter -->
+<script type="text/x-red" data-template-name="Wetter-Dekodierer">
+    <br/>
+    <!-- By convention, most nodes have a 'name' property. The following div -->
+    <!-- provides the necessary field. Should always be the last option      -->
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
 
+</script>
+
+<script type="text/x-red" data-help-name="Wetter-Dekodierer">
+   <p>Die Wetterstation misst Temperatur, Luftfeuchtigkeit, Helligkeit und die gefühlte Temperatur.</p>
+   <p>Dieser Node leitet die im <code>msg.payload</code> enthaltenen Daten an die vier Ausgänge weiter.</p>
+    <p>Ausgang 1 gibt die Temperatur in Grad Celcius als Gleitkommazahl aus. </p>
+    <p>Ausgang 2 gibt die Luftfeuchtigkeit in Prozent als Gleitkommazahl aus. </p>
+    <p>Ausgang 3 gibt die Helligkeit als ganze Zahl zwischen 0 und 1023 aus. Da der Sensor sich eher dafür eignet festzustellen, dass es hell ist, anstatt die Frage zu beantworten, wie hell es ist, gilt folgende Faustregel: Je niedriger der Wert, desto heller ist es.</p>
+    <p>Ausgang 4 gibt die gefühlte Temperatur, welche aus Raumgetemperatur und Luftfeuchtigkeit berechnet wird, in Grad Celcius als Gleitkommazahl aus. </p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType("Wetter-Dekodierer",{
+        category: 'IoT2School',
+        defaults: {             
+            name: {value:""}, 
+        },
+	    color:"#00B1C1",
+        inputs:1,   
+        outputs:4,           
+        outputLabels: ["Temperatur","Luftfeuchtigkeit","Helligkeit","gefühlte Temperatur"], 
+        icon: "wetter.png",   // http://www.iconarchive.com/show/oxygen-icons-by-oxygen-icons.org/Status-weather-clouds-icon.html
+        label: function() {    
+            return this.name||"Dekodierer";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>
 
 
 

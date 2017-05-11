@@ -483,7 +483,7 @@ function AktorStatusNode(config){
         
         this.broker = config.broker;
         this.brokerConn = RED.nodes.getNode(this.broker);
-        this.sensor = RED.nodes.getNode(config.sensor).IoTSensorName;
+        this.aktor = RED.nodes.getNode(config.aktor).IoTAktorName;
         this.number = config.number;
         this.topic = 'pub/Aktor/' + this.aktor + '/' + this.number;
         this.qos = parseInt(config.qos);

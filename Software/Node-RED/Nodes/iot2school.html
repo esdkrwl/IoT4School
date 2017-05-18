@@ -1,7 +1,3 @@
-<script type="text/x-red" data-help-name="IoT-Sensor">
-    <p>Merkt sich die gespeicherten Sensoren.</p>
-</script>
-
 <script type="text/javascript">
 
     RED.nodes.registerType('IoT-Sensor',{
@@ -28,7 +24,7 @@
 -->
 <script type="text/javascript">
     RED.nodes.registerType('Sensor',{
-        category: 'IoT2School',
+        category: 'IoT4School',
         defaults: {
             
             broker: {type:"mqtt-broker", required:true},
@@ -69,7 +65,7 @@
     
         <label for="node-input-broker">
             <i class="fa fa-globe"></i> 
-            <span data-i18n="mqtt.label.broker"></span>
+            Server
         </label>
         
         <input type="text" id="node-input-broker">
@@ -100,7 +96,7 @@
     
         <label for="node-input-qos">
             <i class="fa fa-empire"></i>
-            <span data-i18n="mqtt.label.qos"></span>
+            QoS
         </label>
         <select id="node-input-qos" style="width:125px !important">
             //Anfang
@@ -180,7 +176,7 @@
 <! Status Sensor -->
 <script type="text/javascript">
     RED.nodes.registerType('SensorStatus',{
-        category: 'IoT2School',
+        category: 'IoT4School',
         defaults: {
             
             broker: {type:"mqtt-broker", required:true},
@@ -216,7 +212,7 @@
     
         <label for="node-input-broker">
             <i class="fa fa-globe"></i> 
-            <span data-i18n="mqtt.label.broker"></span>
+            Server
         </label>
         
         <input type="text" id="node-input-broker">
@@ -247,7 +243,7 @@
     
         <label for="node-input-qos">
             <i class="fa fa-empire"></i>
-            <span data-i18n="mqtt.label.qos"></span>
+            QoS
         </label>
         <select id="node-input-qos" style="width:125px !important">
             //Anfang
@@ -298,7 +294,7 @@
 <!-- Aktor -->
 <script type="text/javascript">
     RED.nodes.registerType('Aktor',{
-        category: 'IoT2School',
+        category: 'IoT4School',
         defaults: {
             
             broker: {type:"mqtt-broker", required:true},
@@ -330,7 +326,7 @@
     
         <label for="node-input-broker">
             <i class="fa fa-globe"></i> 
-            <span data-i18n="mqtt.label.broker"></span>
+            Server
         </label>
         
         <input type="text" id="node-input-broker">
@@ -361,7 +357,7 @@
     
         <label for="node-input-qos">
             <i class="fa fa-empire"></i>
-            <span data-i18n="mqtt.label.qos"></span>
+            QoS
         </label>
         <select id="node-input-qos" style="width:125px !important">
             <option value="0">0</option>
@@ -427,7 +423,7 @@
 <!-- Aktor Status -->
 <script type="text/javascript">
     RED.nodes.registerType('AktorStatus',{
-        category: 'IoT2School',
+        category: 'IoT4School',
         defaults: {
             
             broker: {type:"mqtt-broker", required:true},
@@ -459,7 +455,7 @@
     
         <label for="node-input-broker">
             <i class="fa fa-globe"></i> 
-            <span data-i18n="mqtt.label.broker"></span>
+            Server
         </label>
         
         <input type="text" id="node-input-broker">
@@ -490,7 +486,7 @@
     
         <label for="node-input-qos">
             <i class="fa fa-empire"></i>
-            <span data-i18n="mqtt.label.qos"></span>
+            QoS
         </label>
         <select id="node-input-qos" style="width:125px !important">
             <option value="0">0</option>
@@ -629,7 +625,7 @@
     
         <label for="node-input-broker">
             <i class="fa fa-globe"></i> 
-            <span data-i18n="mqtt.label.broker"></span>
+            Server
         </label>
         
         <input type="text" id="node-input-broker">
@@ -683,7 +679,7 @@
     
         <label for="node-input-qos">
             <i class="fa fa-empire"></i>
-            <span data-i18n="mqtt.label.qos"></span>
+            QoS
         </label>
         <select id="node-input-qos" style="width:125px !important">
             <option value="0">0</option>
@@ -743,7 +739,7 @@
 
 <script type="text/javascript">
     RED.nodes.registerType('An',{
-        category: 'IoT2School', 
+        category: 'IoT4School', 
         defaults: {     
             name: {value:""}, 
         },
@@ -778,7 +774,7 @@
 
 <script type="text/javascript">
     RED.nodes.registerType('Aus',{
-        category: 'IoT2School',
+        category: 'IoT4School',
         defaults: {
             name: {value:""},
         },
@@ -816,7 +812,7 @@
 
 <script type="text/javascript">
     RED.nodes.registerType('Toggle',{
-        category: 'IoT2School',      
+        category: 'IoT4School',      
         defaults: {            
         name: {value:""},  
         },
@@ -870,7 +866,7 @@
 
 <script type="text/javascript">
     RED.nodes.registerType('RGB',{
-        category: 'IoT2School',
+        category: 'IoT4School',
         defaults: {
 	    rot: {value:"0",validate:RED.validators.number(), required:true},
 	    gruen: {value:"0", validate:RED.validators.number(), required:true},
@@ -913,7 +909,7 @@
 
 <script type="text/javascript">
     RED.nodes.registerType('Helligkeit',{
-        category: 'IoT2School',
+        category: 'IoT4School',
         defaults: { 
 	        brightness: {value:"0",validate:RED.validators.number(), required:true},
             name: {value:""},
@@ -953,7 +949,7 @@
 
 <script type="text/javascript">
     RED.nodes.registerType("Klick-Dekodierer",{
-        category: 'IoT2School',
+        category: 'IoT4School',
         defaults: {             
             name: {value:""}, 
         },
@@ -994,7 +990,7 @@
 
 <script type="text/javascript">
     RED.nodes.registerType("Wetter-Dekodierer",{
-        category: 'IoT2School',
+        category: 'IoT4School',
         defaults: {             
             name: {value:""}, 
         },

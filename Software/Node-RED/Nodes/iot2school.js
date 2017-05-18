@@ -1064,17 +1064,17 @@ function AktorStatusNode(config){
                 var msg2;
                 var msg3;
                 var msg4;
-                if(msg.payload.hasOwnProperty('Temp')){
-                    msg1 = { payload: parseFloat(msg.payload.Temp)};
+                if(msg.payload.hasOwnProperty('temp')){
+                    msg1 = { payload: parseFloat(msg.payload.temp)};
                 }
-                if(msg.payload.hasOwnProperty('Hum')){
-                    msg2 = { payload: parseFloat(msg.payload.Hum)};
+                if(msg.payload.hasOwnProperty('hum')){
+                    msg2 = { payload: parseFloat(msg.payload.hum)};
                 }
-                if(msg.payload.hasOwnProperty('LDR')){
-                    msg3 ={ payload: parseInt(msg.payload.LDR)};
+                if(msg.payload.hasOwnProperty('ldr')){
+                    msg3 ={ payload: parseInt(msg.payload.ldr)};
                 }
-                if(msg.payload.hasOwnProperty('HI')){
-                   msg4 = { payload: parseFloat(msg.payload.HI)};
+                if(msg.payload.hasOwnProperty('hi')){
+                   msg4 = { payload: parseFloat(msg.payload.hi)};
                 }
                 node.send([msg1, msg2, msg3, msg4]);
                }

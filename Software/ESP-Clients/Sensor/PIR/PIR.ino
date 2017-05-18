@@ -194,7 +194,6 @@ void onConfig(JsonObject& j) {
         alarmModus = OFF;
       }
     }
-
   }
   // prüfe Key
   if (j.containsKey("set_debounceTime")) {

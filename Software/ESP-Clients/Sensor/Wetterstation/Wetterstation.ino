@@ -17,7 +17,6 @@
 #define       LDRPIN    A0
 #define       DHTTYPE   DHT22
 
-
 // Typ des Moduls - Sensor oder Aktor
 String type = "Sensor";
 // Name des Moduls - z.B. RGB-LED, Smart-Button etc..
@@ -25,6 +24,11 @@ String modulName = "Wetter";
 
 // ------ HIER RELEVANTER MODUL PARAMETER SAMMELN ------
 DHT dht(DHTPIN, DHTTYPE);
+enum modus {
+  ECO, PWR
+};
+int energieModus = ECO;
+
 //Schlafdauer in Zeit in Sekunden
 int deepSleepDuration = 60;
 //Messdauer in Zeit in Sekuden
@@ -51,10 +55,15 @@ long timestamp1 = 0;
 long timestamp2 = 0;
 //wird gesetzt um zu gucken ob die messzeit abgelaufen ist
 long timestamp3 = 0;
-// -----------------------------------------------------
 
 //Flag um sicher zu gehen, dass wir nicht in den Deepsleep gehen bevor der Payload nicht versendet wurde
 bool payloadSent = false;
+
+// -----------------------------------------------------
+
+
+//Passwort für OTA Update
+const char* otaPW = "123";
 
 // Char Arrays um MQTT-Daten aus dem EEPROM zwischen zu speichern
 char mqtt_server[40];
@@ -96,7 +105,7 @@ int mqttStrikes = 0;
 // Flag um festzustellen, ob das Modul bereits den neuen Namen vom Python Skript erhalten hat
 bool topicUpdated = false;
 
-// TESTZEUGS 
+// TESTZEUGS
 long lastMsg = 0;
 char msg[50];
 int value = 0;
@@ -115,59 +124,59 @@ String nameString;
  * status: fordert den Client auf, seinen aktuellen Status zu publishen
  */
 void callback(char* topic, byte* payload, unsigned int length) {
-	char jsonPayload[200];
-	Serial.print("[INFO] Daten erhalten. Topic: ");
-	Serial.print(topic);
-	Serial.print(", Payload: ");
-	for (unsigned int i = 0; i < length; i++) {
-		Serial.print((char) payload[i]);
-		jsonPayload[i] = (char) payload[i];
-	}
-	Serial.println();
-	//WICHTIG - Buffer hier anlegen und nicht global!
-	StaticJsonBuffer<200> jsonBuffer;
-	JsonObject& root = jsonBuffer.parseObject(jsonPayload);
-	//Falls kein JSON vorliegt, wird die Nachricht verworfen
-	if (!root.success()) {
+  char jsonPayload[200];
+  Serial.print("[INFO] Daten erhalten. Topic: ");
+  Serial.print(topic);
+  Serial.print(", Payload: ");
+  for (unsigned int i = 0; i < length; i++) {
+    Serial.print((char) payload[i]);
+    jsonPayload[i] = (char) payload[i];
+  }
+  Serial.println();
+  //WICHTIG - Buffer hier anlegen und nicht global!
+  StaticJsonBuffer < 200 > jsonBuffer;
+  JsonObject& root = jsonBuffer.parseObject(jsonPayload);
+  //Falls kein JSON vorliegt, wird die Nachricht verworfen
+  if (!root.success()) {
 
-		Serial.println("[ERROR] JSON Parsing fehlgeschlagen..");
+    Serial.println("[ERROR] JSON Parsing fehlgeschlagen..");
 
-	} else {
+  } else {
 
-		Serial.println("[INFO] JSON Parsing erfolgreich..");
+    Serial.println("[INFO] JSON Parsing erfolgreich..");
 
-		//Prüfe, ob der key identifier vorhanden ist, falls nicht verwerfen
-		if (root.containsKey("identifier")) {
+    //Prüfe, ob der key identifier vorhanden ist, falls nicht verwerfen
+    if (root.containsKey("identifier")) {
 
-			if (root["identifier"] == "name") {
-				Serial.println("[DEBUG] Identifier gefunden: Name");
-				onName(root);
+      if (root["identifier"] == "name") {
+        Serial.println("[DEBUG] Identifier gefunden: Name");
+        onName(root);
 
-			} else if (root["identifier"] == "config") {
+      } else if (root["identifier"] == "config") {
 
-				Serial.println("[DEBUG] Identifier gefunden: Config");
-				onConfig(root);
+        Serial.println("[DEBUG] Identifier gefunden: Config");
+        onConfig(root);
 
-			} else if (root["identifier"] == "data") {
+      } else if (root["identifier"] == "data") {
 
-				Serial.println("[DEBUG] Identifier gefunden: Data");
-				onData(root);
+        Serial.println("[DEBUG] Identifier gefunden: Data");
+        onData(root);
 
-			} else if (root["identifier"] == "status") {
+      } else if (root["identifier"] == "status") {
 
-				Serial.println("[DEBUG] Identifier gefunden: Status");
-				onStatus(root);
+        Serial.println("[DEBUG] Identifier gefunden: Status");
+        onStatus(root);
 
-			} else {
-				Serial.print("[ERROR] Unbekannter Identifier: ");
-				String identifierString = root["identifier"];
-				Serial.println(identifierString);
-			}
+      } else {
+        Serial.print("[ERROR] Unbekannter Identifier: ");
+        String identifierString = root["identifier"];
+        Serial.println(identifierString);
+      }
 
-		} else {
-			Serial.println("[ERROR] Keinen Identifier gefunden");
-		}
-	}
+    } else {
+      Serial.println("[ERROR] Keinen Identifier gefunden");
+    }
+  }
 }
 /*
  * Callback Methode, falls der Identifier Name im Payload gefunden wurde
@@ -175,59 +184,104 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void onName(JsonObject& j) {
 
   Serial.println("[DEBUG] Greetz aus onName");
-  
-  if(j.containsKey( "new_name" )){
+
+  //wenn new_name und suffix im Payload stehen, kann der neue Name gesetzt werden
+  if (j.containsKey("new_name") && j.containsKey("suffix")) {
     String newName = j["new_name"];
     nameString = newName;
-  }
-  if(j.containsKey("suffix")){
+
     String suffix = j["suffix"];
-    
-    String finalSubTopic = "sub/"+ type +"/"+modulName+"/"+suffix;
-    String finalPubTopic = "pub/"+ type +"/"+modulName+"/"+suffix;
-    
+
+    String finalSubTopic = "sub/" + type + "/" + modulName + "/" + suffix;
+    String finalPubTopic = "pub/" + type + "/" + modulName + "/" + suffix;
+
     finalPubTopic.toCharArray(finalPubTopicArray, 200);
     finalSubTopic.toCharArray(finalSubTopicArray, 200);
-    Serial.println("[DEBUG] Final Sub Topic: " + String(finalSubTopicArray));
-    Serial.println("[DEBUG] Final Pub Topic: " + String(finalPubTopicArray));
+    Serial.println(
+        "[DEBUG] Final Sub Topic: " + String(finalSubTopicArray));
+    Serial.println(
+        "[DEBUG] Final Pub Topic: " + String(finalPubTopicArray));
+    topicUpdated = true;
   }
-  topicUpdated = true;
 
 }
 /*
  * Callback Methode, falls der Identifier Config im Payload gefunden wurde
  */
 void onConfig(JsonObject& j) {
-	Serial.println("[DEBUG] Greetz aus onConfig");
-  if(j.containsKey("set_deepSleepTimer")){
-    deepSleepDuration = j["set_deepSleepDuration"];  
+  Serial.println("[DEBUG] Greetz aus onConfig");
+  //key prüfen
+  if (j.containsKey("set_deepSleepDuration")) {
+    //datentyp prüfen
+    if(j["set_deepSleepDuration"].is<int>()){
+      //wertebereich prüfen
+      if( j["set_deepSleepDuration"] > 0 && j["set_deepSleepDuration"] <= 86400){
+        deepSleepDuration = j["set_deepSleepDuration"]; 
+      }
+    }  
   }
-  if(j.containsKey("set_messurementTimer")){
-    messureDuration = j["set_deepSleepDuration"];  
+
+  //key prüfen
+  if (j.containsKey("set_messureDuration")) {
+    //datentyp prüfen
+    if(j["set_messureDuration"].is<int>()){
+      //wertebereich prüfen
+      if( j["set_messureDuration"] > 0 && j["set_messureDuration"] <= 1024){
+        messureDuration = j["set_messureDuration"];
+      }
+    }  
   }
+
+  //key prüfen
+  if (j.containsKey("set_mode")) {
+    //datentyp prüfen
+    if(j["set_mode"].is<const char*>()){
+      //wertebereich prüfen
+      if( j["set_mode"] == "eco"){
+        energieModus = ECO;
+      }
+      if(j["set_mode"] == "pwr"){
+        energieModus = PWR;
+      }
+    }  
+  }
+
 }
 
 /*
  * Callback Methode, falls der Identifier Data im Payload gefunden wurde
  */
 void onData(JsonObject& j) {
-	Serial.println("[DEBUG] Greetz aus onData");
+  Serial.println("[DEBUG] Greetz aus onData");
 }
 
 /*
  * Callback Methode, falls der Identifier Status im Payload gefunden wurde
  */
 void onStatus(JsonObject& j) {
-	Serial.println("[DEBUG] Greetz aus onStatus");
+  Serial.println("[DEBUG] Greetz aus onStatus");
   String payload;
-  payload = "{\"identifier\":\"status\",\"deepSleepDuration\":"+ String(deepSleepDuration)+", \"messurementDuration\":"+ String(messureDuration)+"}";
+  if(energieModus == ECO){
+      payload = "{\"identifier\":\"status\",\"mode\":\"eco\",\"deepSleepDuration\":"
+      + String(deepSleepDuration) + ", \"messurementDuration\":"
+      + String(messureDuration) + "}";
+    
+  }
+  if(energieModus == PWR){
+      payload = "{\"identifier\":\"status\",\"mode\":\"pwr\",\"deepSleepDuration\":"
+      + String(deepSleepDuration) + ", \"messurementDuration\":"
+      + String(messureDuration) + "}";
+    
+  }
+  
 
- 
+
   char payloadArray[200];
   payload.toCharArray(payloadArray, 200);
 
   if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
     Serial.println("[INFO] Status Payload erfolgreich versendet.");
+    blink();
   } else {
     Serial.println("[ERROR] Status Payload nicht versendet.");
   }
@@ -244,42 +298,43 @@ void saveConfigCallback() {
 
 /*
  * Initialisiert und startet den WiFiManager
- * 
+ *
  */
 void initWifiManager() {
-    WiFiManager wifiManager;
+  WiFiManager wifiManager;
   /*
    * CallBack Funktion, falls Daten gespeichert werden sollen
    */
   wifiManager.setSaveConfigCallback(saveConfigCallback);
-  
-	/*
+
+  /*
    * MQTT Server und Port als Extra Params
-	 */
-	WiFiManagerParameter custom_mqtt_server("server", "mqtt server",
-			mqtt_server, 40);
-	WiFiManagerParameter custom_mqtt_port("port", "mqtt port", mqtt_port, 5);
+   */
+  WiFiManagerParameter custom_mqtt_server("server", "mqtt server",
+      mqtt_server, 40);
+  WiFiManagerParameter custom_mqtt_port("port", "mqtt port", mqtt_port, 5);
 
-	wifiManager.addParameter(&custom_mqtt_server);
-	wifiManager.addParameter(&custom_mqtt_port);
+  wifiManager.addParameter(&custom_mqtt_server);
+  wifiManager.addParameter(&custom_mqtt_port);
 
-	if(setReset){
-	  wifiManager.resetSettings();
-	}
-	wifiManager.setTimeout(180);
-  
-	if (!wifiManager.autoConnect("IoT2School", "IoT-PW")) {
-		Serial.println("failed to connect and hit timeout");
-		delay(3000);
-		//reset and try again, or maybe put it to deep sleep
-		ESP.reset();
-		delay(5000);
-	}
+  if (setReset) {
+    wifiManager.resetSettings();
+  }
+  //wifiManager.setTimeout(180);
+
+  if (!wifiManager.autoConnect("IoT4School", "IoT-PW")) {
+    //überflüssig nun
+    Serial.println("[ERROR] failed to connect and hit timeout");
+    delay(3000);
+    //reset and try again, or maybe put it to deep sleep
+    ESP.reset();
+    delay(5000);
+  }
   //Verbunden
- digitalWrite(LED0, !HIGH);
- 
-	strcpy(mqtt_server, custom_mqtt_server.getValue());
-	strcpy(mqtt_port, custom_mqtt_port.getValue());
+  digitalWrite(LED0, !HIGH);
+
+  strcpy(mqtt_server, custom_mqtt_server.getValue());
+  strcpy(mqtt_port, custom_mqtt_port.getValue());
 
 }
 /*
@@ -289,12 +344,12 @@ void readConfigFromFS() {
   if (SPIFFS.begin()) {
     Serial.println("[INFO] Datei gefunden.");
     if (SPIFFS.exists("/config.json")) {
-      //file exists, reading and loading
+      
       Serial.println("[INFO] Lade Config Datei...");
       File configFile = SPIFFS.open("/config.json", "r");
       if (configFile) {
         size_t size = configFile.size();
-        // Allocate a buffer to store contents of the file.
+        
         std::unique_ptr<char[]> buf(new char[size]);
 
         configFile.readBytes(buf.get(), size);
@@ -304,8 +359,8 @@ void readConfigFromFS() {
         if (json.success()) {
           Serial.println("\nparsed json");
 
-           strcpy(mqtt_server, json["mqtt_server"]);
-           strcpy(mqtt_port, json["mqtt_port"]);
+          strcpy(mqtt_server, json["mqtt_server"]);
+          strcpy(mqtt_port, json["mqtt_port"]);
 
         } else {
           Serial.println("[ERROR] Datei gefunden.");
@@ -321,21 +376,21 @@ void readConfigFromFS() {
  * Methode zum Speichern der Konfigparameter
  */
 void saveConfigParams() {
-	Serial.println("[INFO] Speichere Config..");
-	DynamicJsonBuffer jsonBuffer;
-	JsonObject& json = jsonBuffer.createObject();
-	json["mqtt_server"] = mqtt_server;
-	json["mqtt_port"] = mqtt_port;
+  Serial.println("[INFO] Speichere Config..");
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+  json["mqtt_server"] = mqtt_server;
+  json["mqtt_port"] = mqtt_port;
 
-	File configFile = SPIFFS.open("/config.json", "w");
-	if (!configFile) {
-		Serial.println("[ERROR] Config Datei konnte nicht geöffnet werden.]");
-	} else {
+  File configFile = SPIFFS.open("/config.json", "w");
+  if (!configFile) {
+    Serial.println("[ERROR] Config Datei konnte nicht geöffnet werden.]");
+  } else {
     json.printTo(Serial);
     json.printTo(configFile);
     Serial.println();
-	}
-	configFile.close();
+  }
+  configFile.close();
 
 }
 
@@ -344,21 +399,33 @@ void saveConfigParams() {
  * Verbindungsversuch alle 5 Sekunden
  */
 bool connectToWiFi() {
-	Serial.println("[INFO] Verbinde mit SSID: " + WiFi.SSID());
-	while (WiFi.status() != WL_CONNECTED) {
+  Serial.println("[INFO] Verbinde mit SSID: " + WiFi.SSID());
+  while (WiFi.status() != WL_CONNECTED) {
 
-		for (int i = 0; i < 10; i++) {
-			digitalWrite(LED0, HIGH);
-			delay(250);
-			digitalWrite(LED0, LOW);
-			delay(250);
-			Serial.print(".");
-		}
+    for (int i = 0; i < 10; i++) {
+      digitalWrite(LED0, HIGH);
+      delay(250);
+      digitalWrite(LED0, LOW);
+      delay(250);
+      Serial.print(".");
+    }
 
-	}
-	Serial.println();
-	digitalWrite(LED0, !HIGH);
-	return true;
+  }
+  Serial.println();
+  digitalWrite(LED0, !HIGH);
+  return true;
+}
+
+/*
+ * Lässt die Status-LED des ESP Moduls einige male aufblinken
+ */
+void blink() {
+  for (int i = 0; i < 10; i++) {
+    digitalWrite(LED0, HIGH);
+    delay(100);
+    digitalWrite(LED0, LOW);
+    delay(100);
+  }
 }
 
 /*
@@ -366,16 +433,16 @@ bool connectToWiFi() {
  * einige Informationen über das Netzwerk aus
  */
 void printWiFiInfo() {
-	String essid = String(WiFi.SSID());
-	ipAdresse = WiFi.localIP();
-	long signalQuali = WiFi.RSSI();
+  String essid = String(WiFi.SSID());
+  ipAdresse = WiFi.localIP();
+  long signalQuali = WiFi.RSSI();
 
   Serial.println();
-	Serial.println("[INFO] Verbindung aufgebaut zu " + essid);
-	Serial.print("[INFO] IP-Adresse ");
-	Serial.println(ipAdresse);
-	Serial.println("[INFO] Mac-Adresse " + macAdresse);
-	Serial.println("[INFO] Signalstärke " + String(signalQuali) + " dBm");
+  Serial.println("[INFO] Verbindung aufgebaut zu " + essid);
+  Serial.print("[INFO] IP-Adresse ");
+  Serial.println(ipAdresse);
+  Serial.println("[INFO] Mac-Adresse " + macAdresse);
+  Serial.println("[INFO] Signalstärke " + String(signalQuali) + " dBm");
 }
 
 /*
@@ -387,16 +454,16 @@ void setupMqtt() {
   //mqttServer(192, 168, 178, 20);
   //mqttServerPort = 1883;
   //mqttClient.setServer(mqttServer, mqttServerPort);
-	mqttClient.setServer(mqtt_server, atoi(mqtt_port));
-	mqttClient.setCallback(callback);
+  mqttClient.setServer(mqtt_server, atoi(mqtt_port));
+  mqttClient.setCallback(callback);
   String nameClientTopic = "nameClient/" + type + "/mac/" + macAdresse;
-	nameClientTopic.toCharArray(nameTopicArray, nameClientTopic.length() + 1);
+  nameClientTopic.toCharArray(nameTopicArray, nameClientTopic.length() + 1);
   String lastWillTopic = "esp/lastwill/mac/" + macAdresse;
-	lastWillTopic.toCharArray(lastWillTopicArray, lastWillTopic.length() + 1);
+  lastWillTopic.toCharArray(lastWillTopicArray, lastWillTopic.length() + 1);
 
-	createLastWillJson().toCharArray(lastWillPayloadArray, 200);
+  createLastWillJson().toCharArray(lastWillPayloadArray, 200);
 
-	macAdresse.toCharArray(macCharArray, 18);
+  macAdresse.toCharArray(macCharArray, 18);
 }
 
 /*
@@ -404,66 +471,66 @@ void setupMqtt() {
  */
 void connectToBroker() {
 
-	Serial.println("[INFO] Verbinde mit MQTT Broker.");
-	while (!mqttClient.connected()) {
-		Serial.print(".");
-		if (mqttClient.connect(macCharArray, lastWillTopicArray, 1, false,
-				lastWillPayloadArray)) {
-       Serial.println("blalbla");
+  Serial.println("[INFO] Verbinde mit MQTT Broker.");
+  while (!mqttClient.connected()) {
+    Serial.print(".");
+    if (mqttClient.connect(macCharArray, lastWillTopicArray, 1, false,
+        lastWillPayloadArray)) {
+      Serial.println("blalbla");
       Serial.println(nameTopicArray);
-			mqttClient.subscribe(nameTopicArray);
+      mqttClient.subscribe(nameTopicArray);
       mqttStrikes = 0;
 
-		} else {
-			Serial.print("[ERROR] Verbindung zum Broker fehlgeschlagen. Fehlercode: ");
-			Serial.println(mqttClient.state());
-			delay(5000);
+    } else {
+      Serial.print(
+          "[ERROR] Verbindung zum Broker fehlgeschlagen. Fehlercode: ");
+      Serial.println(mqttClient.state());
+      delay(5000);
       mqttStrikes++;
-		}
+    }
     /*
      * Falls sich nach dem dritten Versuch nicht mit dem Broker verbunden werden konnte,
      * wird der Webserver erneut gestartet
      * dort kann man nochmal die Parameter für den Broker überprüfen
      */
-   if(mqttStrikes == 3){
-    mqttStrikes = 0;
-    WiFiManager wifiManager;
+    if (mqttStrikes == 3) {
+      mqttStrikes = 0;
+      WiFiManager wifiManager;
 
       /*
        * CallBack Funktion, falls Daten gespeichert werden sollen
        */
       wifiManager.setSaveConfigCallback(saveConfigCallback);
-      
+
       /*
        * MQTT Server und Port als Extra Params
        */
       WiFiManagerParameter custom_mqtt_server("server", "mqtt server",
           mqtt_server, 40);
-      WiFiManagerParameter custom_mqtt_port("port", "mqtt port", mqtt_port, 5);
-    
+      WiFiManagerParameter custom_mqtt_port("port", "mqtt port",
+          mqtt_port, 5);
+
       wifiManager.addParameter(&custom_mqtt_server);
       wifiManager.addParameter(&custom_mqtt_port);
-    
 
-    
-    
-    wifiManager.setTimeout(180);
-    if (!wifiManager.startConfigPortal("MQTT-AP", "password")) {
-      Serial.println("failed to connect and hit timeout");
-      delay(3000);
-      //reset and try again, or maybe put it to deep sleep
-      ESP.reset();
-      delay(5000);
-    } else {
-      strcpy(mqtt_server, custom_mqtt_server.getValue());
-      strcpy(mqtt_port, custom_mqtt_port.getValue());
-      mqttClient.setServer(custom_mqtt_server.getValue(), atoi(custom_mqtt_port.getValue()));
-      saveConfigParams();
+      wifiManager.setTimeout(180);
+      if (!wifiManager.startConfigPortal("MQTT-AP", "password")) {
+        Serial.println("failed to connect and hit timeout");
+        delay(3000);
+        //reset and try again, or maybe put it to deep sleep
+        ESP.reset();
+        delay(5000);
+      } else {
+        strcpy(mqtt_server, custom_mqtt_server.getValue());
+        strcpy(mqtt_port, custom_mqtt_port.getValue());
+        mqttClient.setServer(custom_mqtt_server.getValue(),
+            atoi(custom_mqtt_port.getValue()));
+        saveConfigParams();
+      }
+
     }
-  
-   }
 
-	}
+  }
 }
 
 /*
@@ -473,39 +540,39 @@ void connectToBroker() {
  */
 
 bool reconnectToBroker() {
-	/*
-	 * @params in
-	 * macCharArray         - ClientID
-	 * lastWillTopicArray   - willTopic
-	 * 1                    - willQoS
-	 * false                - willRetain
-	 * lastWillPayloadArray - willMessage
-	 *
-	 */
-	if (mqttClient.connect(macCharArray, lastWillTopicArray, 1, false,
-			lastWillPayloadArray)) {
-		/*
-		 * alte Topics wieder subscriben
-		 * falls man schon das neue Topic hat, muss man das alte nicht erneut subscriben
-		 */
-		if (topicUpdated) {
-			// esp/TYPE/NAME
-			mqttClient.subscribe(finalSubTopicArray);
-			//Python Bescheid sagen, dass man wieder da ist, damit die DB wieder aktualisiert werden kann
-			createClientStatusJson().toCharArray(clientStatusArray, 200);
-			if (mqttClient.publish(pythonTopic, clientStatusArray)) {
-				Serial.println("[DEBUG] Python über RC informiert");
-			} else {
-				Serial.println("[DEBUG] Python ist nicht informiert");
-			}
-		} else {
-			// nameClient/xxxx/mac/aa:bb:cc:dd:ee
-			mqttClient.subscribe(nameTopicArray);
-			//Python bescheid sagen, dass wir immer noch keinen neuen Namen haben.
-			publishNetworkSettings();
-		}
-	}
-	return mqttClient.connected();
+  /*
+   * @params in
+   * macCharArray         - ClientID
+   * lastWillTopicArray   - willTopic
+   * 1                    - willQoS
+   * false                - willRetain
+   * lastWillPayloadArray - willMessage
+   *
+   */
+  if (mqttClient.connect(macCharArray, lastWillTopicArray, 1, false,
+      lastWillPayloadArray)) {
+    /*
+     * alte Topics wieder subscriben
+     * falls man schon das neue Topic hat, muss man das alte nicht erneut subscriben
+     */
+    if (topicUpdated) {
+      // esp/TYPE/NAME
+      mqttClient.subscribe(finalSubTopicArray);
+      //Python Bescheid sagen, dass man wieder da ist, damit die DB wieder aktualisiert werden kann
+      createClientStatusJson().toCharArray(clientStatusArray, 200);
+      if (mqttClient.publish(pythonTopic, clientStatusArray)) {
+        Serial.println("[DEBUG] Python über RC informiert");
+      } else {
+        Serial.println("[DEBUG] Python ist nicht informiert");
+      }
+    } else {
+      // nameClient/xxxx/mac/aa:bb:cc:dd:ee
+      mqttClient.subscribe(nameTopicArray);
+      //Python bescheid sagen, dass wir immer noch keinen neuen Namen haben.
+      publishNetworkSettings();
+    }
+  }
+  return mqttClient.connected();
 }
 
 /*
@@ -513,13 +580,13 @@ bool reconnectToBroker() {
  * Wird nach dem erstmaligen verbinden angezeigt.
  */
 void printBrokerInfo() {
-	Serial.println();
-	Serial.println("[INFO] Verbindung zum MQTT Broker aufgebaut.");
-	Serial.print("[INFO] MQTT Broker IP-Adresse ");
-	Serial.println(mqtt_server);
+  Serial.println();
+  Serial.println("[INFO] Verbindung zum MQTT Broker aufgebaut.");
+  Serial.print("[INFO] MQTT Broker IP-Adresse ");
+  Serial.println(mqtt_server);
 
-	Serial.print("[INFO] MQTT Broker Port ");
-	Serial.println(mqtt_port);
+  Serial.print("[INFO] MQTT Broker Port ");
+  Serial.println(mqtt_port);
   Serial.println();
 }
 
@@ -532,19 +599,19 @@ void publishNetworkSettings() {
   // über dieses Topic kommuziert das Modul mit dem Python Skript
   String prePubTopic = type + "/mac/" + macAdresse;
   char prePubTopicArray[200];
-	prePubTopic.toCharArray(prePubTopicArray, 200);
+  prePubTopic.toCharArray(prePubTopicArray, 200);
 
-	//Serial.println("[DEBUG] Topic String: " + prePubTopic);
-	//Serial.println("[DEBUG] Topic Array: " + String(prePubTopicArray));
+  //Serial.println("[DEBUG] Topic String: " + prePubTopic);
+  //Serial.println("[DEBUG] Topic Array: " + String(prePubTopicArray));
 
-	createClientStatusJson().toCharArray(clientStatusArray, 200);
+  createClientStatusJson().toCharArray(clientStatusArray, 200);
 
-	if (mqttClient.publish(prePubTopicArray, clientStatusArray)) {
-		Serial.println("[INFO] Status - Payload erfolgreich versendet.");
-	} else {
-		Serial.println(
-				"[ERROR] Status - Payload konnte nicht versendet werden.");
-	}
+  if (mqttClient.publish(prePubTopicArray, clientStatusArray)) {
+    Serial.println("[INFO] Status - Payload erfolgreich versendet.");
+  } else {
+    Serial.println(
+        "[ERROR] Status - Payload konnte nicht versendet werden.");
+  }
 }
 
 /*
@@ -553,15 +620,15 @@ void publishNetworkSettings() {
  */
 String createLastWillJson() {
   String lastWillPayload;
-	lastWillPayload += "{";
+  lastWillPayload += "{";
 
-	lastWillPayload += "\"Mac\": ";
-	lastWillPayload += "\"" + macAdresse + "\", ";
+  lastWillPayload += "\"Mac\": ";
+  lastWillPayload += "\"" + macAdresse + "\", ";
 
-	lastWillPayload += "\"Message\": ";
-	lastWillPayload += "\"Verbindung verloren.\"}";
+  lastWillPayload += "\"Message\": ";
+  lastWillPayload += "\"Verbindung verloren.\"}";
 
- return lastWillPayload;
+  return lastWillPayload;
 }
 
 /*
@@ -569,58 +636,59 @@ String createLastWillJson() {
  * wird versendet, um den Python Skript über den Status des Clients zu informieren
  */
 String createClientStatusJson() {
-	String statusPayload = "{";
+  String statusPayload = "{";
 
-	statusPayload += "\"Mac\": ";
-	statusPayload += "\"" + macAdresse + "\", ";
+  statusPayload += "\"Mac\": ";
+  statusPayload += "\"" + macAdresse + "\", ";
 
-	statusPayload += "\"IP\": ";
-	statusPayload += "\"" + ipAdresse.toString() + "\", ";
+  statusPayload += "\"IP\": ";
+  statusPayload += "\"" + ipAdresse.toString() + "\", ";
 
-	statusPayload += "\"Typ\": ";
+  statusPayload += "\"Typ\": ";
   statusPayload += "\"" + type + "\", ";
- 
-	statusPayload += "\"Name\": ";
-	statusPayload += "\"" + modulName + "\"}";
 
-	Serial.println("[DEBUG] Status-Payload als JSON: " + statusPayload);
+  statusPayload += "\"Name\": ";
+  statusPayload += "\"" + modulName + "\"}";
+
+  Serial.println("[DEBUG] Status-Payload als JSON: " + statusPayload);
   Serial.println();
 
-	return statusPayload;
+  return statusPayload;
 }
 
 /*
  * Konfiguration der OTA Schnittstelle
  */
 void initOTA() {
-	// Standard Port
-	ArduinoOTA.setPort(8266);
+  // Standard Port
+  ArduinoOTA.setPort(8266);
   char newNameArray[50];
   nameString.toCharArray(newNameArray, 50);
-	// Name des Gerätes ist der OTA Name
-	ArduinoOTA.setHostname(newNameArray);
+  // Name des Gerätes ist der OTA Name
+  ArduinoOTA.setHostname(newNameArray);
 
-	// OTA Passwort
-	ArduinoOTA.setPassword((const char *) "123");
+  // OTA Passwort
+  ArduinoOTA.setPassword(otaPW);
 
-	ArduinoOTA.onStart([]() {
-		Serial.println("Start");
-	});
-	ArduinoOTA.onEnd([]() {
-		Serial.println("\nEnd");
+  ArduinoOTA.onStart([]() {
+    Serial.println("Start");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nEnd");
     ESP.restart();
-	});
-	ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-		Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-	});
-	ArduinoOTA.onError([](ota_error_t error) {
-		Serial.printf("Error[%u]: ", error);
-		if (error == OTA_AUTH_ERROR) Serial.println("[ERROR] Auth Failed");
-		else if (error == OTA_BEGIN_ERROR) Serial.println("[ERROR] Begin Failed");
-		else if (error == OTA_CONNECT_ERROR) Serial.println("[ERROR] Connect Failed");
-		else if (error == OTA_RECEIVE_ERROR) Serial.println("[ERROR] Receive Failed");
-		else if (error == OTA_END_ERROR) Serial.println("[ERROR] End Failed");
-	});
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError(
+      [](ota_error_t error) {
+        Serial.printf("Error[%u]: ", error);
+        if (error == OTA_AUTH_ERROR) Serial.println("[ERROR] Auth Failed");
+        else if (error == OTA_BEGIN_ERROR) Serial.println("[ERROR] Begin Failed");
+        else if (error == OTA_CONNECT_ERROR) Serial.println("[ERROR] Connect Failed");
+        else if (error == OTA_RECEIVE_ERROR) Serial.println("[ERROR] Receive Failed");
+        else if (error == OTA_END_ERROR) Serial.println("[ERROR] End Failed");
+      });
 }
 
 /*
@@ -632,71 +700,70 @@ void initOTA() {
  */
 void verifyConnection() {
 
-	if (WiFi.status() != WL_CONNECTED) {
-		connectToWiFi();
-	}
-	// da wir nun sicher sind, dass wir mit dem Wlan verbunden sind,
-	// kann geprüft werden, ob wir mit dem Broker verbunden sind.
-	// Falls nicht führe auch hier alle 5 Sekunden einen Reconnect durch
-	else {
+  if (WiFi.status() != WL_CONNECTED) {
+    connectToWiFi();
+  }
+  // da wir nun sicher sind, dass wir mit dem Wlan verbunden sind,
+  // kann geprüft werden, ob wir mit dem Broker verbunden sind.
+  // Falls nicht führe auch hier alle 5 Sekunden einen Reconnect durch
+  else {
 
-		if (mqttClient.connected()) {
-			mqttClient.loop();
-		} else {
+    if (mqttClient.connected()) {
+      mqttClient.loop();
+    } else {
       Serial.println();
-			Serial.println("[ERROR] Verbindung zum Broker getrennt.");
-			long now = millis();
+      Serial.println("[ERROR] Verbindung zum Broker getrennt.");
+      long now = millis();
 
-			if (now - lastReconnectAttempt > 5000) {
-				lastReconnectAttempt = now;
+      if (now - lastReconnectAttempt > 5000) {
+        lastReconnectAttempt = now;
 
-				Serial.println(
-						"[INFO] Versuche Verbindung zum Broker aufzubauen...");
+        Serial.println(
+            "[INFO] Versuche Verbindung zum Broker aufzubauen...");
 
-				if (reconnectToBroker()) {
+        if (reconnectToBroker()) {
 
-					Serial.println(
-							"[INFO] Verbindung zum Broker wieder aufgebaut.");
-              Serial.println();
-					lastReconnectAttempt = 0;
+          Serial.println(
+              "[INFO] Verbindung zum Broker wieder aufgebaut.");
+          Serial.println();
+          lastReconnectAttempt = 0;
 
-				} else {
-					Serial.println(
-							"[ERROR] Verbindungsversuch fehlgeschlagen...");
-				}
-			}
+        } else {
+          Serial.println(
+              "[ERROR] Verbindungsversuch fehlgeschlagen...");
+        }
+      }
 
-		}
+    }
 
-	}
+  }
 
 }
 
 void setup() {
 
-	Serial.begin(115200);
-	Serial.println();
-	pinMode(LED0, OUTPUT);
+  Serial.begin(115200);
+  Serial.println();
+  pinMode(LED0, OUTPUT);
   pinMode(LDRPIN, INPUT);
   pinMode(DHTPIN, INPUT);
-	digitalWrite(LED0, !LOW);
+  digitalWrite(LED0, !LOW);
 
-	readConfigFromFS();
-	initWifiManager();
-	saveConfigParams();
+  readConfigFromFS();
+  initWifiManager();
+  saveConfigParams();
 
-	printWiFiInfo();
+  printWiFiInfo();
 
-	setupMqtt();
-	connectToBroker();
-	printBrokerInfo();
+  setupMqtt();
+  connectToBroker();
+  printBrokerInfo();
 
-	publishNetworkSettings();
-
+  publishNetworkSettings();
 
   lastPublishAttempt = millis();
   Serial.println("[INFO] Warte auf Namen....");
-  while(!topicUpdated){
+  while (!topicUpdated) {
     verifyConnection();
     long now = millis();
     if (now - lastPublishAttempt > 10000) {
@@ -722,14 +789,78 @@ void setup() {
 
 void loop() {
   ArduinoOTA.handle();
-	verifyConnection();
+  verifyConnection();
+  //im Energiemodus falle in den deepSleep nach 3 Messungen
+  if (energieModus == ECO) {
+    timestamp1 = millis();
+    //Prüfe, ob es schon schlafenszeit ist
+    if (abs(timestamp1 - timestamp3) < messureDuration * 1000
+        && !payloadSent) {
+      //messe alle zwei Sekunden, solange noch nicht die sampleSize stimmt
+      if (abs(timestamp1 - timestamp2) > 2000
+          && messCounter < sampleSize) {
+        ldrValue = analogRead(A0);
+        humidity = dht.readHumidity();
+        delay(250);
+        temperature = dht.readTemperature();
+        delay(250);
+        heatIndex = dht.computeHeatIndex(temperature, humidity, false);
+        delay(250);
+        timestamp2 = millis();
+        if (isnan(humidity) || isnan(temperature)) {
+          Serial.println(
+              "[ERROR] Temperatur oder Feuchtigkeit nicht messbar");
+        } else {
+          averageHumidity += humidity;
+          averageTemperature += temperature;
+          averageLdrValue += ldrValue;
+          averageHeatIndex += heatIndex;
+          messCounter++;
+        }
+      }
+      //sobald wir genug Messwerte gesammelt haben, wird der Durchschnitt gebildet und versendet,
+      if (messCounter == sampleSize) {
+        averageHumidity = averageHumidity / 3.0;
+        averageTemperature = averageTemperature / 3.0;
+        averageLdrValue = averageLdrValue / 3.0;
+        averageHeatIndex = averageHeatIndex / 3.0;
 
- timestamp1 = millis();
- //Prüfe, ob es schon schlafenszeit ist
- if(abs(timestamp1-timestamp3) < messureDuration*1000 && !payloadSent){
-   //messe alle zwei Sekunden, solange noch nicht die sampleSize stimmt
-    if(abs(timestamp1-timestamp2) > 2000 && messCounter < sampleSize){
-      timestamp2 = millis();
+        String payload = "{\"identifier\":\"data\",\"temp\": "
+            + String(averageTemperature) + ", \"hum\":"
+            + String(averageHumidity) + ",\"ldr\":"
+            + String(averageLdrValue) + ", \"hi\":"
+            + String(averageHeatIndex) + "}";
+        char payloadArray[200];
+
+        payload.toCharArray(payloadArray, 200);
+
+        if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
+          Serial.println(
+              "[INFO] Wetter-Payload erfolgreich versendet.");
+          payloadSent = true;
+
+        } else {
+          Serial.println(
+              "[ERROR] Wetter-Payload konnte nicht versendet werden.");
+        }
+      }
+
+    } else {
+      //da Payload nun versendet wurde warten wir bis unsere Zeit abgelaufen ist
+      if ((abs(timestamp1 - timestamp3) > messureDuration * 1000)) {
+        ESP.deepSleep(deepSleepDuration * 1000000);
+        //stand in einem Forum soo..
+        delay(100);
+      }
+    }
+
+  }
+  //im PWR Modus sende alle 10 Sekunden Wetterdaten
+  if (energieModus == PWR) {
+
+    timestamp1 = millis();
+    //messe alle 10 Sekunden
+    if (abs(timestamp1 - timestamp2) > 10000) {
       ldrValue = analogRead(A0);
       humidity = dht.readHumidity();
       delay(250);
@@ -737,48 +868,38 @@ void loop() {
       delay(250);
       heatIndex = dht.computeHeatIndex(temperature, humidity, false);
       delay(250);
-      if(isnan(humidity) || isnan(temperature)){
-        Serial.println("[ERROR] Temperatur oder Feuchtigkeit nicht messbar");
-      } else{
-        averageHumidity += humidity;
-        averageTemperature += temperature;
-        averageLdrValue += ldrValue;
-        averageHeatIndex += heatIndex;
-        messCounter++;
+      timestamp2 = millis();
+      //falls Feuchtigkeit oder Temperatur nicht messbar waren, versende keine Daten
+      if (isnan(humidity) || isnan(temperature)) {
+        Serial.println(
+            "[ERROR] Temperatur oder Feuchtigkeit nicht messbar");
+      } else {
+
+        String payload = "{\"identifier\":\"data\",\"temp\": "
+            + String(temperature) + ", \"hum\":"
+            + String(humidity) + ",\"ldr\":"
+            + String(ldrValue) + ", \"hi\":"
+            + String(heatIndex) + "}";
+        char payloadArray[200];
+
+        payload.toCharArray(payloadArray, 200);
+
+        if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
+          Serial.println(
+              "[INFO] Wetter-Payload erfolgreich versendet.");
+          payloadSent = true;
+
+        } else {
+          Serial.println(
+              "[ERROR] Wetter-Payload konnte nicht versendet werden.");
+        }
+
       }
+
     }
-   //sobald wir genug Messwerte gesammelt haben, wird der Durchschnitt gebildet und versendet,
-   if(messCounter == sampleSize){
-    averageHumidity = averageHumidity/3.0;
-    averageTemperature = averageTemperature/3.0;
-    averageLdrValue = averageLdrValue/3.0;
-    averageHeatIndex = averageHeatIndex/3.0;
-    
-    String payload = "{\"identifier\":\"data\",\"Temp\": \""+String(averageTemperature)+"\", \"Hum\":\""+String(averageHumidity)+"\",\"LDR\":\""+String(averageLdrValue)+"\", \"HI\":\""+String(averageHeatIndex)+"\"}";
-    char payloadArray[200];
-    
-    payload.toCharArray(payloadArray, 200);
-        
-    if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
-      Serial.println("[INFO] Wetter-Payload erfolgreich versendet.");
-      payloadSent = true;
-      
-    } else {
-      Serial.println("[ERROR] Wetter-Payload konnte nicht versendet werden.");
-    } 
-   }
-    
- } else {
-  //da Payload nun versendet wurde warten wir bis unsere Zei
-  if((abs(timestamp1-timestamp3) > messureDuration*1000)){
-    ESP.deepSleep(deepSleepDuration * 1000000);
-    //stand in einem Forum soo..
-    delay(100);
-  } 
- }
+
+  }
 
 }
- 
-
 
 

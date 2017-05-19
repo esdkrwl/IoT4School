@@ -661,20 +661,6 @@ function AktorStatusNode(config){
     RED.nodes.registerType("IoT-Aktor", IoTAktorNode);
     
     
-    function ConfigNode(n){
-        
-        RED.nodes.createNode(this,n);
-
-        this.on('input', function (msg) {
-
-            //msg.payload = "hallo";
-            // in this example just send it straight on... should process it here really
-            node.send(msg);    
-
-        });
-    }
-    RED.nodes.registerType("Config", ConfigNode);
-    
    function anNode(n) {
         // Create a RED node
         RED.nodes.createNode(this,n);

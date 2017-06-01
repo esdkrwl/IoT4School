@@ -364,7 +364,6 @@ void connectToBroker() {
     Serial.print(".");
     if (mqttClient.connect(macCharArray, lastWillTopicArray, 1, false,
         lastWillPayloadArray)) {
-      Serial.println("blalbla");
       Serial.println(nameTopicArray);
       mqttClient.subscribe(nameTopicArray);
       mqttStrikes = 0;
@@ -595,7 +594,6 @@ void verifyConnection() {
   // kann geprüft werden, ob wir mit dem Broker verbunden sind.
   // Falls nicht führe auch hier alle 5 Sekunden einen Reconnect durch
   else {
-    ArduinoOTA.handle();
     if (mqttClient.connected()) {
       mqttClient.loop();
     } else {
@@ -670,6 +668,7 @@ void setup() {
 
 void loop() {
   verifyConnection();
+  ArduinoOTA.handle();
 
 //DEBUG ZEUGS
   long now = millis();

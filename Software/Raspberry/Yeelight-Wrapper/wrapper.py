@@ -311,17 +311,6 @@ def createRGB(rgb_dec):
   blue = int(rgb_hex[4:6], 16)
   return [red, green, blue]
 
-# CHECK DB ENTRIES
-def checkIPinDB(ip):
-  return
-
-# CHECK IF YEELIGHT ALREADY IN DB
-def checkYeelightsinDB():
-  return
-
-# CHECK IF DIC BULBS IS EMPTY ? SCAN AND CHECK DB
-def init():
-  return
 
 # Hilfsmethode zum Lesen der Config Datei
 def ConfigSectionMap(section):
@@ -342,7 +331,7 @@ def create_table():
 
 # Parse Node-Red Command
 def handleNodeRedCmd(client, userdata, msg):
-    logging.debug('Greetz aus dem return name callback')
+    logging.debug('Daten erhalten.')
     logging.info(msg.topic + " " + str(msg.payload) + " " + str(msg.qos))
     yeelight = extractNameFromTopic(msg.topic)
 
@@ -370,7 +359,11 @@ def handleNodeRedCmd(client, userdata, msg):
                     sendCmdBrightness(bulbs[yeelight][0]['ip'], nodeRedPayload['set_brightness'])
 
             if identifier == 'status':
-                return
+                # change sub to pub
+                topic = "p" + msg.topic[1:]
+                bulbs[yeelight][0]['identifier'] = 'status'
+                publish_payload = str(bulbs[yeelight][0]).replace("'",'"')
+                client.publish(topic, str(publish_payload), qos=1)
 
     except Exception as error:
         logging.error("JSON Fehler: " + str(error))

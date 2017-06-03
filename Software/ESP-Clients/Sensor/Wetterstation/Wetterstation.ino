@@ -215,7 +215,7 @@ void onConfig(JsonObject& j) {
     //datentyp prüfen
     if(j["set_deepSleepDuration"].is<int>()){
       //wertebereich prüfen
-      if( j["set_deepSleepDuration"] > 0 && j["set_deepSleepDuration"] <= 86400){
+      if( j["set_deepSleepDuration"] > 0 && j["set_deepSleepDuration"] <= 4294){
         deepSleepDuration = j["set_deepSleepDuration"]; 
       }
     }  

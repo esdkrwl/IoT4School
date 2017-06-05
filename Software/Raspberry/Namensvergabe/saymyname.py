@@ -109,7 +109,10 @@ def return_name_callback(client, userdata, msg):
 
         logging.debug('Name des Clients in der DB: ' + data[0])
         esp_new_name = data[0]
-        suffix = esp_new_name[len(esp_new_name)-1]
+        #finde suffix im namen
+        suffix = re.search('(\d+)$', esp_new_name)
+        print(suffix)
+        #suffix = esp_new_name[len(esp_new_name)-1]
 
 
 
@@ -174,6 +177,7 @@ try:
     client.connect(brokerIP, int(brokerPort), 60)
 except Exception as error:
     logging.error('Konnte keine Verbindung zum Broker aufbauen')
+    sys.exit()
 
 conn = sqlite3.connect(pathToDB)
 c = conn.cursor()

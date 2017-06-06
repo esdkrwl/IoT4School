@@ -55,15 +55,14 @@ def bulbs_detection_loop1():
 
     while True:
         if time_elapsed == search_interval:
+            logging.debug("Nächste Suche beginnt...")
             time_elapsed = 0
             global loops
             loops += 1
             #Prüfe, ob die Anzahl der Birnen in foundBulbs der Anzahl der Birnen im Dict entspricht
             global  foundBulbs
-            print('anzahl elemente')
-            print(len(foundBulbs))
-            print(len(bulbs))
             #falls im letzten durchgang Lampen gefunden wurden, prüfe, ob es weniger sind als ingesamt in der Liste
+
             if foundBulbs:
                 if len(bulbs) > len(foundBulbs):
                     # für alle Elemente im Dict
@@ -247,7 +246,6 @@ def parseResponse(response):
         #Da die Lampe einen Yeelight+Ziffer Namen hat, prüfe, ob der Datenbankeintrag bezüglich der IP noch akutell ist
         c.execute("SELECT IP FROM espClients WHERE name = (?)", (bulb_name,))
         sqlRes = c.fetchone()
-        print(sqlRes)
         #Falls kein Datenbankeintrag vorhanden ist, lege einen neuen an
         if sqlRes is None:
             logging.debug('Lege neuen DB-Eintrag an. Name bereits bekannt.')
@@ -275,11 +273,9 @@ def parseResponse(response):
             c.execute("UPDATE espClients SET status = (?) WHERE name = (?)", ('Verbunden', bulb_name,))
             conn.commit()
 
-        print(bulbs)
         if bulb_name not in foundBulbs:
             foundBulbs.append(bulb_name)
-            print(foundBulbs)
-
+            logging.debug(bulbs)
 
 
 # GET STATUS PARAMS FROM RESPONSE
@@ -300,6 +296,7 @@ def sendSearchBroadcast():
   msg += "MAN: \"ssdp:discover\"\r\n"
   msg += msg + "ST: wifi_bulb"
   logging.debug("send search request")
+  logging.debug(msg)
   scan_socket.sendto(str.encode(msg), multicase_address)
 
   # CREATE RGB DIC
@@ -376,7 +373,7 @@ def on_connect(client, userdata, flags, rc):
         logging.info('Verbindung zum Broker erfolgreich aufgebaut')
         logging.debug("Antwort vom Server: " + str(rc))
 
-        client.subscribe([("pub/Aktor/Yeelight/#", 1), ("sub/Aktor/Yeelight/#", 1)])
+        client.subscribe(("sub/Aktor/Yeelight/#", 1))
 
 
 

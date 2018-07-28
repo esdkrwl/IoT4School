@@ -167,7 +167,7 @@ client.message_callback_add("esp/reconnect", esp_reconnect_callback)
 #Lese Config-Datei aus
 
 try:
-    cfg.read("/home/pi/cfg.ini")
+    cfg.read("cfg.ini")
 except FileNotFoundError as error:
     logging.error("Config-Datei nicht gefunden.")
     sys.exit()

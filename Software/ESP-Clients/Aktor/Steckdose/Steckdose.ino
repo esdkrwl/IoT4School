@@ -269,7 +269,7 @@ void initWifiManager() {
   }
   //wifiManager.setTimeout(180);
 
-  if (!wifiManager.autoConnect("IoT4School", "IoT-PW")) {
+  if (!wifiManager.autoConnect("IoT4School-Steckdose")) {
     //kann eigentlich raus
     Serial.println("[ERROR] failed to connect and hit timeout");
     delay(3000);
@@ -461,7 +461,7 @@ void connectToBroker() {
       wifiManager.addParameter(&custom_mqtt_port);
 
       wifiManager.setTimeout(180);
-      if (!wifiManager.startConfigPortal("MQTT-AP", "password")) {
+      if (!wifiManager.startConfigPortal("MQTT-AP")) {
         Serial.println("failed to connect and hit timeout");
         delay(3000);
         //reset and try again, or maybe put it to deep sleep

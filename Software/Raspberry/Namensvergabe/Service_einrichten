@@ -1,4 +1,4 @@
-sudo nano /lib/systemd/system/XXXX.service
+sudo nano /etc/systemd/system/XXXX.service
 
 ______________________________________________________________
 [Unit]

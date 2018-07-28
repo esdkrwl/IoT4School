@@ -9,28 +9,22 @@
 #include <Arduino.h>
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
-#include <OneButton.h> //https://github.com/mathertel/OneButton
-
+#include <Servo.h>
+Servo espServo;
 //Board-LED
-#define       LED0      2
-#define       ButtonPin 10
+#define       LED           2
+#define       SERVOPIN      10
+
 
 // Typ des Moduls - Sensor oder Aktor
-String type = "Sensor";
+String type = "Aktor";
 // Name des Moduls - z.B. RGB-LED, Smart-Button etc..
-String modulName = "Smart-Button";
+String modulName = "Servo";
 
-// ------ HIER RELEVANTE MODUL PARAMETER SAMMELN ------
+// ------ HIER RELEVANTER MODUL PARAMETER SAMMELN ------
 
-//Zeit in ms bevor Klick registriert wird
-int ticks = 600;
-//Zeit in ms bevor langer Klick erkannt wird
-int pressTicks = 1000;
-// Anzahl aller Klicks
-long totalClickCount = 0;
-//Button nicht low aktiv
-OneButton button(ButtonPin, false);
-
+// Stellwert des Servo Motors
+int angle = 180;
 // -----------------------------------------------------
 
 //Passwort für OTA Update
@@ -76,28 +70,24 @@ int mqttStrikes = 0;
 // Flag um festzustellen, ob das Modul bereits den neuen Namen vom Python Skript erhalten hat
 bool topicUpdated = false;
 
-// TESTZEUGS 
+// TESTZEUGS
 long lastMsg = 0;
 char msg[50];
 int value = 0;
 boolean setReset = false;
 bool shouldSaveConfig = false;
-
-// über dieses Topic kommuziert das Modul mit dem Python Skript
-char prePubTopicArray[200];
-
 String nameString;
 
 /*
- * MQTT Callback Methode
- * Wird aufgerufen, wenn Daten empfangen wurden.
- * Daten werden in Char Array geschrieben und in JSON Objekt geparst
- * Es werden 4 verschiedene identifier unterschieden
- * name: enthält im Payload den neuen Namen des Clients
- * config: enthälig im Payload neue Configparameter für den Client
- * data: enthält Daten, die einen Aktor steuern sollen
- * status: fordert den Client auf, seinen aktuellen Status zu publishen
- */
+   MQTT Callback Methode
+   Wird aufgerufen, wenn Daten empfangen wurden.
+   Daten werden in Char Array geschrieben und in JSON Objekt geparst
+   Es werden 4 verschiedene identifier unterschieden
+   name: enthält im Payload den neuen Namen des Clients
+   config: enthälig im Payload neue Configparameter für den Client
+   data: enthält Daten, die einen Aktor steuern sollen
+   status: fordert den Client auf, seinen aktuellen Status zu publishen
+*/
 void callback(char* topic, byte* payload, unsigned int length) {
   char jsonPayload[200];
   Serial.print("[INFO] Daten erhalten. Topic: ");
@@ -154,11 +144,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 /*
- * Callback Methode, falls der Identifier Name im Payload gefunden wurde
- */
+   Callback Methode, falls der Identifier Name im Payload gefunden wurde
+*/
 void onName(JsonObject& j) {
-
   Serial.println("[DEBUG] Greetz aus onName");
+
   //wenn new_name und suffix im Payload stehen, kann der neue Name gesetzt werden
   if (j.containsKey("new_name") && j.containsKey("suffix")) {
     String newName = j["new_name"];
@@ -172,194 +162,95 @@ void onName(JsonObject& j) {
     finalPubTopic.toCharArray(finalPubTopicArray, 200);
     finalSubTopic.toCharArray(finalSubTopicArray, 200);
     Serial.println(
-        "[DEBUG] Final Sub Topic: " + String(finalSubTopicArray));
+      "[DEBUG] Final Sub Topic: " + String(finalSubTopicArray));
     Serial.println(
-        "[DEBUG] Final Pub Topic: " + String(finalPubTopicArray));
+      "[DEBUG] Final Pub Topic: " + String(finalPubTopicArray));
     topicUpdated = true;
   }
-
 }
 
 /*
- * Callback Methode, falls der Identifier Config im Payload gefunden wurde
- */
+   Callback Methode, falls der Identifier Config im Payload gefunden wurde
+*/
 void onConfig(JsonObject& j) {
   Serial.println("[DEBUG] Greetz aus onConfig");
-  //Prüfe ob es den Key ticks gibt
-  if (j.containsKey("set_ticks")) {
-    //Prüfe, ob der Datentyp stimmt
-    if (j["set_ticks"].is<int>()) {
-      //Prüfe, ob der Wertebereich stimmt
-      if (j["set_ticks"] > 0 && j["set_ticks"] <= 1000) {
-        ticks = j["set_ticks"];
-        button.setClickTicks(ticks);
-        Serial.println("[INFO] Setze Ticks auf "+ String(ticks));
-      }
-    }
-  }
-  //Prüfe, ob es den Key pressTicks gibt
-  if (j.containsKey("set_pressTicks")) {
-    //Prüfe, ob der Datentyp int ist
-    if (j["set_pressTicks"].is<int>()) {
-      //Prüfe, ob der Wertebereich stimmt
-      if (j["set_pressTicks"] > 0 && j["set_pressTicks"] <= 2000) {
-        pressTicks = j["set_pressTicks"];
-        button.setPressTicks(pressTicks);
-      }
-    }
-  }
-  //Prüfe, ob es den Key resetClicks gibt
-  if (j.containsKey("resetClicks")) {
-    //Prüfe Datentyp
-    if (j["resetClicks"].is<int>()) {
-      //Prüfe Wertebereich
-      if (j["resetClicks"] == 1) {
-        totalClickCount = 0;
-      }
-    }
-  }
 
 }
 
 /*
- * Callback Methode, falls der Identifier Data im Payload gefunden wurde
- */
+   Callback Methode, falls der Identifier Data im Payload gefunden wurde
+*/
 void onData(JsonObject& j) {
   Serial.println("[DEBUG] Greetz aus onData");
+
+
+  if (j.containsKey("set_angle")) {
+    if (j["set_angle"].is<int>()) {
+      if (j["set_angle"] >= 0 && j["set_angle"] <= 180) {
+        // da der Servo beim zurücksetzen von einem größeren auf einen kleineren winkel etwas spackt
+        // setze den wert zuerst auf 0, und dann erst auf den gewünschten Stellwert
+        /*if(j["set_angle"] <= angle){
+          espServo.write(0);
+          delay(150);
+          espServo.write(j["set_angle"]);
+        } else {
+          espServo.write(j["set_angle"]);
+        } 
+        angle = j["set_angle"];
+      }*/
+      espServo.write(j["set_angle"]);
+      angle = j["set_angle"];
+    }
+  }
+  }
+
 }
 
 /*
- * Callback Methode, falls der Identifier Status im Payload gefunden wurde
- */
+   Callback Methode, falls der Identifier Status im Payload gefunden wurde
+*/
 void onStatus(JsonObject& j) {
   Serial.println("[DEBUG] Greetz aus onStatus");
-  String payload = "{\"identifier\":\"status\",\"ticks\":" + String(ticks)
-      + ",\"pressTicks\":" + String(pressTicks) + ",\"totalClicks\":"
-      + String(totalClickCount) + "}";
+  String payload = "{\"identifier\":\"status\",\"angle\":" + String(angle) + "}";
+
 
   char payloadArray[200];
   payload.toCharArray(payloadArray, 200);
 
   if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
-    blink();
     Serial.println("[INFO] Status Payload erfolgreich versendet.");
+    blink();
   } else {
     Serial.println("[ERROR] Status Payload nicht versendet.");
   }
   Serial.println();
-}
-
-/*
- * Callbackmethode, falls Button 1x gedrückt
- */
-void onSingleClick() {
-  Serial.println("[DEBUG] Greetz aus onSingleClick");
-  totalClickCount++;
-  String payload =
-      "{\"identifier\":\"data\",\"clickEvent\":\"onSingleClick\"}";
-  char payloadArray[200];
-  payload.toCharArray(payloadArray, 200);
-
-  if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
-    Serial.println("[INFO] Button Payload erfolgreich versendet.");
-  } else {
-    Serial.println("[ERROR] Button Payload nicht versendet.");
-  }
 
 }
 
 /*
- * Callbackmethode, falls Button 2x gedrückt
- */
-void onDoubleClick() {
-  Serial.println("[DEBUG] Greetz aus onDoubleClick");
-  totalClickCount++;
-  totalClickCount++;
-  String payload =
-      "{\"identifier\":\"data\",\"clickEvent\":\"onDoubleClick\"}";
-  char payloadArray[200];
-  payload.toCharArray(payloadArray, 200);
-
-  if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
-    Serial.println("[INFO] Button Payload erfolgreich versendet.");
-  } else {
-    Serial.println("[ERROR] Button Payload nicht versendet.");
-  }
-
-}
-
-/*
- * Callbackmethode, falls Button lange gedrückt
- */
-void onLongPress() {
-  Serial.println("[DEBUG] Greetz aus onLongPress");
-  totalClickCount++;
-  String payload = "{\"identifier\":\"data\",\"clickEvent\":\"onLongPress\"}";
-  char payloadArray[200];
-  payload.toCharArray(payloadArray, 200);
-
-  if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
-    Serial.println("[INFO] Button Payload erfolgreich versendet.");
-  } else {
-    Serial.println("[ERROR] Button Payload nicht versendet.");
-  }
-
-}
-
-/*
- * Callbackmethode, falls Button lange gedrückt und dann losgelassen wurde
- */
-void onLongPressStop() {
-  Serial.println("[DEBUG] Greetz aus onLongPressStop");
-  String payload =
-      "{\"identifier\":\"data\",\"clickEvent\":\"onLongPressStop\"}";
-  char payloadArray[200];
-  payload.toCharArray(payloadArray, 200);
-
-  if (mqttClient.publish(finalPubTopicArray, payloadArray)) {
-    Serial.println("[INFO] Button Payload erfolgreich versendet.");
-  } else {
-    Serial.println("[ERROR] Button Payload nicht versendet.");
-  }
-
-}
-
-/*
- * Konfiguriert den Button und die Callback Methoden
- */
-void setupButton() {
-  button.setClickTicks(ticks);
-  button.setPressTicks(pressTicks);
-  button.attachClick(onSingleClick);
-  button.attachDoubleClick(onDoubleClick);
-  button.attachLongPressStart(onLongPress);
-  button.attachLongPressStop(onLongPressStop);
-}
-
-/*
- * Speicher Callback zum Übernehmen der Webparameter vom WiFi Manager zu übernehmen
- */
+   Speicher Callback zum Übernehmen der Webparameter vom WiFi Manager zu übernehmen
+*/
 void saveConfigCallback() {
   Serial.println("Should save config");
   shouldSaveConfig = true;
 }
 
 /*
- * Initialisiert und startet den WiFiManager
- * 
- */
+   Initialisiert und startet den WiFiManager
+
+*/
 void initWifiManager() {
   WiFiManager wifiManager;
   /*
-   * CallBack Funktion, falls Daten gespeichert werden sollen
-   */
+     CallBack Funktion, falls Daten gespeichert werden sollen
+  */
   wifiManager.setSaveConfigCallback(saveConfigCallback);
 
   /*
-   * MQTT Server und Port als Extra Params
-   */
+     MQTT Server und Port als Extra Params
+  */
   WiFiManagerParameter custom_mqtt_server("server", "mqtt server",
-      mqtt_server, 40);
+                                          mqtt_server, 40);
   WiFiManagerParameter custom_mqtt_port("port", "mqtt port", mqtt_port, 5);
 
   wifiManager.addParameter(&custom_mqtt_server);
@@ -368,37 +259,36 @@ void initWifiManager() {
   if (setReset) {
     wifiManager.resetSettings();
   }
-  //time out rausgeworfen, weil es auch zum time out kommen kann während man im Menü ist
   //wifiManager.setTimeout(180);
 
-  if (!wifiManager.autoConnect("IoT4School-Smart-Button")) {
-    //nicht mehr relevant, da timeout entfernt wurde
-    Serial.println("[ERROR] Timeout. Schließe Portal und starte neu");
+  if (!wifiManager.autoConnect("IoT4School-Servo")) {
+    //kann eigentlich raus
+    Serial.println("[ERROR] failed to connect and hit timeout");
     delay(3000);
     //reset and try again, or maybe put it to deep sleep
     ESP.reset();
     delay(5000);
   }
   //Verbunden
-  digitalWrite(LED0, !HIGH);
+  digitalWrite(LED, LOW);
 
   strcpy(mqtt_server, custom_mqtt_server.getValue());
   strcpy(mqtt_port, custom_mqtt_port.getValue());
 
 }
 /*
- * Metohde zum Lssen der Konfigparameter
- */
+   Metohde zum Lssen der Konfigparameter
+*/
 void readConfigFromFS() {
   if (SPIFFS.begin()) {
     Serial.println("[INFO] Datei gefunden.");
     if (SPIFFS.exists("/config.json")) {
-     
+      //file exists, reading and loading
       Serial.println("[INFO] Lade Config Datei...");
       File configFile = SPIFFS.open("/config.json", "r");
       if (configFile) {
         size_t size = configFile.size();
-        
+        // Allocate a buffer to store contents of the file.
         std::unique_ptr<char[]> buf(new char[size]);
 
         configFile.readBytes(buf.get(), size);
@@ -422,8 +312,8 @@ void readConfigFromFS() {
 }
 
 /*
- * Methode zum Speichern der Konfigparameter
- */
+   Methode zum Speichern der Konfigparameter
+*/
 void saveConfigParams() {
   Serial.println("[INFO] Speichere Config..");
   DynamicJsonBuffer jsonBuffer;
@@ -444,31 +334,31 @@ void saveConfigParams() {
 }
 
 /*
- * Verbindet sich mit dem WLAN
- * Verbindungsversuch alle 5 Sekunden
- */
+   Verbindet sich mit dem WLAN
+   Verbindungsversuch alle 5 Sekunden
+*/
 bool connectToWiFi() {
   Serial.println("[INFO] Verbinde mit SSID: " + WiFi.SSID());
   while (WiFi.status() != WL_CONNECTED) {
 
     for (int i = 0; i < 10; i++) {
-      digitalWrite(LED0, HIGH);
+      digitalWrite(LED, HIGH);
       delay(250);
-      digitalWrite(LED0, LOW);
+      digitalWrite(LED, LOW);
       delay(250);
       Serial.print(".");
     }
 
   }
   Serial.println();
-  digitalWrite(LED0, !HIGH);
+  digitalWrite(LED, LOW);
   return true;
 }
 
 /*
- * Gibt nach dem erfolgreichen Verbindungsversuch
- * einige Informationen über das Netzwerk aus
- */
+   Gibt nach dem erfolgreichen Verbindungsversuch
+   einige Informationen über das Netzwerk aus
+*/
 void printWiFiInfo() {
   String essid = String(WiFi.SSID());
   ipAdresse = WiFi.localIP();
@@ -483,32 +373,27 @@ void printWiFiInfo() {
 }
 
 /*
- * Lässt die Status-LED des ESP Moduls einige male aufblinken
- */
+   Lässt die Status-LED des ESP Moduls einige male aufblinken
+*/
 void blink() {
   for (int i = 0; i < 10; i++) {
-    digitalWrite(LED0, HIGH);
+    digitalWrite(LED, !LOW);
     delay(100);
-    digitalWrite(LED0, LOW);
+    digitalWrite(LED, !HIGH);
     delay(100);
   }
 }
 
 /*
- * Bereitet MQTT Verbindung zum Broker vor
- * Server und Callback werden definiert
- */
+   Bereitet MQTT Verbindung zum Broker vor
+   Server und Callback werden definiert
+*/
 void setupMqtt() {
 
-  //mqttServer(192, 168, 178, 20);
-  //mqttServerPort = 1883;
-  //mqttClient.setServer(mqttServer, mqttServerPort);
   mqttClient.setServer(mqtt_server, atoi(mqtt_port));
   mqttClient.setCallback(callback);
-
   String nameClientTopic = "nameClient/" + type + "/mac/" + macAdresse;
   nameClientTopic.toCharArray(nameTopicArray, nameClientTopic.length() + 1);
-
   String lastWillTopic = "esp/lastwill/mac/" + macAdresse;
   lastWillTopic.toCharArray(lastWillTopicArray, lastWillTopic.length() + 1);
 
@@ -518,47 +403,48 @@ void setupMqtt() {
 }
 
 /*
- * Verbindet sich mit dem MQTT Broker
- */
+   Verbindet sich mit dem MQTT Broker
+*/
 void connectToBroker() {
 
   Serial.println("[INFO] Verbinde mit MQTT Broker.");
   while (!mqttClient.connected()) {
     Serial.print(".");
     if (mqttClient.connect(macCharArray, lastWillTopicArray, 1, false,
-        lastWillPayloadArray)) {
-
+                           lastWillPayloadArray)) {
+      Serial.println("blalbla");
+      Serial.println(nameTopicArray);
       mqttClient.subscribe(nameTopicArray);
       mqttStrikes = 0;
 
     } else {
       Serial.print(
-          "[ERROR] Verbindung zum Broker fehlgeschlagen. Fehlercode: ");
+        "[ERROR] Verbindung zum Broker fehlgeschlagen. Fehlercode: ");
       Serial.println(mqttClient.state());
       delay(5000);
       mqttStrikes++;
     }
     /*
-     * Falls sich nach dem dritten Versuch nicht mit dem Broker verbunden werden konnte,
-     * wird der Webserver erneut gestartet
-     * dort kann man nochmal die Parameter für den Broker überprüfen
-     */
+       Falls sich nach dem dritten Versuch nicht mit dem Broker verbunden werden konnte,
+       wird der Webserver erneut gestartet
+       dort kann man nochmal die Parameter für den Broker überprüfen
+    */
     if (mqttStrikes == 3) {
       mqttStrikes = 0;
       WiFiManager wifiManager;
 
       /*
-       * CallBack Funktion, falls Daten gespeichert werden sollen
-       */
+         CallBack Funktion, falls Daten gespeichert werden sollen
+      */
       wifiManager.setSaveConfigCallback(saveConfigCallback);
 
       /*
-       * MQTT Server und Port als Extra Params
-       */
+         MQTT Server und Port als Extra Params
+      */
       WiFiManagerParameter custom_mqtt_server("server", "mqtt server",
-          mqtt_server, 40);
+                                              mqtt_server, 40);
       WiFiManagerParameter custom_mqtt_port("port", "mqtt port",
-          mqtt_port, 5);
+                                            mqtt_port, 5);
 
       wifiManager.addParameter(&custom_mqtt_server);
       wifiManager.addParameter(&custom_mqtt_port);
@@ -574,7 +460,7 @@ void connectToBroker() {
         strcpy(mqtt_server, custom_mqtt_server.getValue());
         strcpy(mqtt_port, custom_mqtt_port.getValue());
         mqttClient.setServer(custom_mqtt_server.getValue(),
-            atoi(custom_mqtt_port.getValue()));
+                             atoi(custom_mqtt_port.getValue()));
         saveConfigParams();
       }
 
@@ -584,27 +470,27 @@ void connectToBroker() {
 }
 
 /*
- * Verbindet sich erneut mit dem Broker, falls die Verbindung verloren gegangen sein sollte.
- * Im Gegensatz zu connectToBroker, blockt diese Funktion den Programmablauf nicht, sagt dem
- * Python Skript, dass man wieder verbunden ist und setzt die Subscriptions neu
- */
+   Verbindet sich erneut mit dem Broker, falls die Verbindung verloren gegangen sein sollte.
+   Im Gegensatz zu connectToBroker, blockt diese Funktion den Programmablauf nicht, sagt dem
+   Python Skript, dass man wieder verbunden ist und setzt die Subscriptions neu
+*/
 
 bool reconnectToBroker() {
   /*
-   * @params in
-   * macCharArray         - ClientID
-   * lastWillTopicArray   - willTopic
-   * 1                    - willQoS
-   * false                - willRetain
-   * lastWillPayloadArray - willMessage
-   *
-   */
+     @params in
+     macCharArray         - ClientID
+     lastWillTopicArray   - willTopic
+     1                    - willQoS
+     false                - willRetain
+     lastWillPayloadArray - willMessage
+
+  */
   if (mqttClient.connect(macCharArray, lastWillTopicArray, 1, false,
-      lastWillPayloadArray)) {
+                         lastWillPayloadArray)) {
     /*
-     * alte Topics wieder subscriben
-     * falls man schon das neue Topic hat, muss man das alte nicht erneut subscriben
-     */
+       alte Topics wieder subscriben
+       falls man schon das neue Topic hat, muss man das alte nicht erneut subscriben
+    */
     if (topicUpdated) {
       // esp/TYPE/NAME
       mqttClient.subscribe(finalSubTopicArray);
@@ -626,9 +512,9 @@ bool reconnectToBroker() {
 }
 
 /*
- * Gibt Informationen zum Broker in der Konsole aus
- * Wird nach dem erstmaligen verbinden angezeigt.
- */
+   Gibt Informationen zum Broker in der Konsole aus
+   Wird nach dem erstmaligen verbinden angezeigt.
+*/
 void printBrokerInfo() {
   Serial.println();
   Serial.println("[INFO] Verbindung zum MQTT Broker aufgebaut.");
@@ -641,32 +527,33 @@ void printBrokerInfo() {
 }
 
 /*
- * Sendet die Statusinformationen des Clients an das Python Skript
- * Zu den Informationen gehören
- * Mac IP Typ und Name des Moduls
- */
+   Sendet die Statusinformationen des Clients an das Python Skript
+   Zu den Informationen gehören
+   Mac IP Typ und Name des Moduls
+*/
 void publishNetworkSettings() {
-
+  // über dieses Topic kommuziert das Modul mit dem Python Skript
   String prePubTopic = type + "/mac/" + macAdresse;
+  char prePubTopicArray[200];
   prePubTopic.toCharArray(prePubTopicArray, 200);
 
-  Serial.println("[DEBUG] Topic String: " + prePubTopic);
-  Serial.println("[DEBUG] Topic Array: " + String(prePubTopicArray));
+  //Serial.println("[DEBUG] Topic String: " + prePubTopic);
+  //Serial.println("[DEBUG] Topic Array: " + String(prePubTopicArray));
 
   createClientStatusJson().toCharArray(clientStatusArray, 200);
-  //esp/sensor/mac/5C:CF:7F:2C:E7:12
+
   if (mqttClient.publish(prePubTopicArray, clientStatusArray)) {
     Serial.println("[INFO] Status - Payload erfolgreich versendet.");
   } else {
     Serial.println(
-        "[ERROR] Status - Payload konnte nicht versendet werden.");
+      "[ERROR] Status - Payload konnte nicht versendet werden.");
   }
 }
 
 /*
- * String im JSON Format
- * wird versendet, wenn der Client die Verbindung zum Broker verliert.
- */
+   String im JSON Format
+   wird versendet, wenn der Client die Verbindung zum Broker verliert.
+*/
 String createLastWillJson() {
   String lastWillPayload;
   lastWillPayload += "{";
@@ -681,9 +568,9 @@ String createLastWillJson() {
 }
 
 /*
- * String im JSON Format
- * wird versendet, um den Python Skript über den Status des Clients zu informieren
- */
+   String im JSON Format
+   wird versendet, um den Python Skript über den Status des Clients zu informieren
+*/
 String createClientStatusJson() {
   String statusPayload = "{";
 
@@ -699,18 +586,18 @@ String createClientStatusJson() {
   statusPayload += "\"Name\": ";
   statusPayload += "\"" + modulName + "\"}";
 
-  Serial.println("[Debug] Status-Payload als JSON: " + statusPayload);
+  Serial.println("[DEBUG] Status-Payload als JSON: " + statusPayload);
+  Serial.println();
 
   return statusPayload;
 }
 
 /*
- * Konfiguration der OTA Schnittstelle
- */
+   Konfiguration der OTA Schnittstelle
+*/
 void initOTA() {
   // Standard Port
   ArduinoOTA.setPort(8266);
-
   char newNameArray[50];
   nameString.toCharArray(newNameArray, 50);
   // Name des Gerätes ist der OTA Name
@@ -730,23 +617,23 @@ void initOTA() {
     Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
   });
   ArduinoOTA.onError(
-      [](ota_error_t error) {
-        Serial.printf("Error[%u]: ", error);
-        if (error == OTA_AUTH_ERROR) Serial.println("[ERROR] Auth Failed");
-        else if (error == OTA_BEGIN_ERROR) Serial.println("[ERROR] Begin Failed");
-        else if (error == OTA_CONNECT_ERROR) Serial.println("[ERROR] Connect Failed");
-        else if (error == OTA_RECEIVE_ERROR) Serial.println("[ERROR] Receive Failed");
-        else if (error == OTA_END_ERROR) Serial.println("[ERROR] End Failed");
-      });
+  [](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("[ERROR] Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("[ERROR] Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("[ERROR] Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("[ERROR] Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("[ERROR] End Failed");
+  });
 }
 
 /*
- * Prüft regelmäßig, ob Verbindung zum WLAN besteht.
- * Falls nicht wird ein reconnect durchgeführt.
- *
- * Falls WLAN verbunden, wird geprüft, ob Verbindung zum MQTT Broker steht.
- * Falls nicht wird alle 5 Sekunden ein reconnect durchgeführt
- */
+   Prüft regelmäßig, ob Verbindung zum WLAN besteht.
+   Falls nicht wird ein reconnect durchgeführt.
+
+   Falls WLAN verbunden, wird geprüft, ob Verbindung zum MQTT Broker steht.
+   Falls nicht wird alle 5 Sekunden ein reconnect durchgeführt
+*/
 void verifyConnection() {
 
   if (WiFi.status() != WL_CONNECTED) {
@@ -756,7 +643,7 @@ void verifyConnection() {
   // kann geprüft werden, ob wir mit dem Broker verbunden sind.
   // Falls nicht führe auch hier alle 5 Sekunden einen Reconnect durch
   else {
-
+    ArduinoOTA.handle();
     if (mqttClient.connected()) {
       mqttClient.loop();
     } else {
@@ -768,18 +655,18 @@ void verifyConnection() {
         lastReconnectAttempt = now;
 
         Serial.println(
-            "[INFO] Versuche Verbindung zum Broker aufzubauen...");
+          "[INFO] Versuche Verbindung zum Broker aufzubauen...");
 
         if (reconnectToBroker()) {
 
           Serial.println(
-              "[INFO] Verbindung zum Broker wieder aufgebaut.");
+            "[INFO] Verbindung zum Broker wieder aufgebaut.");
           Serial.println();
           lastReconnectAttempt = 0;
 
         } else {
           Serial.println(
-              "[ERROR] Verbindungsversuch fehlgeschlagen...");
+            "[ERROR] Verbindungsversuch fehlgeschlagen...");
         }
       }
 
@@ -793,10 +680,23 @@ void setup() {
 
   Serial.begin(115200);
   Serial.println();
-  pinMode(LED0, OUTPUT);
-  digitalWrite(LED0, !LOW);
+  digitalWrite(LED, LOW);
 
-  setupButton();
+  espServo.attach(SERVOPIN);
+
+  int pos;
+
+  for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+    // in steps of 1 degree
+    espServo.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }
+
+  for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+    espServo.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }
+
 
   readConfigFromFS();
   initWifiManager();
@@ -826,16 +726,15 @@ void setup() {
   mqttClient.unsubscribe(nameTopicArray);
   mqttClient.subscribe(finalSubTopicArray);
 
+
   initOTA();
   ArduinoOTA.begin();
+
 
 }
 
 void loop() {
-  ArduinoOTA.handle();
+
   verifyConnection();
 
-  button.tick();
-  delay(10);
 }
-

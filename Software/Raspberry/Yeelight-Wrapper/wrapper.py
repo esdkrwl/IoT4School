@@ -384,7 +384,7 @@ client.on_connect = on_connect
 client.message_callback_add("sub/Aktor/Yeelight/#", handleNodeRedCmd)
 
 try:
-    cfg.read("/home/pi/cfg.ini")
+    cfg.read("cfg.ini")
 except FileNotFoundError as error:
     logging.error("Config-Datei nicht gefunden.")
     sys.exit()

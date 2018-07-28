@@ -371,7 +371,7 @@ void initWifiManager() {
   //time out rausgeworfen, weil es auch zum time out kommen kann während man im Menü ist
   //wifiManager.setTimeout(180);
 
-  if (!wifiManager.autoConnect("IoT4School", "IoT-PW")) {
+  if (!wifiManager.autoConnect("IoT4School-Smart-Button")) {
     //nicht mehr relevant, da timeout entfernt wurde
     Serial.println("[ERROR] Timeout. Schließe Portal und starte neu");
     delay(3000);
@@ -564,7 +564,7 @@ void connectToBroker() {
       wifiManager.addParameter(&custom_mqtt_port);
 
       wifiManager.setTimeout(180);
-      if (!wifiManager.startConfigPortal("MQTT-AP", "password")) {
+      if (!wifiManager.startConfigPortal("MQTT-AP")) {
         Serial.println("failed to connect and hit timeout");
         delay(3000);
         //reset and try again, or maybe put it to deep sleep

@@ -5,6 +5,7 @@ import json
 import os
 import configparser
 import sys
+import re
 
 logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s - %(message)s')
 logging.debug('Starte Programm')
@@ -110,8 +111,10 @@ def return_name_callback(client, userdata, msg):
         logging.debug('Name des Clients in der DB: ' + data[0])
         esp_new_name = data[0]
         #finde suffix im namen
-        suffix = re.search('(\d+)$', esp_new_name)
-        print(suffix)
+        #suffix = re.search('(\d+)$', esp_new_name)
+        suffix = re.findall("\d+", esp_new_name)
+        suffix = suffix[0]
+        print(suffix[0])
         #suffix = esp_new_name[len(esp_new_name)-1]
 
 

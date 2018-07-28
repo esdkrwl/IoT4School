@@ -16,8 +16,8 @@
 #define       LED0      2
 
 #define       LDRPIN    A0
-#define       scl 14
-#define       sda 2
+#define       scl 5
+#define       sda 4
 
 // Typ des Moduls - Sensor oder Aktor
 String type = "Sensor";
@@ -513,7 +513,7 @@ void connectToBroker() {
       wifiManager.addParameter(&custom_mqtt_port);
 
       wifiManager.setTimeout(180);
-      if (!wifiManager.startConfigPortal("MQTT-AP", "password")) {
+      if (!wifiManager.startConfigPortal("MQTT-AP")) {
         Serial.println("failed to connect and hit timeout");
         delay(3000);
         //reset and try again, or maybe put it to deep sleep

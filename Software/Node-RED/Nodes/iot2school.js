@@ -329,9 +329,7 @@ module.exports = function(RED) {
                         payload = payload.toString();
                     }
                     var msg = {topic:topic, payload:payload, qos: packet.qos, retain: packet.retain};
-                    if ((node.brokerConn.broker === "localhost")||(node.brokerConn.broker === "127.0.0.1")){
-                        msg._topic = topic;
-                    }
+
                     //Prüfe, ob Nachricht Payload hat
                     if (msg.hasOwnProperty("payload")) {
 
@@ -351,13 +349,7 @@ module.exports = function(RED) {
                         else { 
                             node.warn(RED._("json.errors.dropped"));
                         }
-                    }
-                    //Falls kein Payload vorhanden, leite die Nachricht einfach so weiter
-                    else { 
-                        node.send(msg); 
-                    }
-
-                    
+                    }                    
                 }, this.id);
                 
                 if (this.brokerConn.connected) {
@@ -860,7 +852,18 @@ function AktorStatusNode(config){
                 msg.payload = JSON.parse(newPayload);
                 node.send(msg);            
             }
-            else if(msg.payload.length == 6){        
+            else if(msg.payload.length == 6){
+                var result = /([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(msg.payload);
+                if (result !== null){
+                    var r = parseInt(result[1],16);
+                    var g = parseInt(result[2],16);
+                    var b = parseInt(result[3],16);
+                    var newPayload = '{"set_rgb":['+ r + ','+ g + ',' + b + ']}';
+                
+                    msg.payload = JSON.parse(newPayload);
+                    node.send(msg);  
+                }
+
             }
             else if(msg.payload.length == 7 && msg.payload.includes("#")){
                 
@@ -877,6 +880,16 @@ function AktorStatusNode(config){
                 
             }
             else if(msg.payload.length == 8 && msg.payload.includes('0x')){
+                var result = /^0x?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(msg.payload);
+                if (result !== null){
+                    var r = parseInt(result[1],16);
+                    var g = parseInt(result[2],16);
+                    var b = parseInt(result[3],16);
+                    var newPayload = '{"set_rgb":['+ r + ','+ g + ',' + b + ']}';
+                
+                    msg.payload = JSON.parse(newPayload);
+                    node.send(msg);  
+                }
                 
             }
             else{
@@ -1008,7 +1021,184 @@ function AktorStatusNode(config){
         
     }
     RED.nodes.registerType("Helligkeit",brightnessNode);
-    
+
+
+
+
+function servoNode(n) {
+        // Create a RED node
+        RED.nodes.createNode(this,n);
+        if(n.winkel > 180){
+            this.winkel = 180;
+        } else if(n.winkel < 0){
+            this.winkel = 0;      
+        } else {
+            this.winkel = n.winkel;
+        }
+        var node = this;
+        this.on('input', function (msg) {
+            //wenn der Payload ein Object ist, dann ist 
+            //die Nachricht sehr wahrscheinlich von intern
+            //füge daher nun den helligkeitswert aus dem Node hinzu
+                if(typeof msg.payload === 'object'){
+                    if(!Buffer.isBuffer(msg.payload)){
+                        try{
+                            msg.payload.set_angle = parseInt(node.winkel);
+                            node.send(msg);
+                        }
+                        catch(e){
+                            //solte der Payload nicht geparsed weden
+                            //können, dann den vorigen Payload ignorieren
+                            var newPayload = '{"set_angle":'+node.winkel+'}';
+                            msg.payload = JSON.parse(newPayload);
+                            node.send(msg);  
+                        }
+                    }
+                }
+            
+
+            // falls im Payload ein String steht
+            // prüfe ob man diesne nicht als int darstellen kann
+            // falls int möglich jedoch zu groß werden die Daten
+            // verworfen
+            else if(typeof msg.payload === 'string'){
+                if(!isNaN(msg.payload)){
+                    var winkel = parseInt(msg.payload);
+                    if(winkel <= 180 && winkel >= 0){
+                        node.winkel = winkel;
+                    }
+                    var newPayload = '{"set_angle":'+node.winkel+'}';
+                    msg.payload = JSON.parse(newPayload);
+                    node.send(msg);
+                //falls der string doch nur text war, dann
+                //als payload die helligkeit aus dem node verweden
+                } else {
+                    var newPayload = '{"set_angle":'+node.winkel+'}';
+                    msg.payload = JSON.parse(newPayload);
+                    node.send(msg);  
+                }
+                
+            }
+            //falls im Payload eine Nummer steht
+            // prüfe ob diese zwischen 0..180 liegt
+            // falls nicht werden die Daten im Node übertragen
+            else if(typeof msg.payload === 'number'){
+                if(msg.payload <= 180 && msg.payload >= 0){
+                    var newPayload = '{"set_angle":'+msg.payload+'}';
+                    msg.payload = JSON.parse(newPayload);
+                    node.send(msg);  
+                } else {
+                    //falls irgendeine zahl die kleiner als 0 und
+                    //größer als 100 übergeben wurde, nimm die Daten
+                    //aus dem Node
+                    var newPayload = '{"set_angle":'+node.winkel+'}';
+                    msg.payload = JSON.parse(newPayload);
+                    node.send(msg); 
+                }
+            }
+            //falls werder object, string oder number
+            //nehme einfach die Daten aus dem Node
+            else {
+                var newPayload = '{"set_angle":'+node.winkel+'}';
+                msg.payload = JSON.parse(newPayload);
+                node.send(msg);    
+            }
+
+        });
+        
+    }
+    RED.nodes.registerType("Servo",servoNode);
+
+
+
+function piezoNode(n) {
+        // Create a RED node
+        RED.nodes.createNode(this,n);
+        this.melody = n.melody;
+        if(this.wiederholungen <= 0 || this.wiederholungen == ''){
+            this.wiederholungen = 1;   
+        } else {
+            this.wiederholungen = n.wiederholungen;
+        }
+
+
+        var node = this;
+        this.on('input', function (msg) {
+            //wenn der Payload ein Object ist, dann ist 
+            //die Nachricht sehr wahrscheinlich von intern
+            //füge daher nun den helligkeitswert aus dem Node hinzu
+                if(typeof msg.payload === 'object'){
+                    if(!Buffer.isBuffer(msg.payload)){
+                        try{
+                            msg.payload.set_melody = parseInt(node.melody);
+                            msg.payload.set_loops = parseInt(node.wiederholungen);
+                            node.send(msg);
+                        }
+                        catch(e){
+                            //solte der Payload nicht geparsed weden
+                            //können, dann den vorigen Payload ignorieren
+                            var newPayload = '{"set_melody":'+node.melody+', "set_loops":'+node.wiederholungen+'}';
+                            msg.payload = JSON.parse(newPayload);
+                            node.send(msg);  
+                        }
+                    }
+                }
+            
+
+            // falls im Payload ein String steht
+            // prüfe ob man diesne nicht als int darstellen kann
+            // falls int möglich jedoch zu groß werden die Daten
+            // verworfen
+            else if(typeof msg.payload === 'string'){
+                if(!isNaN(msg.payload)){
+                    var melody = parseInt(msg.payload);
+                    if(melody <= 6 && melody >= 1){
+                        node.melody = melody;
+                    }
+                    var newPayload = '{"set_melody":'+node.melody+', "set_loops":'+node.wiederholungen+'}';
+                    msg.payload = JSON.parse(newPayload);
+                    node.send(msg);
+                //falls der string doch nur text war, dann
+                //als payload die helligkeit aus dem node verweden
+                } else {
+                    var newPayload = '{"set_melody":'+node.melody+', "set_loops":'+node.wiederholungen+'}';
+                    msg.payload = JSON.parse(newPayload);
+                    node.send(msg);  
+                }
+                
+            }
+            //falls im Payload eine Nummer steht
+            // prüfe ob diese zwischen 1..6 liegt
+            // falls nicht werden die Daten im Node übertragen
+            else if(typeof msg.payload === 'number'){
+                if(msg.payload <= 6 && msg.payload >= 1){
+                    var newPayload = '{"set_melody":'+msg.payload+', "set_loops":'+node.wiederholungen+'}';
+                    msg.payload = JSON.parse(newPayload);
+                    node.send(msg);  
+                } else {
+                    //falls irgendeine zahl die kleiner als 0 und
+                    //größer als 100 übergeben wurde, nimm die Daten
+                    //aus dem Node
+                    var newPayload = '{"set_melody":'+node.melody+', "set_loops":'+node.wiederholungen+'}';
+                    msg.payload = JSON.parse(newPayload);
+                    node.send(msg); 
+                }
+            }
+            //falls werder object, string oder number
+            //nehme einfach die Daten aus dem Node
+            else {
+                var newPayload = '{"set_melody":'+node.melody+', "set_loops":'+node.wiederholungen+'}';
+                msg.payload = JSON.parse(newPayload);
+                node.send(msg);    
+            }
+
+        });
+        
+    }
+    RED.nodes.registerType("Piezo",piezoNode);
+
+
+
     function clickNode(n) {
         // Create a RED node
         RED.nodes.createNode(this,n);

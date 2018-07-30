@@ -1,0 +1,20 @@
+{
+    "name"         : "node-red-contrib-iot4school",
+    "version"      : "1.0.11",
+    "description"  : "Nodes for my master thesis",
+    "license"      : "Apache-2.0",
+    "repository"   : {
+        "type":"git",
+        "url":"https://github.com/esdkrwl/IoT4School.git"
+    },
+    "dependencies": {
+		"mqtt": "^2.7.1",
+		"is-utf8": "^0.2.1"
+    },
+    "keywords": [ "node-red" ],
+    "node-red"     : {
+        "nodes": {
+            "iot2school": "iot2school.js"
+        }
+    }
+}

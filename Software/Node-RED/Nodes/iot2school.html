@@ -738,6 +738,105 @@
 </script>
 
 
+<! Servo -->
+
+<script type="text/x-red" data-template-name="Servo">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-winkel"><i class="fa fa-tag"></i> Stellwert</label>
+        <input type="text" id="node-input-winkel" placeholder="0..180">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="Servo">
+   <p>Wandelt einen beliebigen Eingang in einen vorher definierten Stellwert für den Servomotor um.</p>
+   <p>Wenn am Eingang eine ganze Zahl zwischen 0 und 180 liegt,
+    wird diese, unabhängig vom vorher definierten Stellwert im Knoten, übertragen.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('Servo',{
+        category: 'IoT4School',
+        defaults: { 
+	        winkel: {value:"0",validate:RED.validators.number(), required:true},
+            name: {value:""},
+        },
+	    color:"#00B1C1",
+        inputs:1,
+        outputs:1,
+        icon: "cog.png",
+        label: function() {
+            return this.name||this.winkel||"Servo";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>
+
+
+<! Piezo -->
+
+<script type="text/x-red" data-template-name="Piezo">
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-wiederholungen"><i class="fa fa-tag"></i> Replays</label>
+        <input type="text" id="node-input-wiederholungen" placeholder="mind. 1">
+    </div>
+    <div class="form-row">
+    
+        <label for="node-input-melody">
+            <i class="fa fa-music"></i>
+            Melodie
+        </label>
+        <select id="node-input-melody">
+            //Anfang
+            <option value="1">Signalton</option>
+            <option value="2">Alarm 1</option>
+            <option value="3">Alarm 2</option>
+            <option value="4">Türklingel</option>
+            <option value="5">Star Wars</option>
+            <option value="6">Jingle Bells</option>
+        </select>
+        
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="Piezo">
+   <p>Spielt eine der 6 Melodien beliebig oft ab.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('Piezo',{
+        category: 'IoT4School',
+        defaults: { 
+            melody: {value:"1"},
+	        wiederholungen: {value:"1", validate:RED.validators.number()},
+            name: {value:""},
+        },
+	    color:"#00B1C1",
+        inputs:1,
+        outputs:1,
+        icon: "comment.png",
+        label: function() {
+            return this.name||"Piezo";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>
+
+
+
+
 <! Click -->
 <script type="text/x-red" data-template-name="Klick-Dekodierer">
     <br/>

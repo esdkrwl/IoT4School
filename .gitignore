@@ -1,6 +1,5 @@
 .db
 .idea
-*.xml
 *.iml
 *.epf
 *.b

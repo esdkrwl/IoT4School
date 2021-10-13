@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <Meta charset="UTF-8">
+    <title>IoT4School</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="shortcut icon" href="icons/favicon.ico" type="image/x-icon"/>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script> 
+    $.get('header.html', function(data){
+      $('#includeHeader').prepend(data);
+      var x = location.hostname;
+      for (let i = 1; i < 6; i++) {
+        if(x == "iot4school" + i) {
+          $('#logo').attr('src', 'icons/logo' + i + '.png');
+          $('#logo').attr('width', '350');
+        }
+      }
+      $('body').fadeIn(500);
+    });
+    </script>
+  </head>
+  <body>
+    <header>
+      <div id="includeHeader"></div>
+    </header>
+    
+    <div class="container">
+      <div class="content">
+      <h2>Willkommen im Internet der Dinge!</h2>
+      <article>
+        Hier findest du eine Sammlung vieler nützlicher Links.<p></p>
+        Über den Navigationspunkt "Node-RED" erhälst du Zugriff auf den Node-RED-Editor sowie das Node-RED-Dashboard.
+        Klicke dort einfach auf den Namen deiner Gruppe, um dich in der Node-RED Weboberfläche anzumelden.<p></p>
+
+        Die Navigationspunkte "BIPES" und "Datenbank" beinhalten direkte Verlinkungen zur jeweiligen Anwendung.
+
+      </article>
+      <ul>
+        <h3><li>Wusstest du?</li></h3>
+      <li>
+        <b>BIPES</b> ist eine blockbasierte, integrierte Plattform für eingebettete Systeme.
+        Nutze den Link im Navigationsmenü, um mit dem Programmieren deines Mikrocontrollers loszulegen!<p></p>
+      </li>
+      <li>
+        Über die <b>Datenbank</b> kannst du in Erfahrung bringen, welche Geräte sich im Netzwerk befinden und ob diese eine Verbindung zur Infrastruktur haben.
+      </li>
+      </ul>
+      </div>
+    </div>
+  </body>
+
+  <footer>
+    <p>Die Onlinedokumentation findest du bei <a href="https://github.com/esdkrwl/IoT4School">Github</a>.</p>
+  </footer>
+
+</html>

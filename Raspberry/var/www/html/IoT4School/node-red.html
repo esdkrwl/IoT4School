@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <Meta charset="UTF-8">
+    <title>IoT4School</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="shortcut icon" href="icons/favicon.ico" type="image/x-icon"/>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script> 
+    $.get('header.html', function(data){
+      $('#includeHeader').prepend(data);
+      var x = location.hostname;
+      for (let i = 1; i < 6; i++) {
+        if(x == "iot4school" + i) {
+          $('#logo').attr('src', 'icons/logo' + i + '.png');
+          $('#logo').attr('width', '350');
+        }
+      }
+      $('body').fadeIn(500);
+    });
+    </script>
+  </head>
+
+  <body onload="setHref()">
+    <header>
+      <script>
+        function setHref() {
+        //Portbelegung für Gruppen
+        group1 = ":1884"
+        group2 = ":1885"
+        group3 = ":1886"
+        group4 = ":1887"
+        group5 = ":1888"
+
+        //Node-RED-Editor-Links
+        document.getElementById('group1Edit').href = window.location.protocol + "//" + window.location.hostname + group1;
+        document.getElementById('group2Edit').href = window.location.protocol + "//" + window.location.hostname + group2;
+        document.getElementById('group3Edit').href = window.location.protocol + "//" + window.location.hostname + group3;
+        document.getElementById('group4Edit').href = window.location.protocol + "//" + window.location.hostname + group4;
+        document.getElementById('group5Edit').href = window.location.protocol + "//" + window.location.hostname + group5;
+        //Node-RED-Dashboard-Links
+        document.getElementById('group1Dash').href = window.location.protocol + "//" + window.location.hostname + group1 + "/ui";
+        document.getElementById('group2Dash').href = window.location.protocol + "//" + window.location.hostname + group2 + "/ui";
+        document.getElementById('group3Dash').href = window.location.protocol + "//" + window.location.hostname + group3 + "/ui";
+        document.getElementById('group4Dash').href = window.location.protocol + "//" + window.location.hostname + group4 + "/ui";
+        document.getElementById('group5Dash').href = window.location.protocol + "//" + window.location.hostname + group5 + "/ui";
+      }
+      </script>
+      <div id="includeHeader"></div>
+    </header>
+    
+    <div class="container">
+      <div class="content">
+      <h2>Willkommen im Internet der Dinge!</h2>
+      <ul>
+        <h3><li>Node-RED-Editor</li></h3>
+        <li><a href="#" id="group1Edit">Gruppe 1</a></li>
+        <li><a href="#" id="group2Edit">Gruppe 2</a></li>
+        <li><a href="#" id="group3Edit">Gruppe 3</a></li>
+        <li><a href="#" id="group4Edit">Gruppe 4</a></li>
+        <li><a href="#" id="group5Edit">Gruppe 5</a></li>
+      </ul>
+      <ul>
+        <h3><li>Node-RED-Dashboard</li></h3>
+        <li><a href="#" id="group1Dash">Gruppe 1</a></li>
+        <li><a href="#" id="group2Dash">Gruppe 2</a></li>
+        <li><a href="#" id="group3Dash">Gruppe 3</a></li>
+        <li><a href="#" id="group4Dash">Gruppe 4</a></li>
+        <li><a href="#" id="group5Dash">Gruppe 5</a></li>
+      </ul>
+      </div>
+    </div>
+  </body>
+
+  <footer>
+    <p>Die Onlinedokumentation findest du bei <a href="https://github.com/esdkrwl/IoT4School">Github</a>.</p>
+  </footer>
+  
+</html>

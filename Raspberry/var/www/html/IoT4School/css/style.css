@@ -1,0 +1,149 @@
+@font-face {
+  font-family: 'Titillium Web';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/titillium-web-v10-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local(''),
+       url('../fonts/titillium-web-v10-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/titillium-web-v10-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/titillium-web-v10-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/titillium-web-v10-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/titillium-web-v10-latin-regular.svg#TitilliumWeb') format('svg'); /* Legacy iOS */
+}
+
+table{
+  border: 2px solid black;
+  width: 940px;
+}
+
+th, td{
+  border: 2px solid black;
+}
+body{
+	display: none;
+        margin: 0;
+	padding: 0;
+	font-family: 'Titillium Web';
+	color: #585858;
+	background: #f3f3f3;
+}
+
+h2{
+	color: white;
+}
+
+h3{
+	margin-top: 1px;
+	color: white;
+
+}
+
+.container{
+	position: relative;
+	max-width: 960px;
+	width: 100%;
+	height: 20%;
+	margin: auto;
+}
+
+/* ------HEADER------ */
+header{
+	background: #fff;
+	margin-bottom: 20px;
+	overflow: hidden;
+}
+
+.logo{
+	float: left;
+	margin-top: 10px;
+}
+
+nav{
+	float: right;
+	line-height: 70px;
+        margin-top: 5px;
+	margin-right: 10px;
+}
+
+nav li{
+	display: inline-block;
+	padding: 5px 20px;
+	margin-left: 10px;
+	background: #f3f3f3;
+        border-radius: 5px;
+	line-height: normal;
+}
+
+a{
+	color: #00B1C1;
+}
+
+a:visited{
+	color: #00B1C1;
+}
+
+nav a{
+	color: #585858;
+}
+
+nav a:visited{
+	color: #585858;
+}
+
+nav a:hover{
+	color: #FF4719;
+}
+
+/* ------CONTENT------ */
+
+.content h2{
+	background: #FF4719;
+	padding: 10px;
+	border-radius: 5px;
+	margin-bottom: 20px;
+	margin-right: 20px;
+}
+
+.content article{
+	float: left;
+	padding: 10px;
+	width: 640px;
+}
+
+.content ul{
+	float: left;
+	width: 250px;
+	background: #00B1C1;
+	padding: 20px;
+	margin-right: 10px;
+	padding-right: 10px;
+	border-radius: 5px;
+	list-style: none;
+}
+
+.content ul li{
+	color: white;
+	margin-bottom: 5px;
+}
+
+.content ul a{
+	color: white;
+}
+
+.content ul a:visited{
+	color: white;
+}
+
+.content ul a:hover{
+	color: #FF4719;
+}
+
+footer{
+	position: absolute;
+    text-align: center;
+    font-size: 0.8em;
+    bottom:0;
+    width: 100%;
+    height: 30px;
+    margin-top: -50px;
+}

@@ -1,0 +1,47 @@
+Als root anmelden
+
+// paho-mqtt wird von db-status-updater benötigt
+pip3 install paho-mqtt
+
+cd /lib/systemd/system
+sudo touch db-status-updater.service
+
+Inhalt aus db-status-updater.service einfÃ¼gen bzw. folgenden Inhalt (ohne Linien) kopieren:
+______________________________________________________________
+[Unit]
+Description=DB Status Updater
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /home/pi/db-status-updater.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+_______________________________________________________________
+
+// Schreibrechte Root-Benutzer für den Service und Ausführ-Recht für das Skript aktivieren
+sudo chmod 644 /lib/systemd/system/db-status-updater.service
+chmod +x /home/pi/db-status-updater.py
+
+// Damit der hinzugefügte Dienst per Symlink eingebunden wird
+sudo systemctl daemon-reload
+
+// Dienst in den Autostart packen und starten
+sudo systemctl enable db-status-updater.service 
+sudo systemctl start db-status-updater.service 
+
+// Check, ob Dienst auf "active" steht
+sudo systemctl status db-status-updater.service 
+
+
+// Wenn der Dienst nicht starten sollte, kann man über diesen Befehl den genauen Fehler sehen:
+sudo journalctl -f -u db-status-updater.service
+
+Quelle: https://roboticsbackend.com/make-a-raspberry-pi-3-program-start-on-boot/
+
+
+
+

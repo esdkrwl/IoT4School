@@ -1,0 +1,14 @@
+{
+   "name":"wemos9999",
+   "ap_mode_password":"12345678",
+   "wireless_config":{
+      "SSID":"mynetwork",
+      "password":"mypassword"
+   },
+   "webrepl_password":"123",
+   "mqtt_settings":{
+      "mqtt_server":"192.168.178.10",
+      "mqtt_port":"1883",
+      "keep_alive":"15"
+   }
+}

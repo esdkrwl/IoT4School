@@ -1,0 +1,65 @@
+################################################################################
+# Node-RED Stack or Compose
+################################################################################
+# docker stack deploy node-red --compose-file docker-compose-node-red.yml
+# docker-compose -f docker-compose-node-red.yml -p myNoderedProject up
+################################################################################
+version: "3.7"
+
+services:
+  node-red:
+    image: nodered/node-red:latest
+    container_name: node-red1
+    restart: always
+    environment:
+      - TZ=Europe/Berlin
+    ports:
+      - "1884:1884"
+    volumes:
+      - /home/pi/node-red/group1:/data
+      - /home/pi/node-red/node_modules:/data/node_modules
+  node-red2:
+    image: nodered/node-red:latest
+    container_name: node-red2
+    restart: always
+    environment:
+      - TZ=Europe/Berlin
+    ports:
+      - "1885:1885"
+    volumes:
+      - /home/pi/node-red/group2:/data
+      - /home/pi/node-red/node_modules:/data/node_modules
+  node-red3:
+    image: nodered/node-red:latest
+    container_name: node-red3
+    restart: always
+    environment:
+      - TZ=Europe/Berlin
+    ports:
+      - "1886:1886"
+    volumes:
+      - /home/pi/node-red/group3:/data
+      - /home/pi/node-red/node_modules:/data/node_modules
+  node-red4:
+    image: nodered/node-red:latest
+    container_name: node-red4
+    restart: always
+    environment:
+      - TZ=Europe/Berlin
+    ports:
+      - "1887:1887"
+    volumes:
+      - /home/pi/node-red/group4:/data
+      - /home/pi/node-red/node_modules:/data/node_modules
+  node-red5:
+    image: nodered/node-red:latest
+    container_name: node-red5
+    restart: always
+    environment:
+      - TZ=Europe/Berlin
+    ports:
+      - "1888:1888"
+    volumes:
+      - /home/pi/node-red/group5:/data
+      - /home/pi/node-red/node_modules:/data/node_modules
+

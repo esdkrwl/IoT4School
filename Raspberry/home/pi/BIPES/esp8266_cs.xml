@@ -1,0 +1,232 @@
+
+<sep></sep>
+  <category name="IoT4School" colour="185">
+    <block type="iot_setup"></block>
+    <category name="IoT Modul-IDs" colour="185" custom="CREATE_TYPED_MODULE_ID"></category>
+    <category name="IoT MQTT" colour="185">
+      <block type="iot_mqtt_set_callback"></block>
+      <block type="iot_mqtt_subscribe">
+        <value name="topic">
+          <shadow type="text">
+            <field name="TEXT">thema123</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="iot_mqtt_publish">
+        <value name="topic">
+          <shadow type="text">
+            <field name="TEXT">thema123</field>
+          </shadow>
+        </value>
+        <value name="msg">
+          <shadow type="text">
+            <field name="TEXT">hallo</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="Aktoren" colour="185">
+      <category name="Buzzer" colour="185">
+        <block type="iot_buzzer_init">
+          <value name="pin">
+            <shadow type="pinout">
+              <field name="PIN">14</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_buzzer_set_volume">
+          <value name="volume">
+            <shadow type="math_number">
+              <field name="NUM">1</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_buzzer_play_tone">
+          <value name="frequency">
+            <shadow type="math_number">
+              <field name="NUM">500</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_buzzer_tone_type"></block>
+        <block type="iot_buzzer_play_song">
+          <value name="rtttl_string">
+            <shadow type="text">
+              <field name="TEXT">Zelda1:d=4,o=5,b=125:a#,f.,8a#,16a#,16c6,16d6,16d#6,2f6,8p,8f6,16f.6,16f#6,16g#.6,2a#.6,16a#.6,16g#6,16f#.6,8g#.6,16f#.6,2f6,f6,8d#6,16d#6,16f6,2f#6,8f6,8d#6,8c#6,16c#6,16d#6,2f6,8d#6,8c#6,8c6,16c6,16d6,2e6,g6,8f6,16f,16f,8f,16f,16f,8f,16f,16f,8f,8f,a#,f.,8a#,16a#,16c6,16d6,16d#6,2f6,8p,8f6,16f.6,16f#6,16g#.6,2a#.6,c#7,c7,2a6,f6,2f#.6,a#6,a6,2f6,f6,2f#.6,a#6,a6,2f6,d6,2d#.6,f#6,f6,2c#6,a#,c6,16d6,2e6,g6,8f6,16f,16f,8f,16f,16f,8f,16f,16f,8f,8f</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_buzzer_play_song_from_file">
+          <value name="rtttl_songname">
+            <shadow type="text">
+              <field name="TEXT">TakeOnMe</field>
+            </shadow>
+          </value>
+        </block>
+      </category>
+      <category name="Motor" colour="185">
+        <label text="Getestet mit Motor HW-648"></label>
+        <block type="iot_motor_init">
+          <value name="i2c">
+            <shadow type="math_number">
+              <field name="NUM">0x30</field>
+            </shadow>
+          </value>
+          <value name="scl">
+            <shadow type="pinout">
+              <field name="PIN">5</field>
+            </shadow>
+          </value>
+          <value name="sda">
+            <shadow type="pinout">
+              <field name="PIN">4</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_motor_set_speed">
+          <value name="speed">
+            <shadow type="math_number">
+              <field name="NUM">50</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_motor_brake">
+        </block>
+        <block type="iot_motor_set_enabled"></block>
+        <block type="iot_motor_set_disabled"></block>
+        <block type="iot_motor_toggle"></block>
+      </category>
+      <category name="RGB_LED" colour="185">
+        <label text="Kompatibel mit Wemos RGB LED und WS2812B"></label>
+        <block type="iot_rgb_led_init">
+          <value name="pin">
+            <shadow type="pinout">
+              <field name="PIN">4</field>
+            </shadow>
+          </value>
+          <value name="number">
+            <shadow type="math_number">
+              <field name="NUM">1</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_rgb_led_set_color"></block>
+        <block type="iot_rgb_led_color_colors"></block>
+        <block type="iot_rgb_led_color_numbers">
+          <value name="red">
+            <shadow type="math_number">
+              <field name="NUM">0</field>
+            </shadow>
+          </value>
+          <value name="green">
+            <shadow type="math_number">
+              <field name="NUM">177</field>
+            </shadow>
+          </value>
+          <value name="blue">
+            <shadow type="math_number">
+              <field name="NUM">193</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_rgb_led_set_brightness">
+          <value name="brightness">
+            <shadow type="math_number">
+              <field name="NUM">50</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_rgb_led_set_enabled"></block>
+        <block type="iot_rgb_led_set_disabled"></block>
+        <block type="iot_rgb_led_toggle"></block>
+      </category>
+    </category>
+    <category name="Sensoren" colour="185">
+      <category name="DHT / SHT" colour="185">
+        <label text="Temperatur- und Feuchtigkeitssensoren"></label>
+        <label text="Unterstützt werden DHT11/DHT22 sowie SHT30/31/35"></label>
+        <block type="iot_dht_init">
+          <value name="pin">
+            <shadow type="pinout">
+              <field name="PIN">2</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_sht_init">
+          <value name="i2c">
+            <shadow type="math_number">
+              <field name="NUM">0x45</field>
+            </shadow>
+          </value>
+          <value name="scl">
+            <shadow type="pinout">
+              <field name="PIN">5</field>
+            </shadow>
+          </value>
+          <value name="sda">
+            <shadow type="pinout">
+              <field name="PIN">4</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_dsht_set_enabled"></block>
+        <block type="iot_dsht_set_disabled"></block>
+        <block type="iot_dsht_set_debounce_time">
+          <value name="debounce">
+            <shadow type="math_number">
+              <field name="NUM">10</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_dsht_get_temperature"></block>
+        <block type="iot_dsht_get_humidity"></block>
+      </category>
+      <category name="PIR" colour="185">
+        <label text="PIR steht für &quot;Passive Infrared Sensor&quot;"></label>
+        <label text="Es handelt sich dabei um Bewegungssensoren, die mit Infrarot arbeiten"></label>
+        <block type="iot_pir_init">
+          <value name="pin">
+            <shadow type="pinout">
+              <field name="PIN">0</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_pir_set_enabled"></block>
+        <block type="iot_pir_set_disabled"></block>
+        <block type="iot_pir_set_debounce_time">
+          <value name="debounce">
+            <shadow type="math_number">
+              <field name="NUM">10</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_pir_reset_total_alarms"></block>
+        <block type="iot_pir_get_total_alarms"></block>
+      </category>
+      <category name="Smart_Button" colour="185">
+        <block type="iot_smart_button_init">
+          <value name="pin">
+            <shadow type="pinout">
+              <field name="PIN">0</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_smart_button_set_ticks">
+          <value name="ticks">
+            <shadow type="math_number">
+              <field name="NUM">600</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_smart_button_set_press_ticks">
+          <value name="press_ticks">
+            <shadow type="math_number">
+              <field name="NUM">800</field>
+            </shadow>
+          </value>
+        </block>
+        <block type="iot_smart_button_reset_total_clicks"></block>
+        <block type="iot_smart_button_get_total_clicks"></block>
+      </category>
+    </category>
+  </category>

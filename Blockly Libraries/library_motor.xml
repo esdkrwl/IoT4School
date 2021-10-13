@@ -1,0 +1,516 @@
+<xml xmlns="https://developers.google.com/blockly/xml"><block type="factory_base" id="`[-5~73TMm]q(aftB*]/" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_motor_init</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="YjknyVjCA.qKls!0h@2F">
+        <field name="ALIGN">CENTRE</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="HD;VTRHvk=DE);c*i_lL">
+            <field name="TEXT">Initialisiere Motor</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_dummy" id="?En;B%}3Zed?C|5MyuZe">
+            <field name="ALIGN">CENTRE</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="onS3QHB,2e##,~ryX5(d">
+                <field name="TEXT">mit Modul-ID</field>
+                <next>
+                  <block type="field_variable" id="bV5[go-(lb:F0{({HYQD">
+                    <field name="TEXT"></field>
+                    <field name="FIELDNAME">NAME</field>
+                  </block>
+                </next>
+              </block>
+            </statement>
+            <next>
+              <block type="input_dummy" id="wlQDX=ahV3bdNWq#xMJT">
+                <field name="ALIGN">LEFT</field>
+                <statement name="FIELDS">
+                  <block type="field_image" id="3sxA8Lm2`,pjk?,he=15">
+                    <field name="SRC">/iot_img/motor.png</field>
+                    <field name="WIDTH">80</field>
+                    <field name="HEIGHT">80</field>
+                    <field name="ALT">*</field>
+                    <field name="FLIP_RTL">FALSE</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="input_value" id="TJcT^zGLox_xrl{fYeez">
+                    <field name="INPUTNAME">i2c</field>
+                    <field name="ALIGN">RIGHT</field>
+                    <statement name="FIELDS">
+                      <block type="field_static" id="yR$`fEL_hJDiNGFH6^ET">
+                        <field name="TEXT">I2C</field>
+                      </block>
+                    </statement>
+                    <value name="TYPE">
+                      <shadow type="type_null" id="U=5t-)~p.1q%ko^,mcra"></shadow>
+                      <block type="type_number" id="K_k4xHlw}iIMAx#8i0o`"></block>
+                    </value>
+                    <next>
+                      <block type="input_value" id="#{68;(ruJiTSJvRF]]AI">
+                        <field name="INPUTNAME">scl</field>
+                        <field name="ALIGN">RIGHT</field>
+                        <statement name="FIELDS">
+                          <block type="field_static" id="ff/hC-po0bh(}~7d;2%(">
+                            <field name="TEXT">SCL</field>
+                          </block>
+                        </statement>
+                        <value name="TYPE">
+                          <shadow type="type_null"></shadow>
+                          <block type="type_number" id="u?I2o0-CKTC2)s}Cnq$E"></block>
+                        </value>
+                        <next>
+                          <block type="input_value" id="g,@#$z{tic?/Pli`{As^">
+                            <field name="INPUTNAME">sda</field>
+                            <field name="ALIGN">RIGHT</field>
+                            <statement name="FIELDS">
+                              <block type="field_static" id="M9iPX%b)*bQ0.57l6zPr">
+                                <field name="TEXT">SDA</field>
+                              </block>
+                            </statement>
+                            <value name="TYPE">
+                              <shadow type="type_null"></shadow>
+                              <block type="type_number" id="r0ncV!}tL79rJb:EU:F5"></block>
+                            </value>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="`wCz#0ItvAC)Pz*xbV+-" deletable="false" movable="false">
+        <field name="TEXT">Initialisiere das Motor-Modul mit einer definierten Modul-ID und der verwendeten I2C-Adresse (HEX-Wert wird automatisch zu Dezimal umgewandelt)</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="o_?iNE!w2MB(l5fWe4TF" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="x$M{|FTt~_}3~UUYJ-lg"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="lg+EIM|cP*I/32B@k4U}"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="l=?}$Ss=x:p#m_.g=TTG">
+        <mutation colour="#5ba56d"></mutation>
+        <field name="HUE">135</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="3,3HB;{3?87(0Y1`g]BU" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_motor_set_enabled</field>
+    <field name="INLINE">EXT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="f18G%.m#P+jGcJ({Cccp">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="3J=KGdTn3;vsc2pC8/v]">
+            <field name="TEXT">Schalte Motor an</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="TB;u8ETa6[sre#5DbAzO">
+            <field name="INPUTNAME">motor_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="eRR).)67Z^]+#4sjyx+J">
+                <field name="TEXT">Modul-ID</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null" id="N@@qMqGn`dq6~EQRUDnq"></shadow>
+              <block type="type_other" id="63v^CR|RbVl~mz%;KZ4D">
+                <field name="TYPE">motor</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_value" id="7}7x=@Ctytp*[pQ*-_8c">
+                <field name="INPUTNAME">motor_index</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="oLO@{Z{_e`VU,8yn|@[9">
+                    <field name="TEXT">(Optional) Motor-Index</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="mAS@5J(w7xJJT/m/g0[b"></shadow>
+                  <block type="type_number" id="%4UUTa9A8+ln=:yo895V"></block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="id:Dfh(;]62@72!gRN+y" deletable="false" movable="false">
+        <field name="TEXT">Als Eingabe wird eine Motor-Modul-ID und optional ein Motor-Index (0 = 1. Motor; 1 = 2. Motor) erwartet. Wurde kein Motor-Index angegeben, werden beide Motoren angesprochen.</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="vqfQ2{dek(lDmr;SfecB" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="RJTD}@H=t/$gYCFgb^z~"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="^O20h^Jj,)c.h.s2v28/"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="iq633[l9ic3R+qC!uS:Z">
+        <mutation colour="#5ba56d"></mutation>
+        <field name="HUE">135</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="3,3HB;{3?87(0Y1`g]BU" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_motor_set_disabled</field>
+    <field name="INLINE">EXT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="/sR+9xW:KIBd1^O$:Fmh">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="eRR).)67Z^]+#4sjyx+J">
+            <field name="TEXT">Schalte Motor aus</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="hao@!Ed@{:~O0TiA0HCR">
+            <field name="INPUTNAME">motor_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="|P;a_.wRb3Upo9yY6^xv">
+                <field name="TEXT">Modul-ID</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null"></shadow>
+              <block type="type_other" id="=K(.mimE2`:nz,Sx=3AY">
+                <field name="TYPE">motor</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_value" id="G6[7_zt4=n8s3Qc(s{e3">
+                <field name="INPUTNAME">motor_index</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="-0pmV?dJPSioks(01js`">
+                    <field name="TEXT">(Optional) Motor-Index</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="%dt9Px{sZE3|Y2QRpv:v"></shadow>
+                  <block type="type_number" id="vYg)fF/T|N2eu%]h*Z1h"></block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="id:Dfh(;]62@72!gRN+y" deletable="false" movable="false">
+        <field name="TEXT">Als Eingabe wird eine Motor-Modul-ID und optional ein Motor-Index (0 = 1. Motor; 1 = 2. Motor) erwartet. Wurde kein Motor-Index angegeben, werden beide Motoren angesprochen.</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="vqfQ2{dek(lDmr;SfecB" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="RJTD}@H=t/$gYCFgb^z~"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="^O20h^Jj,)c.h.s2v28/"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="iq633[l9ic3R+qC!uS:Z">
+        <mutation colour="#5ba56d"></mutation>
+        <field name="HUE">135</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="3,3HB;{3?87(0Y1`g]BU" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_motor_toggle</field>
+    <field name="INLINE">EXT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="/sR+9xW:KIBd1^O$:Fmh">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="eRR).)67Z^]+#4sjyx+J">
+            <field name="TEXT">Schalte Motor um</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="hao@!Ed@{:~O0TiA0HCR">
+            <field name="INPUTNAME">motor_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="|P;a_.wRb3Upo9yY6^xv">
+                <field name="TEXT">Modul-ID</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null"></shadow>
+              <block type="type_other" id="=K(.mimE2`:nz,Sx=3AY">
+                <field name="TYPE">motor</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_value" id="G6[7_zt4=n8s3Qc(s{e3">
+                <field name="INPUTNAME">motor_index</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="-0pmV?dJPSioks(01js`">
+                    <field name="TEXT">(Optional) Motor-Index</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="%dt9Px{sZE3|Y2QRpv:v"></shadow>
+                  <block type="type_number" id="!S!(X:fKrWz1rOPg3jv@"></block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="id:Dfh(;]62@72!gRN+y" deletable="false" movable="false">
+        <field name="TEXT">Als Eingabe wird eine Motor-Modul-ID und optional ein Motor-Index (0 = 1. Motor; 1 = 2. Motor) erwartet. Wurde kein Motor-Index angegeben, werden beide Motoren angesprochen.</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="vqfQ2{dek(lDmr;SfecB" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="RJTD}@H=t/$gYCFgb^z~"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="^O20h^Jj,)c.h.s2v28/"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="iq633[l9ic3R+qC!uS:Z">
+        <mutation colour="#5ba56d"></mutation>
+        <field name="HUE">135</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="qkuL*Tcu`rW/X_#(qL]," deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_motor_set_speed</field>
+    <field name="INLINE">EXT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="X|c:MblUwJegY?syKnj@">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="8=DA-GN8;|qx3A-ezo95">
+            <field name="TEXT">Setze Motor-Geschwindigkeit</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="CjJ[K@yGmHAU@_`-_4s-">
+            <field name="INPUTNAME">motor_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="GGe/n$b,uc/19Oaj7D,;">
+                <field name="TEXT">Modul-ID</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null" id="B9Gvt._JqP=^`O=tH?v:"></shadow>
+              <block type="type_other" id="BA6~o9/yjjvAVCX1KP,p">
+                <field name="TYPE">motor</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_value" id="-B9T*YvZKsb^dZw!j`F}">
+                <field name="INPUTNAME">speed</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="(09w#s]Nl8pw1Wqn$gND">
+                    <field name="TEXT">Geschwindigkeit (in %)</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="$lc_%0_vW.|BiiWKEG(="></shadow>
+                  <block type="type_number" id="$!r|BlkTx79Kh2pp.L@c"></block>
+                </value>
+                <next>
+                  <block type="input_value" id="MM^+q4o!n}P:1XIRRXzU">
+                    <field name="INPUTNAME">motor_index</field>
+                    <field name="ALIGN">RIGHT</field>
+                    <statement name="FIELDS">
+                      <block type="field_static" id="e=nABDfD_NWS[K)?gF~.">
+                        <field name="TEXT">(Optional) Motor-Index</field>
+                      </block>
+                    </statement>
+                    <value name="TYPE">
+                      <shadow type="type_null"></shadow>
+                      <block type="type_number" id="fjn45S(Bn/~MOrI6l_#}"></block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="S{2W}lf/@YJ4U8_J5?$R" deletable="false" movable="false">
+        <field name="TEXT">Definiere die Motorgeschwindigkeit mithilfe einer Motor-Modul-ID und einem Nummernblock im Wertebereich von -100 (rÃ¼ckwÃ¤rts) bis 100 (vorwÃ¤rts). Optional: Angabe eines Motor-Index (0 = 1. Motor; 1 = 2. Motor). Wurde kein Motor-Index angegeben, werden beide Motoren angesprochen</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="px6p4wh~h/Vx!r{ES.p}" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="6|Dr+5(|{=7OI@ibCl44"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="~(Kzs:j{4VBNA:u|=*Ni"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id=",[V|n:)S}-J0!5P9ofC4">
+        <mutation colour="#5ba56d"></mutation>
+        <field name="HUE">135</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="3,3HB;{3?87(0Y1`g]BU" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_motor_brake</field>
+    <field name="INLINE">EXT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="f18G%.m#P+jGcJ({Cccp">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="3J=KGdTn3;vsc2pC8/v]">
+            <field name="TEXT">Halte Motor an</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="TB;u8ETa6[sre#5DbAzO">
+            <field name="INPUTNAME">motor_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="eRR).)67Z^]+#4sjyx+J">
+                <field name="TEXT">Modul-ID</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null" id="N@@qMqGn`dq6~EQRUDnq"></shadow>
+              <block type="type_other" id="63v^CR|RbVl~mz%;KZ4D">
+                <field name="TYPE">motor</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_value" id="7}7x=@Ctytp*[pQ*-_8c">
+                <field name="INPUTNAME">motor_index</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="oLO@{Z{_e`VU,8yn|@[9">
+                    <field name="TEXT">(Optional) Motor-Index</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="mAS@5J(w7xJJT/m/g0[b"></shadow>
+                  <block type="type_number" id="%4UUTa9A8+ln=:yo895V"></block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="id:Dfh(;]62@72!gRN+y" deletable="false" movable="false">
+        <field name="TEXT">Der Motor wird aktiv gebremst, anstatt langsam auszurollen. Als Eingabe wird eine Motor-Modul-ID und optional ein Motor-Index (0 = 1. Motor; 1 = 2. Motor) erwartet. Wurde kein Motor-Index angegeben, werden beide Motoren angesprochen.</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="vqfQ2{dek(lDmr;SfecB" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="RJTD}@H=t/$gYCFgb^z~"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="^O20h^Jj,)c.h.s2v28/"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="iq633[l9ic3R+qC!uS:Z">
+        <mutation colour="#5ba56d"></mutation>
+        <field name="HUE">135</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="L{:k$@NT|4vBJrz/nFJN" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">iot_motor_get_module_id</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="m6!,T`%FR+*JU#Wx.l!u">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_variable" id="[36~*?R4w^uv$iUP[kAx">
+            <field name="TEXT">item</field>
+            <field name="FIELDNAME">NAME</field>
+            <next>
+              <block type="field_static" id="6Bx8=Nxn7T~kV$fX-JR{">
+                <field name="TEXT">(Motor)</field>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="A:Vw7^w^Lr)siS9^k;ug" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="poJxXI7t|6urdWL|Sv+{" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="bY?C8cg:kf9H^2TB~PD*"></shadow>
+      <block type="type_other" id="~rotdJfmdKG0Ask;LR/C">
+        <field name="TYPE">motor</field>
+      </block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="axGw+zz,A~T|O8Nn@e)0">
+        <mutation colour="#5ba56d"></mutation>
+        <field name="HUE">135</field>
+      </block>
+    </value>
+  </block></xml>

@@ -1,0 +1,412 @@
+<xml xmlns="https://developers.google.com/blockly/xml"><block type="factory_base" id="`[-5~73TMm]q(aftB*]/" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_buzzer_init</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="YjknyVjCA.qKls!0h@2F">
+        <field name="ALIGN">CENTRE</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="HD;VTRHvk=DE);c*i_lL">
+            <field name="TEXT">Initialisiere Buzzer</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_dummy" id="?En;B%}3Zed?C|5MyuZe">
+            <field name="ALIGN">CENTRE</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="onS3QHB,2e##,~ryX5(d">
+                <field name="TEXT">mit Modul-ID</field>
+                <next>
+                  <block type="field_variable" id="bV5[go-(lb:F0{({HYQD">
+                    <field name="TEXT"></field>
+                    <field name="FIELDNAME">NAME</field>
+                  </block>
+                </next>
+              </block>
+            </statement>
+            <next>
+              <block type="input_dummy" id="wlQDX=ahV3bdNWq#xMJT">
+                <field name="ALIGN">LEFT</field>
+                <statement name="FIELDS">
+                  <block type="field_image" id="3sxA8Lm2`,pjk?,he=15">
+                    <field name="SRC">/iot_img/buzzer.png</field>
+                    <field name="WIDTH">80</field>
+                    <field name="HEIGHT">80</field>
+                    <field name="ALT">*</field>
+                    <field name="FLIP_RTL">FALSE</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="input_value" id="TJcT^zGLox_xrl{fYeez">
+                    <field name="INPUTNAME">pin</field>
+                    <field name="ALIGN">RIGHT</field>
+                    <statement name="FIELDS">
+                      <block type="field_static" id="yR$`fEL_hJDiNGFH6^ET">
+                        <field name="TEXT">Pin</field>
+                      </block>
+                    </statement>
+                    <value name="TYPE">
+                      <shadow type="type_null" id="U=5t-)~p.1q%ko^,mcra"></shadow>
+                      <block type="type_number" id="K_k4xHlw}iIMAx#8i0o`"></block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="`wCz#0ItvAC)Pz*xbV+-" deletable="false" movable="false">
+        <field name="TEXT">Initialisiere das Buzzer-Modul mit einer definierten Modul-ID und des verwendeten Pins</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="o_?iNE!w2MB(l5fWe4TF" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="x$M{|FTt~_}3~UUYJ-lg"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="lg+EIM|cP*I/32B@k4U}"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="l=?}$Ss=x:p#m_.g=TTG">
+        <mutation colour="#a55b80"></mutation>
+        <field name="HUE">330</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="qkuL*Tcu`rW/X_#(qL]," deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_buzzer_set_volume</field>
+    <field name="INLINE">EXT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="qLOpxW^VmLB.kp.rXc1f">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="s$6|v;1@D16~t@)1u*m1">
+            <field name="TEXT">Definiere Buzzer-LautstÃ¤rke</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="CjJ[K@yGmHAU@_`-_4s-">
+            <field name="INPUTNAME">buzzer_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="GGe/n$b,uc/19Oaj7D,;">
+                <field name="TEXT">Modul-ID</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null" id="B9Gvt._JqP=^`O=tH?v:"></shadow>
+              <block type="type_other" id="K;Yr]kf1]YzgvI}FfTY{">
+                <field name="TYPE">buzzer</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_value" id="-B9T*YvZKsb^dZw!j`F}">
+                <field name="INPUTNAME">volume</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="(09w#s]Nl8pw1Wqn$gND">
+                    <field name="TEXT">LautstÃ¤rke (in %)</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="$lc_%0_vW.|BiiWKEG(="></shadow>
+                  <block type="type_number" id="$!r|BlkTx79Kh2pp.L@c"></block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="S{2W}lf/@YJ4U8_J5?$R" deletable="false" movable="false">
+        <field name="TEXT">Definiere die Buzzer-LautstÃ¤rke mithilfe einer Buzzer-Modul-ID und einem Nummernblock (Wert von 0-100)</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="px6p4wh~h/Vx!r{ES.p}" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="6|Dr+5(|{=7OI@ibCl44"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="~(Kzs:j{4VBNA:u|=*Ni"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id=",[V|n:)S}-J0!5P9ofC4">
+        <mutation colour="#a55b80"></mutation>
+        <field name="HUE">330</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="L{:k$@NT|4vBJrz/nFJN" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">iot_buzzer_get_module_id</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="m6!,T`%FR+*JU#Wx.l!u">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_variable" id="[36~*?R4w^uv$iUP[kAx">
+            <field name="TEXT">item</field>
+            <field name="FIELDNAME">NAME</field>
+            <next>
+              <block type="field_static" id="6Bx8=Nxn7T~kV$fX-JR{">
+                <field name="TEXT">(Buzzer)</field>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="A:Vw7^w^Lr)siS9^k;ug" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="poJxXI7t|6urdWL|Sv+{" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="bY?C8cg:kf9H^2TB~PD*"></shadow>
+      <block type="type_other" id="~rotdJfmdKG0Ask;LR/C">
+        <field name="TYPE">buzzer</field>
+      </block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="axGw+zz,A~T|O8Nn@e)0">
+        <mutation colour="#a55b80"></mutation>
+        <field name="HUE">330</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="dWv~q;e_ZgSYL-U;Q]%9" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_buzzer_play_tone</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="G-NE.aZ8m6L|i[nR[fl!">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="!eOP8+54P`zMV[w5I+qm">
+            <field name="TEXT">Spiele Buzzer Ton</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="qSyqnkFkIgHPOcPUl|lz">
+            <field name="INPUTNAME">buzzer_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="kYR_V7g(of$4RP*qkkIN">
+                <field name="TEXT">Modul-ID</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null"></shadow>
+              <block type="type_other" id="Gb_Gmx7!)N7?.#AW)NDi">
+                <field name="TYPE">buzzer</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_value" id="DCzf0__ZdaQvdAr1r3Cw">
+                <field name="INPUTNAME">frequency</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="e5Hu{/qU6:}HN$085*2*">
+                    <field name="TEXT">Frequenz / Note</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="acmsxB(h,qrS.#bqCD=)"></shadow>
+                  <block type="type_group" id="xjXQ.#?JP8mj{n8AZsb?">
+                    <mutation types="2"></mutation>
+                    <value name="TYPE0">
+                      <block type="type_number" id="_VzJCwGK2~)p0R:NUwgZ"></block>
+                    </value>
+                    <value name="TYPE1">
+                      <block type="type_other" id="oaBaO5AlBi{qyypf9J`w">
+                        <field name="TYPE">Note</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="ij(uj[8=OkLDD0q2eeHj" deletable="false" movable="false">
+        <field name="TEXT">Spiele einen Buzzer Ton mithilfe einer Buzzer Modul-ID und einem Nummernblock (Wert von 1-1000) bzw. einem Notenblock</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="8A*:a_wAxw(J-2vY,~wQ" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="G6-v:EZ-EUS4_5)f%]g/"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="Q33LXe`we7GX`sh4jVr="></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="H2-ux4v_u[E}JT#*(EN2">
+        <mutation colour="#a55b80"></mutation>
+        <field name="HUE">330</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="xK6e+Q+3=AA~atl-^[]s" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_buzzer_play_song</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="dDwPMGX2HT*MPZHM.,9.">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="C*q.^wraMoVwm?[Fjt){">
+            <field name="TEXT">Spiele Musik (RTTTL)</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="CnU?Iok=9)Ew+||+zzl]">
+            <field name="INPUTNAME">buzzer_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="M[7=wKL9AmYeM8+@iQts">
+                <field name="TEXT">Modul-ID</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null"></shadow>
+              <block type="type_other" id="`Ogx9.Qvw@ApdmDbixUh">
+                <field name="TYPE">buzzer</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_value" id="U[;!KdjZh6iaTsH{lw^{">
+                <field name="INPUTNAME">rtttl_string</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="zJ8F-/MlTM)gY.bJAkbr">
+                    <field name="TEXT">RTTTL-String</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="L{$uRus7y)P+99q2Z$d_"></shadow>
+                  <block type="type_string" id="AK2@45A]XKrzCuJRi@h."></block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="G$XtsRWs8wZ:93,nVn:]" deletable="false" movable="false">
+        <field name="TEXT">Spiele Musik (wie zu Nokia-Zeiten) mithilfe einer Modul-ID und einem RTTTL-String. (Rechtsklick auf den Block fÃ¼r weitere Infos zu RTTTL)</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id=".A#DX$!#{a~1Oc`0g/0*" deletable="false" movable="false">
+        <field name="TEXT">https://de.wikipedia.org/wiki/Ring_Tones_Text_Transfer_Language</field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="F#su+F4xN3Hd5xR0EKY}"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id=";4ZFrF!E2[_`U`Y]%7l%"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="d^^uMB|?yxas}Y($Ts_V">
+        <mutation colour="#a55b80"></mutation>
+        <field name="HUE">330</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="HGT+,itsMm+L.X1%b6Ee" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_buzzer_play_song_from_file</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="KJ^.A=:85}eG-~kN3N|%">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="^q5^y_B;]qWx.J0:3nnP">
+            <field name="TEXT">Spiele Musik (RTTTL) von Datei</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="}jCJa)7J_Gz}2EQpCADv">
+            <field name="INPUTNAME">buzzer_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="{nbS_]|m@:~}^KhSQ61B">
+                <field name="TEXT">Modul-ID</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null"></shadow>
+              <block type="type_other" id=".O^4Z%G0O0FtOSU!BLdG">
+                <field name="TYPE">buzzer</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_value" id="[/(aWR(Fm}Z_M#TvKqj|">
+                <field name="INPUTNAME">rtttl_songname</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="x8:n@qDMoq1qjpl(4`Aw">
+                    <field name="TEXT">Name des Klingeltons</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null"></shadow>
+                  <block type="type_string" id="ncw~k``a~1T?+CRI/Bp("></block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="3)C;XYjNcK0.oCK.+5zL" deletable="false" movable="false">
+        <field name="TEXT">Spielt Songs vom Mikrocontroller aus der Datei 'songs.py'. Angabe des Klingelton-Namens. (Rechtsklick auf den Block fÃ¼r weitere Infos zu RTTTL)</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="-[Igy+%)5wAfG-XM=d,b" deletable="false" movable="false">
+        <field name="TEXT">https://de.wikipedia.org/wiki/Ring_Tones_Text_Transfer_Language</field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="F-t/1r6XW1u85Hg*%Fta"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="l*5ZA]JT9ja|r~w,C`x]"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="$R:g@,=YdO$BgwtmYo^g">
+        <mutation colour="#a55b80"></mutation>
+        <field name="HUE">330</field>
+      </block>
+    </value>
+  </block></xml>

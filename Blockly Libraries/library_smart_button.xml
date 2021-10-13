@@ -1,0 +1,360 @@
+<xml xmlns="https://developers.google.com/blockly/xml"><block type="factory_base" id="`[-5~73TMm]q(aftB*]/" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_smart_button_init</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="YjknyVjCA.qKls!0h@2F">
+        <field name="ALIGN">CENTRE</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="HD;VTRHvk=DE);c*i_lL">
+            <field name="TEXT">Initialisiere Smart_Button</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_dummy" id="?En;B%}3Zed?C|5MyuZe">
+            <field name="ALIGN">CENTRE</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="onS3QHB,2e##,~ryX5(d">
+                <field name="TEXT">mit Modul-ID</field>
+                <next>
+                  <block type="field_variable" id="bV5[go-(lb:F0{({HYQD">
+                    <field name="TEXT"></field>
+                    <field name="FIELDNAME">NAME</field>
+                  </block>
+                </next>
+              </block>
+            </statement>
+            <next>
+              <block type="input_dummy" id="wlQDX=ahV3bdNWq#xMJT">
+                <field name="ALIGN">LEFT</field>
+                <statement name="FIELDS">
+                  <block type="field_image" id="3sxA8Lm2`,pjk?,he=15">
+                    <field name="SRC">/iot_img/onebutton.png</field>
+                    <field name="WIDTH">80</field>
+                    <field name="HEIGHT">80</field>
+                    <field name="ALT">*</field>
+                    <field name="FLIP_RTL">FALSE</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="input_value" id="TJcT^zGLox_xrl{fYeez">
+                    <field name="INPUTNAME">pin</field>
+                    <field name="ALIGN">RIGHT</field>
+                    <statement name="FIELDS">
+                      <block type="field_static" id="yR$`fEL_hJDiNGFH6^ET">
+                        <field name="TEXT">Pin</field>
+                      </block>
+                    </statement>
+                    <value name="TYPE">
+                      <shadow type="type_null" id="U=5t-)~p.1q%ko^,mcra"></shadow>
+                      <block type="type_number" id="K_k4xHlw}iIMAx#8i0o`"></block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="`wCz#0ItvAC)Pz*xbV+-" deletable="false" movable="false">
+        <field name="TEXT">Initialisiere das Smart_Button-Modul mit einer definierten Modul-ID und des verwendeten Pins</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="o_?iNE!w2MB(l5fWe4TF" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="x$M{|FTt~_}3~UUYJ-lg"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="lg+EIM|cP*I/32B@k4U}"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="l=?}$Ss=x:p#m_.g=TTG">
+        <mutation colour="#a5935b"></mutation>
+        <field name="HUE">45</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="qkuL*Tcu`rW/X_#(qL]," deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_smart_button_set_ticks</field>
+    <field name="INLINE">INT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="CjJ[K@yGmHAU@_`-_4s-">
+        <field name="INPUTNAME">smart_button_module_id</field>
+        <field name="ALIGN">RIGHT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="GGe/n$b,uc/19Oaj7D,;">
+            <field name="TEXT">Setze Klick-Registrierungsdauer von</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null" id="B9Gvt._JqP=^`O=tH?v:"></shadow>
+          <block type="type_other" id="K;Yr]kf1]YzgvI}FfTY{">
+            <field name="TYPE">smart_button</field>
+          </block>
+        </value>
+        <next>
+          <block type="input_value" id="-B9T*YvZKsb^dZw!j`F}">
+            <field name="INPUTNAME">ticks</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="(09w#s]Nl8pw1Wqn$gND">
+                <field name="TEXT">auf</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null" id="$lc_%0_vW.|BiiWKEG(="></shadow>
+              <block type="type_number" id="$!r|BlkTx79Kh2pp.L@c"></block>
+            </value>
+            <next>
+              <block type="input_dummy" id="R),3/sgfG*qIqSWe~jsl">
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="b~!{[y6+v6nl7*PJZaYI">
+                    <field name="TEXT">ms</field>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="S{2W}lf/@YJ4U8_J5?$R" deletable="false" movable="false">
+        <field name="TEXT">Definiere Zeit in ms bevor Klick registriert wird mithilfe einer Smart_Button-Modul-ID und einem Nummernblock (Wert von 1-1000)</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="px6p4wh~h/Vx!r{ES.p}" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="6|Dr+5(|{=7OI@ibCl44"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="~(Kzs:j{4VBNA:u|=*Ni"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id=",[V|n:)S}-J0!5P9ofC4">
+        <mutation colour="#a5935b"></mutation>
+        <field name="HUE">45</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="{%78gob%kTjbN435dhL6" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_smart_button_set_press_ticks</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="_4]V7S_rD)YxK[I==JDo">
+        <field name="INPUTNAME">smart_button_module_id</field>
+        <field name="ALIGN">RIGHT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="MR8uUG0JDxl-UCPeS6O_">
+            <field name="TEXT">Setze DrÃ¼ck-Registrierungsdauer von</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null"></shadow>
+          <block type="type_other" id="Gq)(CU%lJ7,BDVR`3FJe">
+            <field name="TYPE">smart_button</field>
+          </block>
+        </value>
+        <next>
+          <block type="input_value" id="7rb^s:N5N6H17nG;(ftS">
+            <field name="INPUTNAME">press_ticks</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="{Eug^DGg3o-V-J?9/G7!">
+                <field name="TEXT">auf</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null"></shadow>
+              <block type="type_number" id="kTYY9.Xa|KykTX%5A,/:"></block>
+            </value>
+            <next>
+              <block type="input_dummy" id="[88}c0T`};SYP]3pz}x+">
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="f*{xjr(FehnBei9_@5D%">
+                    <field name="TEXT">ms</field>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="$nnw,y.Xe|:cteXt/(VL" deletable="false" movable="false">
+        <field name="TEXT">Definiere Zeit in ms bevor langer Klick (GedrÃ¼ckthalten des Buttons) registriert wird mithilfe einer Smart_Button-Modul-ID und einem Nummernblock (Wert von 1-2000)</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="8[D*M49Bi_~*4_.wB30B" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="j(Ae`D1=z;^T+%$%e-s2"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="Uli=@O|yfJ?-0*PWAp9%"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="**%}q3igBYwUUvJqK6(z">
+        <mutation colour="#a5935b"></mutation>
+        <field name="HUE">45</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="LoYs]1q+x4(BbMJWN{n7" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_smart_button_reset_total_clicks</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="@7[Emw{xd7I~*x4l`n01">
+        <field name="INPUTNAME">smart_button_module_id</field>
+        <field name="ALIGN">RIGHT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="7Fi?zyc:w0_5lJ[s._vX">
+            <field name="TEXT">Setze den Klick-ZÃ¤hler von</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null"></shadow>
+          <block type="type_other" id="kE3SwzC[=#JjrY:J,]k3">
+            <field name="TYPE">smart_button</field>
+          </block>
+        </value>
+        <next>
+          <block type="input_dummy" id="dRqStzJ%ed`=E{_?S4`K">
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="F3Lk^YS=4e1/~7A[.gvp">
+                <field name="TEXT">zurück</field>
+              </block>
+            </statement>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="%Pq;=,GgYU|8EGy5Tcnb" deletable="false" movable="false">
+        <field name="TEXT">Setzt die Anzahl bisher getÃ¤tigter Klicks der angegebenen Smart_Button-Modul-ID auf 0 zurÃ¼ck.</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="e+2Rx7Hkxda9)v-7vxKZ" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="jT[W,9Aj=XypP-*{(#=0"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="NSb)[e#2|)3t$^.?ZCF6"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="CRQ}41vX%$5qd;k(gmxL">
+        <mutation colour="#a5935b"></mutation>
+        <field name="HUE">45</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="L{:k$@NT|4vBJrz/nFJN" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">iot_smart_button_get_module_id</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="m6!,T`%FR+*JU#Wx.l!u">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_variable" id="[36~*?R4w^uv$iUP[kAx">
+            <field name="TEXT">item</field>
+            <field name="FIELDNAME">NAME</field>
+            <next>
+              <block type="field_static" id="6Bx8=Nxn7T~kV$fX-JR{">
+                <field name="TEXT">(Smart_Button)</field>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="A:Vw7^w^Lr)siS9^k;ug" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="poJxXI7t|6urdWL|Sv+{" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="bY?C8cg:kf9H^2TB~PD*"></shadow>
+      <block type="type_other" id="~rotdJfmdKG0Ask;LR/C">
+        <field name="TYPE">smart_button</field>
+      </block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="axGw+zz,A~T|O8Nn@e)0">
+        <mutation colour="#a5935b"></mutation>
+        <field name="HUE">45</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="jI/K=jvyRW|h(A?xmSsn" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">iot_smart_button_get_total_clicks</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="g-eArs,lYASGn)z/~}1;">
+        <field name="INPUTNAME">smart_button_module_id</field>
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="^]K(xck-?kC%2!0w:S=l">
+            <field name="TEXT">Lese den KlickzÃ¤hler von</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null" id="T/mfUtkt]o.xK`kE^VJL"></shadow>
+          <block type="type_other" id="e4q9QO16(+^M3n}3hlSI">
+            <field name="TYPE">smart_button</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="72~;:HbV$%S/j(tm/:C2" deletable="false" movable="false">
+        <field name="TEXT">Liest die Anzahl getÃ¤tigter Klicks eines Smart_Button-Moduls aus und gibt diese als Ganzzahl zurÃ¼ck</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="+!J2U|V)lJ*%vHavMeBf" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="^l-S$L4WaNvq8|{q^ety"></shadow>
+      <block type="type_number" id="shCC.OB-TiAmJz~Flj5x"></block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="s|14[SIk%U+ks)A$aif}">
+        <mutation colour="#a5935b"></mutation>
+        <field name="HUE">45</field>
+      </block>
+    </value>
+  </block></xml>

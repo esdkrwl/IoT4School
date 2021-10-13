@@ -1,0 +1,247 @@
+<xml xmlns="https://developers.google.com/blockly/xml"><block type="factory_base" id="f_g$Buizz0KYJ].z=#Pn" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_mqtt_set_callback</field>
+    <field name="INLINE">EXT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="?vw7j?$+cFrBS*PGUV.5">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="?`NdU$e4P+xrbJj)t%x8">
+            <field name="TEXT">Setze Callback fÃ¼r Nachrichten der Form</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_dummy" id="gfy$WC[7oS=_/ojH[Et)">
+            <field name="ALIGN">LEFT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="fq_t5kl[48U;.0``0cu]">
+                <field name="TEXT">(</field>
+                <next>
+                  <block type="field_variable" id="P8`EY7:4.O2%JcKqmW8Q">
+                    <field name="TEXT">topic</field>
+                    <field name="FIELDNAME">topic</field>
+                    <next>
+                      <block type="field_static" id="@d_^*1KS8[=/HXcxgF;t">
+                        <field name="TEXT">,</field>
+                        <next>
+                          <block type="field_variable" id="(I12|;k@tC_RWcRVo/R4">
+                            <field name="TEXT">msg</field>
+                            <field name="FIELDNAME">msg</field>
+                            <next>
+                              <block type="field_static" id="OOL`N:1nfN!^o@$mau),">
+                                <field name="TEXT">,</field>
+                                <next>
+                                  <block type="field_label_serializable" id="|dzr`:5c?NC~n:_0[yHQ">
+                                    <field name="TEXT">retain</field>
+                                    <field name="FIELDNAME">retain</field>
+                                    <next>
+                                      <block type="field_static" id="b.q;:-9)BQf-peK]5s+0">
+                                        <field name="TEXT">,</field>
+                                        <next>
+                                          <block type="field_label_serializable" id="[aVowCytbyUGsg.Vuy#w">
+                                            <field name="TEXT">duplicate</field>
+                                            <field name="FIELDNAME">duplicate</field>
+                                            <next>
+                                              <block type="field_static" id=":~NTJNYKL?@z)+`2h5me">
+                                                <field name="TEXT">)</field>
+                                              </block>
+                                            </next>
+                                          </block>
+                                        </next>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </statement>
+            <next>
+              <block type="input_dummy" id="|q^?U*5(01wNnXE}:=s@">
+                <field name="ALIGN">LEFT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="q|)WNGi%uY5P1df%UfCf">
+                    <field name="TEXT">und führe bei Nachrichteneingang</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="input_statement" id="qX:uY/(rI6njKL-K1IV^">
+                    <field name="INPUTNAME">do</field>
+                    <field name="ALIGN">LEFT</field>
+                    <statement name="FIELDS">
+                      <block type="field_static" id="?Kvp!BLWI|_d$p7a^P$@">
+                        <field name="TEXT">Folgendes aus:</field>
+                      </block>
+                    </statement>
+                    <value name="TYPE">
+                      <shadow type="type_null" id=".E-:2=SD:xUo+l-R4M,{"></shadow>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="6hqYWQXN0)~Ws*35kXj+" deletable="false" movable="false">
+        <field name="TEXT">Durch diese Funktion kÃ¶nnen eigene Aktionen festgelegt werden, wenn das GerÃ¤t eine Nachricht auf ein abonniertes Thema erhÃ¤lt</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="QXcLE9)N+CBv5x)A5rnm" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="Er:~)*+Kb*bH(Xr+$a[l"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="0ZFOH#[[1l1jlz7]}O_#"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="2uDUsviu0?SPn%]NX!Rh">
+        <mutation colour="#5b67a5"></mutation>
+        <field name="HUE">230</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="[C1[_CWu4ZV,1|i5*4`i" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_mqtt_subscribe</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="Mr;/SfRN3%)*O47.-ZpU">
+        <field name="INPUTNAME">topic</field>
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="2dk5v(H?.*=2*y}nfBGQ">
+            <field name="TEXT">Abonniere folgendes MQTT Thema:</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null" id=",%/BO1xh|rztob}81kpt"></shadow>
+          <block type="type_string" id="2dp?W%+T$/e.m_Y`lWv+"></block>
+        </value>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="UezXu-e87`wT]%2:2{]H" deletable="false" movable="false">
+        <field name="TEXT">Hier kann ein eigenes Abonnement (Subscription) zu einem beliebigen Thema (Topic) festgelegt werden. (Angabe des Themas als String)</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="|0$h42D7WP~YX0bK;^EV" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="n/(O6Q|E;8wb)796pytD"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="OhyH0U|sIZ3~|p6xotSG"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="jA~7A8NLULcG+X,8|w0U">
+        <mutation colour="#5b67a5"></mutation>
+        <field name="HUE">230</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="YhwEPdmyr9m]_#FB=(6l" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_mqtt_publish</field>
+    <field name="INLINE">EXT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="j39p5%|_q$:@dOVAH-5#">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="XkYrg#CTOdk;y2yjMZdu">
+            <field name="TEXT">Sende MQTT-Nachricht</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="%FY*WClp=Auki}zVPHm,">
+            <field name="INPUTNAME">topic</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="Zy.|f^h@(81;Vo%XPfYE">
+                <field name="TEXT">Thema</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null" id="Z(XKfh8T|c0A?g*8)VfI"></shadow>
+              <block type="type_string" id="-_X7C0J5MH12GEHfXbK`"></block>
+            </value>
+            <next>
+              <block type="input_value" id="!+)pz0Yn;Q%VzNz=nt`+">
+                <field name="INPUTNAME">msg</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="q+4*][F3QTMAafna;n7k">
+                    <field name="TEXT">Nachrichten-Inhalt</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="F3?0n+b2(o]izsYFe4yc"></shadow>
+                  <block type="type_string" id=";.-l4_cxoToD/B8wY97s"></block>
+                </value>
+                <next>
+                  <block type="input_dummy" id="|g,.Ei.xFbWdqEJ8Dn!)">
+                    <field name="ALIGN">RIGHT</field>
+                    <statement name="FIELDS">
+                      <block type="field_static" id="-/Wx1BjrBaS6`Y6VdD]C">
+                        <field name="TEXT">QoS</field>
+                        <next>
+                          <block type="field_dropdown" id="6hvFEK(I;A7}):;y}ye4">
+                            <mutation options="[&quot;text&quot;,&quot;text&quot;,&quot;text&quot;]"></mutation>
+                            <field name="FIELDNAME">qos_lvl</field>
+                            <field name="USER0">0 - hÃ¶chstens 1x</field>
+                            <field name="CPU0">0 </field>
+                            <field name="USER1">1 - mindestens 1x</field>
+                            <field name="CPU1">1</field>
+                            <field name="USER2">option</field>
+                            <field name="CPU2">OPTIONNAME</field>
+                          </block>
+                        </next>
+                      </block>
+                    </statement>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="7DE6i]x4nHC/=-]_gFIu" deletable="false" movable="false">
+        <field name="TEXT">Dieser Block sendet die definierte Nachricht (Payload) an das definierte Thema (Topic) unter Angabe einer DienstgÃ¼te (Quality of Service). Als Eingabe wird jeweils ein String erwartet</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="(fXI{[0rnxl=#yXK8)~9" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="MZ;$1P1#z@h.Q%l2QR@0"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="e3KXEr}5xh@SoqE2+*pw"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="ASiu2Nnph@|6|Ze1cb7o">
+        <mutation colour="#5b67a5"></mutation>
+        <field name="HUE">230</field>
+      </block>
+    </value>
+  </block></xml>

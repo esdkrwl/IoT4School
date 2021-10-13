@@ -1,0 +1,60 @@
+<xml xmlns="https://developers.google.com/blockly/xml"><block type="factory_base" id="9SYh#M9dYYH}oyf$?FG3" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="NONE"></mutation>
+    <field name="NAME">iot_setup</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">NONE</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="G,d+c^92[lFCd6bfAd8C">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="sl8B|bQRG(k2(|a-WJn=">
+            <field name="TEXT">Vorbereitung</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_statement" id="Bu~M~u9T}rT~!@[6kjTa">
+            <field name="INPUTNAME">setup_code</field>
+            <field name="ALIGN">LEFT</field>
+            <value name="TYPE">
+              <shadow type="type_null" id=",BpMgv(l5Jb3s4*9=ZgA"></shadow>
+            </value>
+            <next>
+              <block type="input_dummy" id="C;b=B}WLRqV)CoR:)vPq">
+                <field name="ALIGN">LEFT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="`Qt{gMSch.z:Qc7UvBpC">
+                    <field name="TEXT">Hauptschleife</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="input_statement" id="Fk4wZo|VP?O]%}[`fXQo">
+                    <field name="INPUTNAME">loop_code</field>
+                    <field name="ALIGN">LEFT</field>
+                    <value name="TYPE">
+                      <shadow type="type_null" id="K.lAaw6v`pYExMFrzBqe"></shadow>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="iHU+=Y2UlAtN:rM9$B%Q" deletable="false" movable="false">
+        <field name="TEXT">Dieser Block wird fÃ¼r die IoT4School-Module zur Vorbereitung benÃ¶tigt. BlÃ¶cke, die im Bereich Vorbereitung gesetzt werden, werden 1x ausgefÃ¼hrt. BlÃ¶cke in der Hauptschleife werden wiederholt ausgefÃ¼hrt</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="xwBdmznlY9IxI[=ZZ2iQ" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="*Yne0k-?QRk4(cB(NbC8">
+        <mutation colour="#5b9fa5"></mutation>
+        <field name="HUE">185</field>
+      </block>
+    </value>
+  </block></xml>

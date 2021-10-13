@@ -1,0 +1,409 @@
+<xml xmlns="https://developers.google.com/blockly/xml"><block type="factory_base" id="`[-5~73TMm]q(aftB*]/" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_pir_init</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="YjknyVjCA.qKls!0h@2F">
+        <field name="ALIGN">CENTRE</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="HD;VTRHvk=DE);c*i_lL">
+            <field name="TEXT">Initialisiere PIR</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_dummy" id="?En;B%}3Zed?C|5MyuZe">
+            <field name="ALIGN">CENTRE</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="onS3QHB,2e##,~ryX5(d">
+                <field name="TEXT">mit Modul-ID</field>
+                <next>
+                  <block type="field_variable" id="bV5[go-(lb:F0{({HYQD">
+                    <field name="TEXT"></field>
+                    <field name="FIELDNAME">NAME</field>
+                  </block>
+                </next>
+              </block>
+            </statement>
+            <next>
+              <block type="input_dummy" id="wlQDX=ahV3bdNWq#xMJT">
+                <field name="ALIGN">LEFT</field>
+                <statement name="FIELDS">
+                  <block type="field_image" id="3sxA8Lm2`,pjk?,he=15">
+                    <field name="SRC">/iot_img/pir.png</field>
+                    <field name="WIDTH">80</field>
+                    <field name="HEIGHT">80</field>
+                    <field name="ALT">*</field>
+                    <field name="FLIP_RTL">FALSE</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="input_value" id="TJcT^zGLox_xrl{fYeez">
+                    <field name="INPUTNAME">pin</field>
+                    <field name="ALIGN">RIGHT</field>
+                    <statement name="FIELDS">
+                      <block type="field_static" id="yR$`fEL_hJDiNGFH6^ET">
+                        <field name="TEXT">Pin</field>
+                      </block>
+                    </statement>
+                    <value name="TYPE">
+                      <shadow type="type_null" id="U=5t-)~p.1q%ko^,mcra"></shadow>
+                      <block type="type_number" id="K_k4xHlw}iIMAx#8i0o`"></block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="`wCz#0ItvAC)Pz*xbV+-" deletable="false" movable="false">
+        <field name="TEXT">Initialisiere das PIR-Modul mit einer definierten Modul-ID und des verwendeten Pins</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="o_?iNE!w2MB(l5fWe4TF" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="x$M{|FTt~_}3~UUYJ-lg"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="lg+EIM|cP*I/32B@k4U}"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="l=?}$Ss=x:p#m_.g=TTG">
+        <mutation colour="#6d5ba5"></mutation>
+        <field name="HUE">255</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="3,3HB;{3?87(0Y1`g]BU" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_pir_set_enabled</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="/sR+9xW:KIBd1^O$:Fmh">
+        <field name="ALIGN">RIGHT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="eRR).)67Z^]+#4sjyx+J">
+            <field name="TEXT">Schalte PIR</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="TB;u8ETa6[sre#5DbAzO">
+            <field name="INPUTNAME">pir_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <value name="TYPE">
+              <shadow type="type_null" id="N@@qMqGn`dq6~EQRUDnq"></shadow>
+              <block type="type_other" id="63v^CR|RbVl~mz%;KZ4D">
+                <field name="TYPE">pir</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_dummy" id="=lqviRDr{KLUT],{3XAp">
+                <field name="ALIGN">LEFT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="oLO@{Z{_e`VU,8yn|@[9">
+                    <field name="TEXT">an</field>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="id:Dfh(;]62@72!gRN+y" deletable="false" movable="false">
+        <field name="TEXT">Als Eingabe wird eine PIR-Modul-ID erwartet</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="vqfQ2{dek(lDmr;SfecB" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="RJTD}@H=t/$gYCFgb^z~"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="^O20h^Jj,)c.h.s2v28/"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="iq633[l9ic3R+qC!uS:Z">
+        <mutation colour="#6d5ba5"></mutation>
+        <field name="HUE">255</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="3,3HB;{3?87(0Y1`g]BU" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_pir_set_disabled</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="/sR+9xW:KIBd1^O$:Fmh">
+        <field name="ALIGN">RIGHT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="eRR).)67Z^]+#4sjyx+J">
+            <field name="TEXT">Schalte PIR</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="TB;u8ETa6[sre#5DbAzO">
+            <field name="INPUTNAME">pir_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <value name="TYPE">
+              <shadow type="type_null" id="N@@qMqGn`dq6~EQRUDnq"></shadow>
+              <block type="type_other" id="63v^CR|RbVl~mz%;KZ4D">
+                <field name="TYPE">pir</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_dummy" id="=lqviRDr{KLUT],{3XAp">
+                <field name="ALIGN">LEFT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="oLO@{Z{_e`VU,8yn|@[9">
+                    <field name="TEXT">aus</field>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="id:Dfh(;]62@72!gRN+y" deletable="false" movable="false">
+        <field name="TEXT">Als Eingabe wird eine PIR-Modul-ID erwartet</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="vqfQ2{dek(lDmr;SfecB" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="RJTD}@H=t/$gYCFgb^z~"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="^O20h^Jj,)c.h.s2v28/"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="iq633[l9ic3R+qC!uS:Z">
+        <mutation colour="#6d5ba5"></mutation>
+        <field name="HUE">255</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="qkuL*Tcu`rW/X_#(qL]," deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_pir_set_debounce_time</field>
+    <field name="INLINE">INT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="CjJ[K@yGmHAU@_`-_4s-">
+        <field name="INPUTNAME">pir_module_id</field>
+        <field name="ALIGN">RIGHT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="GGe/n$b,uc/19Oaj7D,;">
+            <field name="TEXT">Setze "Bewegungserkennungs-Rate" von</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null" id="B9Gvt._JqP=^`O=tH?v:"></shadow>
+          <block type="type_other" id="BA6~o9/yjjvAVCX1KP,p">
+            <field name="TYPE">pir</field>
+          </block>
+        </value>
+        <next>
+          <block type="input_value" id="-B9T*YvZKsb^dZw!j`F}">
+            <field name="INPUTNAME">debounce</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="(09w#s]Nl8pw1Wqn$gND">
+                <field name="TEXT">auf</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null" id="$lc_%0_vW.|BiiWKEG(="></shadow>
+              <block type="type_number" id="$!r|BlkTx79Kh2pp.L@c"></block>
+            </value>
+            <next>
+              <block type="input_dummy" id="R),3/sgfG*qIqSWe~jsl">
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="b~!{[y6+v6nl7*PJZaYI">
+                    <field name="TEXT">s</field>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="S{2W}lf/@YJ4U8_J5?$R" deletable="false" movable="false">
+        <field name="TEXT">Definiere die "Bewegungserkennungs-Rate" (Zeit, die nach einer Bewegungserkennung verstreichen muss, bis erneut eine Bewegung erkannt werden kann) in Sekunden mithilfe einer PIR-Modul-ID und einem Nummernblock (Wert von 1-3600)</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="px6p4wh~h/Vx!r{ES.p}" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="6|Dr+5(|{=7OI@ibCl44"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="~(Kzs:j{4VBNA:u|=*Ni"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id=",[V|n:)S}-J0!5P9ofC4">
+        <mutation colour="#6d5ba5"></mutation>
+        <field name="HUE">255</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="L{:k$@NT|4vBJrz/nFJN" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">iot_pir_get_module_id</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="m6!,T`%FR+*JU#Wx.l!u">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_variable" id="[36~*?R4w^uv$iUP[kAx">
+            <field name="TEXT">item</field>
+            <field name="FIELDNAME">NAME</field>
+            <next>
+              <block type="field_static" id="6Bx8=Nxn7T~kV$fX-JR{">
+                <field name="TEXT">(PIR)</field>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="A:Vw7^w^Lr)siS9^k;ug" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="poJxXI7t|6urdWL|Sv+{" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="bY?C8cg:kf9H^2TB~PD*"></shadow>
+      <block type="type_other" id="~rotdJfmdKG0Ask;LR/C">
+        <field name="TYPE">pir</field>
+      </block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="axGw+zz,A~T|O8Nn@e)0">
+        <mutation colour="#6d5ba5"></mutation>
+        <field name="HUE">255</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="z}6uF/RYCFwpAv12daLC" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_pir_reset_total_alarms</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="T}V?8{bB,NzD^eMGp.mZ">
+        <field name="INPUTNAME">pir_module_id</field>
+        <field name="ALIGN">RIGHT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id=",MJKW12:lAxQv/mTSxe:">
+            <field name="TEXT">Setze den Alarmcounter von</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null" id="TZFPL8m8Tto!)R1SR3`m"></shadow>
+          <block type="type_other" id="h/U-(!FHneWmzxZ1mDj/">
+            <field name="TYPE">pir</field>
+          </block>
+        </value>
+        <next>
+          <block type="input_dummy" id="anqZJ|LK*V2f;bCHII}T">
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="TR5R5A[w(yO;,.e.j09(">
+                <field name="TEXT">zurÃ¼ck</field>
+              </block>
+            </statement>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="}+u/xF~8l131GBZmJJLe" deletable="false" movable="false">
+        <field name="TEXT">Setzt den Counter fÃ¼r die Anzahl ausgelÃ¶ster Alarme der angegebenen PIR-Modul-ID auf 0 zurÃ¼ck.</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="s.!$fR4UqeRwMk5F*Z3]" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="`2H6z-V[+kLN+x/#E@!1"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="+VY$0hLmhzg`A/MbNLg="></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="?E!lg7O,!w|7qRxtk^7B">
+        <mutation colour="#6d5ba5"></mutation>
+        <field name="HUE">255</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="z}6uF/RYCFwpAv12daLC" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">iot_pir_get_total_alarms</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="T}V?8{bB,NzD^eMGp.mZ">
+        <field name="INPUTNAME">pir_module_id</field>
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id=",MJKW12:lAxQv/mTSxe:">
+            <field name="TEXT">Lese den AlarmzÃ¤hler von</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null" id="TZFPL8m8Tto!)R1SR3`m"></shadow>
+          <block type="type_other" id="h/U-(!FHneWmzxZ1mDj/">
+            <field name="TYPE">pir</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="}+u/xF~8l131GBZmJJLe" deletable="false" movable="false">
+        <field name="TEXT">Liest die Anzahl ausgelÃ¶ster Alarme eines PIR-Sensors aus und gibt diese als Ganzzahl zurÃ¼ck</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="s.!$fR4UqeRwMk5F*Z3]" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="o/||DQ7h2`+k@Lj*6g6I"></shadow>
+      <block type="type_number" id="3YysR3_kG(Mhsl,(vXNU"></block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="?E!lg7O,!w|7qRxtk^7B">
+        <mutation colour="#6d5ba5"></mutation>
+        <field name="HUE">255</field>
+      </block>
+    </value>
+  </block></xml>

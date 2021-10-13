@@ -1,0 +1,473 @@
+<xml xmlns="https://developers.google.com/blockly/xml"><block type="factory_base" id="`[-5~73TMm]q(aftB*]/" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_rgb_led_init</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="YjknyVjCA.qKls!0h@2F">
+        <field name="ALIGN">CENTRE</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="HD;VTRHvk=DE);c*i_lL">
+            <field name="TEXT">Initialisiere RGB_LED</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_dummy" id="?En;B%}3Zed?C|5MyuZe">
+            <field name="ALIGN">CENTRE</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="onS3QHB,2e##,~ryX5(d">
+                <field name="TEXT">mit Modul-ID</field>
+                <next>
+                  <block type="field_variable" id="bV5[go-(lb:F0{({HYQD">
+                    <field name="TEXT"></field>
+                    <field name="FIELDNAME">NAME</field>
+                  </block>
+                </next>
+              </block>
+            </statement>
+            <next>
+              <block type="input_dummy" id="wlQDX=ahV3bdNWq#xMJT">
+                <field name="ALIGN">LEFT</field>
+                <statement name="FIELDS">
+                  <block type="field_image" id="3sxA8Lm2`,pjk?,he=15">
+                    <field name="SRC">/iot_img/rgb-led.png</field>
+                    <field name="WIDTH">80</field>
+                    <field name="HEIGHT">80</field>
+                    <field name="ALT">*</field>
+                    <field name="FLIP_RTL">FALSE</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="input_value" id="TJcT^zGLox_xrl{fYeez">
+                    <field name="INPUTNAME">pin</field>
+                    <field name="ALIGN">RIGHT</field>
+                    <statement name="FIELDS">
+                      <block type="field_static" id="yR$`fEL_hJDiNGFH6^ET">
+                        <field name="TEXT">Pin</field>
+                      </block>
+                    </statement>
+                    <value name="TYPE">
+                      <shadow type="type_null" id="U=5t-)~p.1q%ko^,mcra"></shadow>
+                      <block type="type_number" id="K_k4xHlw}iIMAx#8i0o`"></block>
+                    </value>
+                    <next>
+                      <block type="input_value" id="YfVkHs`tmKb%SYCLI9C#">
+                        <field name="INPUTNAME">number</field>
+                        <field name="ALIGN">RIGHT</field>
+                        <statement name="FIELDS">
+                          <block type="field_static" id="ek@-wb=ZS}rRCeA*$#Qb">
+                            <field name="TEXT">LED-Anzahl</field>
+                          </block>
+                        </statement>
+                        <value name="TYPE">
+                          <shadow type="type_null" id="%Cf*|%o92b2L+e60Zvmw"></shadow>
+                          <block type="type_number" id="W8T:`h1({wEgrIosq:jJ"></block>
+                        </value>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="`wCz#0ItvAC)Pz*xbV+-" deletable="false" movable="false">
+        <field name="TEXT">Initialisiere das RGB_LED-Modul mit einer definierten Modul-ID, des verwendeten Pins und der Anzahl der LEDs auf dem Modul</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="o_?iNE!w2MB(l5fWe4TF" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="x$M{|FTt~_}3~UUYJ-lg"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="lg+EIM|cP*I/32B@k4U}"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="l=?}$Ss=x:p#m_.g=TTG">
+        <mutation colour="#a55b5b"></mutation>
+        <field name="HUE">0</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="eVklV5fvLf2m,g(*sQXe" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_rgb_led_set_color</field>
+    <field name="INLINE">EXT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="Wr1gjDqoqEJJy?N|dAa^">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="NI3A{(ZEzEF!z?tD(x[h">
+            <field name="TEXT">Definiere RGB-Farbe</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id=",f3M~{a?Ws)oe7NV{M7;">
+            <field name="INPUTNAME">rgb_led_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="D6[ZDBkDgnV#/ee-B0;_">
+                <field name="TEXT">Modul-ID</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null" id="ArB{I,OS+YZ~9dig;=+o"></shadow>
+              <block type="type_other" id="RU5mC?=Rqy?0H#]Ekh${">
+                <field name="TYPE">rgb_led</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_value" id="XrPse$M1fC|O%_wqM!Ov">
+                <field name="INPUTNAME">color</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="U(Z8I:|abut!*7DM)8d`">
+                    <field name="TEXT">Farbe</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="J?_wH*p)7RPdQ#LZ0Q_h"></shadow>
+                  <block type="type_other" id="Ra^.5xi|!7/@jNIiwi|_">
+                    <field name="TYPE">rgb_led_color</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="input_value" id="9XzwfE`5)]=LLz#7,j7R">
+                    <field name="INPUTNAME">led</field>
+                    <field name="ALIGN">RIGHT</field>
+                    <statement name="FIELDS">
+                      <block type="field_static" id="_L3a;4.lcHKk4pXLYX7S">
+                        <field name="TEXT">(Optional) LED-Index</field>
+                      </block>
+                    </statement>
+                    <value name="TYPE">
+                      <shadow type="type_null" id="F.T:[JtH-(kMQf}loi`a"></shadow>
+                      <block type="type_number" id=".iw*fp/5w?tGDeSQ~Pr#"></block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="U3hU6$DU+TxQ2N7(~^,f" deletable="false" movable="false">
+        <field name="TEXT">Definiere eine RGB-Farbe mithilfe einer RGB_LED-Modul-ID und einem Farbblock. Optional: Um die Farbe einer bestimmten LED zu Ã¤ndern, gib den Index (beginnend bei 0!) fÃ¼r die zu Ã¤nderende LED an</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="Z[w2cJdnZiKJ}ppg[!6(" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="Ta]Hto%S5)?+$*LWY=8#"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="$cc@%^H)Ch$@rMeqx#Vj"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id=",iW:P~Y;Zp3MUl(A+]V/">
+        <mutation colour="#a55b5b"></mutation>
+        <field name="HUE">0</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="qkuL*Tcu`rW/X_#(qL]," deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_rgb_led_set_brightness</field>
+    <field name="INLINE">EXT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="qLOpxW^VmLB.kp.rXc1f">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="s$6|v;1@D16~t@)1u*m1">
+            <field name="TEXT">Definiere RGB-Helligkeit</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="CjJ[K@yGmHAU@_`-_4s-">
+            <field name="INPUTNAME">rgb_led_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="GGe/n$b,uc/19Oaj7D,;">
+                <field name="TEXT">Modul-ID</field>
+              </block>
+            </statement>
+            <value name="TYPE">
+              <shadow type="type_null" id="B9Gvt._JqP=^`O=tH?v:"></shadow>
+              <block type="type_other" id="K;Yr]kf1]YzgvI}FfTY{">
+                <field name="TYPE">rgb_led</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_value" id="-B9T*YvZKsb^dZw!j`F}">
+                <field name="INPUTNAME">brightness</field>
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="(09w#s]Nl8pw1Wqn$gND">
+                    <field name="TEXT">Helligkeit (in %)</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="$lc_%0_vW.|BiiWKEG(="></shadow>
+                  <block type="type_number" id="$!r|BlkTx79Kh2pp.L@c"></block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="S{2W}lf/@YJ4U8_J5?$R" deletable="false" movable="false">
+        <field name="TEXT">Definiere die RGB-Helligkeit mithilfe einer RGB_LED-Modul-ID und einem Nummernblock (Wert von 0-100)</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="px6p4wh~h/Vx!r{ES.p}" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="6|Dr+5(|{=7OI@ibCl44"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="~(Kzs:j{4VBNA:u|=*Ni"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id=",[V|n:)S}-J0!5P9ofC4">
+        <mutation colour="#a55b5b"></mutation>
+        <field name="HUE">0</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="v/Rgdeo#bCgJv?gd)OxJ" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_rgb_led_set_enabled</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="IP6znCs^cDW$+bVp{FVw">
+        <field name="ALIGN">RIGHT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="2s2^d-;,JpA+E:I#itsg">
+            <field name="TEXT">Schalte RGB-LED</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="^~!YRk1n8R*epJsh{EaK">
+            <field name="INPUTNAME">rgb_led_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <value name="TYPE">
+              <shadow type="type_null"></shadow>
+              <block type="type_other" id="|Sf|X*,E(td(o|dJzlgJ">
+                <field name="TYPE">rgb_led</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_dummy" id="vv;AZ1`VC;Y]n#[D8Hrr">
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="],2A::1JL?*.Ym{YSd{1">
+                    <field name="TEXT">an</field>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="uUq0oeBTq:Bo`AG~!6!;" deletable="false" movable="false">
+        <field name="TEXT">Als Eingabe wird eine RGB-LED_Modul-ID erwartet</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="e}|%)9zJ8l/6DTQFc`TE" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="AN3R_?MF6$-10K%^*|kw"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="t)$x6!0jmx3uqx|F24Rx"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="|Uc+mV;]!(f7_t?Nh9Px">
+        <mutation colour="#a55b5b"></mutation>
+        <field name="HUE">0</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="opQK2NiL7;HKkVSx:5b|" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_rgb_led_set_disabled</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="Wa0h?Mn=#T^4r)bSK233">
+        <field name="ALIGN">RIGHT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="VcjQVi)W*u8Eh7InR$`q">
+            <field name="TEXT">Schalte RGB-LED</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="5~F7aj,]ch[k?rE)-Wu9">
+            <field name="INPUTNAME">rgb_led_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <value name="TYPE">
+              <shadow type="type_null"></shadow>
+              <block type="type_other" id="f139|6Tm_+/2,8^L;Fv3">
+                <field name="TYPE">rgb_led</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_dummy" id="#!LgJ6/]@m`qpH[*3F7V">
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="a:B,CGT:wp:ih?V{tTzA">
+                    <field name="TEXT">aus</field>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="_Oqyq24,zvRK%N;9JOB9" deletable="false" movable="false">
+        <field name="TEXT">Als Eingabe wird eine RGB-LED_Modul-ID erwartet</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="@Z0W*!Tj{DK42LyTw.FK" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="I?[4Q4*7s2%G{gvmW4m?"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="i|]PC(|aYqlWj2V{LsmA"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="[|9W{u_,M7*HNeRAVu61">
+        <mutation colour="#a55b5b"></mutation>
+        <field name="HUE">0</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="*,YVbqL?T?R^TA-CwzKE" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">iot_rgb_led_toggle</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="MA5E?4sZe%/@)HW8B5hG">
+        <field name="ALIGN">RIGHT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="7/q%[8FoM)Iix]oIUSM~">
+            <field name="TEXT">Schalte RGB-LED</field>
+          </block>
+        </statement>
+        <next>
+          <block type="input_value" id="KZDJ2#lD6QfR.5Fl2#DZ">
+            <field name="INPUTNAME">rgb_led_module_id</field>
+            <field name="ALIGN">RIGHT</field>
+            <value name="TYPE">
+              <shadow type="type_null"></shadow>
+              <block type="type_other" id="-GT1:3mo*70VOK?UGY#y">
+                <field name="TYPE">rgb_led</field>
+              </block>
+            </value>
+            <next>
+              <block type="input_dummy" id="NgQElPNO~Witd2tnj=ti">
+                <field name="ALIGN">RIGHT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="`SNkv*aI_I!nLy#iwcwK">
+                    <field name="TEXT">um</field>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="V~OZ(%#$pjQ_u$8^fg9n" deletable="false" movable="false">
+        <field name="TEXT">Als Eingabe wird eine RGB-LED_Modul-ID erwartet. Schaltet die LED aus/an, je nach aktuellem Zustand</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="7rP!qg*PvBZ*|:]B-Ww3" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="w`7guW92TyD(A8CFN7a^"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="vEXtmW!nB?0:$e7^x=WS"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="NIVME_?O]0~yU5nw14X4">
+        <mutation colour="#a55b5b"></mutation>
+        <field name="HUE">0</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="L{:k$@NT|4vBJrz/nFJN" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">iot_rgb_led_get_module_id</field>
+    <field name="INLINE">AUTO</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="m6!,T`%FR+*JU#Wx.l!u">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_variable" id="[36~*?R4w^uv$iUP[kAx">
+            <field name="TEXT">item</field>
+            <field name="FIELDNAME">NAME</field>
+            <next>
+              <block type="field_static" id="6Bx8=Nxn7T~kV$fX-JR{">
+                <field name="TEXT">(RGB_LED)</field>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="A:Vw7^w^Lr)siS9^k;ug" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="poJxXI7t|6urdWL|Sv+{" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="bY?C8cg:kf9H^2TB~PD*"></shadow>
+      <block type="type_other" id="~rotdJfmdKG0Ask;LR/C">
+        <field name="TYPE">rgb_led</field>
+      </block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="axGw+zz,A~T|O8Nn@e)0">
+        <mutation colour="#5b9fa5"></mutation>
+        <field name="HUE">185</field>
+      </block>
+    </value>
+  </block></xml>

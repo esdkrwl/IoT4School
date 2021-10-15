@@ -6,4 +6,4 @@ Die größten Änderungen zur Version 1.0:
 - Verwendung eines modularen Stecksystems auf Basis des Evaluationsboards Wemos D1 (ESP8266)
 - Blockbasierte Einrichtung und Programmierung der Module mittels BIPES
 
-Weitere Informationen zu den einzelnen Dateien sind in den READMEs der Unterordner zu finden.
+Weitere Informationen zum Projekt sind im [Wiki](https://github.com/esdkrwl/IoT4School/wiki) zu finden.

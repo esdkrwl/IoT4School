@@ -26,7 +26,6 @@ class NetworkManager:
     # Parameter: Geräte-ID, AP Passwort, WLAN-Zugangsdaten, MQTT-Zugangsdaten
     def __init__(self, device_id, ap_password, wireless_config, mqtt_settings):
         machine.Pin(2, machine.Pin.OUT).on()
-        self.board_led = machine.Pin(2, machine.Pin.OUT)
         self.wlan_sta = network.WLAN(network.STA_IF)
         self.wlan_sta.active(True)
         self.mac = (ubinascii.hexlify(self.wlan_sta.config('mac'),":")).decode('utf-8')
@@ -51,15 +50,15 @@ class NetworkManager:
     def connect(self):
         if self.__WifiConnect(self.wireless_config[0], self.wireless_config[1], self.reconnect):
             if self.__MQTTConnect(self.device_id, self.mqtt_settings[0], self.mqtt_settings[1], self.mqtt_settings[2], self.reconnect):
-                self.board_led.off()
+                machine.Pin(2, machine.Pin.OUT).off()
                 self.reconnect = True
                 return True
             else:
-                self.board_led.on()
+                machine.Pin(2, machine.Pin.OUT).on()
                 print('\n[INFO] Verbindung zum MQTT-Broker konnte nicht hergestellt werden. Starte das Konfigurationsportal...')
                 return self.__WebServer()
         else:
-            self.board_led.on()
+            machine.Pin(2, machine.Pin.OUT).on()
             print('\n[INFO] Verbindung zum WLAN Netzwerk konnte nicht hergestellt werden. Starte das Konfigurationsportal...')
             return self.__WebServer()
 
@@ -85,10 +84,10 @@ class NetworkManager:
                     print('\n[INFO] Verbunden mit IP:', ip, ', Subnetz:', sub, ', Gateway:', gw, 'und DNS:', dns, '.')
                     return True
                 else:
-                    self.board_led.on()
+                    machine.Pin(2, machine.Pin.OUT).on()
                     print('.', end='')
                     utime.sleep_ms(250)
-                    self.board_led.off()
+                    machine.Pin(2, machine.Pin.OUT).off()
                     utime.sleep_ms(250)
             return False
         # Loopt solange, bis Verbindung zum WLAN-Netzwerk wiederhergestellt werden konnte
@@ -99,10 +98,10 @@ class NetworkManager:
                     print('\n[INFO] Verbunden mit IP:', ip, ', Subnetz:', sub, ', Gateway:', gw, 'und DNS:', dns, '.')
                     return True
                 else:
-                    self.board_led.on()
+                    machine.Pin(2, machine.Pin.OUT).on()
                     print('.', end='')
                     utime.sleep_ms(250)
-                    self.board_led.off()
+                    machine.Pin(2, machine.Pin.OUT).off()
                     utime.sleep_ms(250)
     
     # Interne Funktion, um Verbindung zum MQTT-Broker herzustellen.
@@ -114,9 +113,9 @@ class NetworkManager:
             print('[INFO] Verbindungsversuch zum MQTT Broker mit IP bzw. Hostnamen:', mqtt_server, 'und Port:', mqtt_port, end='')
             self.mqtt_client = None
             for _ in range(4):
-                self.board_led.off()
+                machine.Pin(2, machine.Pin.OUT).off()
                 utime.sleep_ms(100)
-                self.board_led.on()
+                machine.Pin(2, machine.Pin.OUT).on()
                 utime.sleep_ms(250)
             try:
                 # Parameter für MQTTClient (Client-ID, Server, Port, Benutzer, Passwort, Keepalive-Zeit)
@@ -149,10 +148,10 @@ class NetworkManager:
                     self.mqtt_client.publish('connect', create_connect_msg(client_id, self.wlan_sta.ifconfig()[0], self.mac), False, 1)
                     return True
                 else:
-                    self.board_led.off()
+                    machine.Pin(2, machine.Pin.OUT).off()
                     print('.', end='')
                     utime.sleep_ms(100)
-                    self.board_led.on()
+                    machine.Pin(2, machine.Pin.OUT).on()
                     utime.sleep_ms(250)
                     self.mqtt_client.reconnect()
     
@@ -311,19 +310,19 @@ class NetworkManager:
         #print('[DEBUG] Match:', match)
         
         if match_name:
-                hostname = match_name.group(1).decode('utf-8').replace('%3F', '?').replace('%21', '!')
-                if len(hostname) == 0:
-                    self.__SendResponse("""<p>Der Hostname wurde nicht verändert!</p><p>Gehe zurück und ändere den Hostnamen!</p>""")
-                    return False
-                else:
-                    #self.wlan_sta.config(dhcp_hostname = hostname)
-                    jsonhandling.write_key(hostname, 'name')
-                    self.__SendResponse("""
-                                    <p>Der Hostname wurde erfolgreich zu {0} geändert!</p>
-                                    <p>Gerät wird neu gestartet und ist jetzt mit der SSID {0} erreichbar.</p>
-                    """.format(hostname))
-                    utime.sleep(5)
-                    machine.reset()
+            hostname = match_name.group(1).decode('utf-8').replace('%3F', '?').replace('%21', '!')
+            if len(hostname) == 0:
+                self.__SendResponse("""<p>Der Hostname wurde nicht verändert!</p><p>Gehe zurück und ändere den Hostnamen!</p>""")
+                return False
+            else:
+                #self.wlan_sta.config(dhcp_hostname = hostname)
+                jsonhandling.write_key(hostname, 'name')
+                self.__SendResponse("""
+                                <p>Der Hostname wurde erfolgreich zu {0} geändert!</p>
+                                <p>Gerät wird neu gestartet und ist jetzt mit der SSID {0} erreichbar.</p>
+                """.format(hostname))
+                utime.sleep(5)
+                machine.reset()
         
         # Entweder wurde eine SSID aus der Liste ausgewählt (match) oder es wurde "Sonstige SSID" ausgewählt (match_custom)
         if match or match_custom:

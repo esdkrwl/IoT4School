@@ -353,6 +353,7 @@ class NetworkManager:
                                     <p>Erfolgreich verbunden mit dem WLAN-Netzwerk <b>{0}</b>!</p><p>IP-Addresse: {1}</p>
                                     <p>Erfolgreich verbunden mit dem Broker <b>{2}</b>!</p><p>Port: {3}</p>
                     """.format(self.wireless_config[0], self.wlan_sta.ifconfig()[0], self.mqtt_settings[0], self.mqtt_settings[1]))
+                    machine.Pin(2, machine.Pin.OUT).off()
                     utime.sleep(5)
                     return True
                 # Erfolgreiche WLAN-Verbindung, aber fehlgeschlagene Verbindung zum Broker

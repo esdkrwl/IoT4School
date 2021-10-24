@@ -146,45 +146,53 @@ class RGB_LED:
     # Default für alle LEDs, ansonsten muss die entsprechende LED als Zahl übergeben werden
     def set_color(self, red_value, green_value, blue_value, led = 'all'):
         if led == 'all':
+            print('[INFO] Setze R = {}, G = {} und B = {} für alle LEDs.'.format(red_value, green_value, blue_value))
             for i in range(0, self.num_led):
                 self.red_value[i] = red_value
                 self.green_value[i] = green_value
                 self.blue_value[i] = blue_value
                 
                 self.rgbLeds[i] = (self.red_value[i], self.green_value[i], self.blue_value[i])
-                self.set_brightness(self.brightness)
                 
-                self.enabled = True
-                self.rgbLeds.write()
-        
+            self.set_brightness(self.brightness)
+            
+            self.enabled = True
         # Wenn LED als Zahl übergeben, muss der Wert zwischen 0 und (Anzahl der auf dem Modul verfügbaren LEDs - 1) sein
         elif led >= 0 and led <= (self.num_led - 1):
+            print('[INFO] Setze R = {}, G = {} und B = {} für LED mit Index {}.'.format(red_value, green_value, blue_value, led))
             self.red_value[led] = red_value
             self.green_value[led] = green_value
             self.blue_value[led] = blue_value
             
             self.rgbLeds[led] = (self.red_value[led], self.green_value[led], self.blue_value[led])
-            self.set_brightness(self.brightness)
+            self.set_brightness(self.brightness, led)
             
             self.enabled = True
-            self.rgbLeds.write()
         else:
             print('[ERROR] Ungültige Angabe der LED. Muss zwischen 0 und {} sein.'.format(self.num_led - 1))
     
     # Helligkeit RGB-Farbmodell entspricht 0 (aus) - 255 (maximale Helligkeit) jeweils für R, G und B.
     # Umrechnung in Prozent, wobei 1% = 2,55 - 100% = 255.
     # Ergebnis wird so gut es geht approximiert
-    def set_brightness(self, brightness):
+    def set_brightness(self, brightness, led = 'all'):
         self.brightness = brightness
         red_value = []
         green_value = []
         blue_value = []
-        for i in range(0, self.num_led):
-            red_value.append(round(brightness * self.red_value[i] / 100))
-            green_value.append(round(brightness * self.green_value[i] / 100))
-            blue_value.append(round(brightness * self.blue_value[i] / 100))
-            self.rgbLeds[i] = (red_value[i], green_value[i], blue_value[i])
-        print('[INFO] Setze Helligkeit der RGB_LED auf {}%.'.format(brightness))
-        self.rgbLeds.write()
+        if led == 'all':
+            print('[INFO] Setze Helligkeit der RGB_LED auf {}%.'.format(brightness))
+            for i in range(0, self.num_led):
+                red_value.append(round(brightness * self.red_value[i] / 100))
+                green_value.append(round(brightness * self.green_value[i] / 100))
+                blue_value.append(round(brightness * self.blue_value[i] / 100))
+                self.rgbLeds[i] = (red_value[i], green_value[i], blue_value[i])
+            self.rgbLeds.write()
+        else:
+            print('[INFO] Setze Helligkeit für LED mit Index {} auf {}%.'.format(led, brightness))
+            red_value.append(round(brightness * self.red_value[led] / 100))
+            green_value.append(round(brightness * self.green_value[led] / 100))
+            blue_value.append(round(brightness * self.blue_value[led] / 100))
+            self.rgbLeds[led] = (red_value[led], green_value[led], blue_value[led])
+            self.rgbLeds.write()
         
                 

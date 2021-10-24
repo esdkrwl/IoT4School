@@ -178,9 +178,9 @@ class RGB_LED:
         green_value = []
         blue_value = []
         for i in range(0, self.num_led):
-            red_value.append(round(brightness * self.red_value[i] / 255))
-            green_value.append(round(brightness * self.green_value[i] / 255))
-            blue_value.append(round(brightness * self.blue_value[i] / 255))
+            red_value.append(round(brightness * self.red_value[i] / 100))
+            green_value.append(round(brightness * self.green_value[i] / 100))
+            blue_value.append(round(brightness * self.blue_value[i] / 100))
             self.rgbLeds[i] = (red_value[i], green_value[i], blue_value[i])
         print('[INFO] Setze Helligkeit der RGB_LED auf {}%.'.format(brightness))
         self.rgbLeds.write()

@@ -192,7 +192,7 @@ class RGB_LED:
             red_value.append(round(brightness * self.red_value[led] / 100))
             green_value.append(round(brightness * self.green_value[led] / 100))
             blue_value.append(round(brightness * self.blue_value[led] / 100))
-            self.rgbLeds[led] = (red_value[led], green_value[led], blue_value[led])
+            self.rgbLeds[led] = (red_value[0], green_value[0], blue_value[0])
             self.rgbLeds.write()
         
                 

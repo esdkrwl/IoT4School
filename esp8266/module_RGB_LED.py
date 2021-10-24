@@ -152,6 +152,7 @@ class RGB_LED:
                 self.blue_value[i] = blue_value
                 
                 self.rgbLeds[i] = (self.red_value[i], self.green_value[i], self.blue_value[i])
+                self.set_brightness(self.brightness)
                 
                 self.enabled = True
                 self.rgbLeds.write()
@@ -163,6 +164,7 @@ class RGB_LED:
             self.blue_value[led] = blue_value
             
             self.rgbLeds[led] = (self.red_value[led], self.green_value[led], self.blue_value[led])
+            self.set_brightness(self.brightness)
             
             self.enabled = True
             self.rgbLeds.write()

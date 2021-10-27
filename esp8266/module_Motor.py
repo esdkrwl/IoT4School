@@ -242,5 +242,3 @@ class Motor:
             elif motor_index == 1:
                 self.m1.brake()
                 self.enabled_m1 = False
-        
-                

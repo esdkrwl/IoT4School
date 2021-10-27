@@ -159,7 +159,6 @@ class Smart_Button:
         self.ticks = ticks
         self.button.setClickTicks(ticks)
         
-        
     def set_press_ticks(self, press_ticks):
         print('[INFO] Setze Zeit bevor ein langer Klick (Halten des Buttons) registriert wird auf {}ms.'.format(press_ticks))
         self.press_ticks = press_ticks

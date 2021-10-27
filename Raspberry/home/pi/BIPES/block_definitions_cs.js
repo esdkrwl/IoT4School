@@ -806,7 +806,7 @@ Blockly.Blocks['iot_mqtt_publish'] = {
     this.appendDummyInput()
         .setAlign(Blockly.ALIGN_RIGHT)
         .appendField("QoS")
-        .appendField(new Blockly.FieldDropdown([["0 - höchstens 1x","0 "], ["1 - mindestens 1x","1"], ["option","OPTIONNAME"]]), "qos_lvl");
+        .appendField(new Blockly.FieldDropdown([["0 - höchstens 1x","0 "], ["1 - mindestens 1x","1"]]), "qos_lvl");
     this.setInputsInline(false);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);

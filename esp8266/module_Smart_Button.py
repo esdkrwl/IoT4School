@@ -111,7 +111,7 @@ class Smart_Button:
     # Callbackmethode, falls Button 2x kurz hintereinander gedrückt wurde (Doppelklick)
     def on_double_click(self, button):
         print('[DEBUG] "on_double_click"- Callback ausgelöst.')
-        self.total_clicks += 1
+        self.total_clicks += 2
         
         msg = '{"identifier": "data", "click_event": "on_double_click"}'
         # Argumente: Topic, Message, Retain, QoS
@@ -135,7 +135,6 @@ class Smart_Button:
     # Callbackmethode, falls Button, nach einem langen Drücken des Buttons, wieder losgelassen wird
     def on_long_press_stop(self, button):
         print('[DEBUG] "on_long_press_stop"- Callback ausgelöst.')
-        self.total_clicks += 1
         
         msg = '{"identifier": "data", "click_event": "on_long_press_stop"}'
         # Argumente: Topic, Message, Retain, QoS

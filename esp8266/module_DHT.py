@@ -102,26 +102,28 @@ class DHT:
     def check(self):
         self.current_measure = utime.ticks_ms()
         if utime.ticks_diff(self.current_measure, self.last_measure) >= (self.debounce_time*1000) and self.enabled:
+            # Da Messung nur alle 2 Sekunden möglich für DHT22, 1 Sekunde warten, falls debounce_time kleiner 2
+            if self.debounce_time < 2 and type(self.dht).__name__ == 'DHT22':
+                utime.sleep_ms(1000)
             self.last_measure = self.current_measure
-            if self.enabled:
-                print('[DEBUG] Messung wird durchgeführt!')
-                try:
-                    self.dht.measure()
-                except OSError:
-                    print('[ERROR] Messung nicht möglich. Gerät kann nicht erreicht werden.')
-                self.temperature = int(self.dht.temperature())
-                self.humidity = int(self.dht.humidity())
-                # Workaround, falls DHT11 / DHT22 auf GPIO2 (bzw. PIN4), da sonst die LED nach Messung ausgeht 
-                if self.pin == 2:
-                    Pin(self.pin).off()
-                msg = '{{"identifier": "data", "temperature": {}, "humidity": {}}}'\
-                      .format(self.temperature, self.humidity)
-                # Argumente: Topic, Message, Retain, QoS
-                if self.mqtt_client.publish(self.publish_topic, msg, False, self.qos):
-                    print('[INFO] DHT Payload erfolgreich versendet.')
-                    print(msg)
-                else:
-                    print('[ERROR] DHT Payload nicht versendet.')
+            print('[DEBUG] Messung wird durchgeführt!')
+            try:
+                self.dht.measure()
+            except OSError:
+                print('[ERROR] Messung nicht möglich. Gerät kann nicht erreicht werden.')
+            self.temperature = int(self.dht.temperature())
+            self.humidity = int(self.dht.humidity())
+            # Workaround, falls DHT11 / DHT22 auf GPIO2 (bzw. PIN4), da sonst die LED nach Messung ausgeht 
+            if self.pin == 2:
+                Pin(self.pin).off()
+            msg = '{{"identifier": "data", "temperature": {}, "humidity": {}}}'\
+                  .format(self.temperature, self.humidity)
+            # Argumente: Topic, Message, Retain, QoS
+            if self.mqtt_client.publish(self.publish_topic, msg, False, self.qos):
+                print('[INFO] DHT Payload erfolgreich versendet.')
+                print(msg)
+            else:
+                print('[ERROR] DHT Payload nicht versendet.')
         
     # --- Ab hier folgen Funktionen, die man in BIPES als Blöcke realisieren kann ---
     # Funktion, die den DHT-Sensor aktiviert

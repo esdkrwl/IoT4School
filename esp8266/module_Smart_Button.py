@@ -77,8 +77,7 @@ class Smart_Button:
                     self.set_press_ticks(json['set_press_ticks'])
         
         if 'reset_total_clicks' in json:
-            if json['reset_total_clicks'] == True:
-                self.reset_total_clicks()
+            self.reset_total_clicks()
             #if isinstance(json['reset_total_clicks'], int) or isinstance(json['reset_total_clicks'], bool):
                 #if json['reset_total_clicks'] == 1 or json['reset_total_clicks'] == True:
         

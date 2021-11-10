@@ -1,7 +1,7 @@
 import ujson
 from blink import blink
 from machine import I2C, Pin
-import d1motor # D1-Motor Library Quelle: https://cdn.hackaday.io/files/18439788894176/motor_shield.bin (Selber in Firmware eingefroren)
+import d1motor # D1-Motor Library Quelle: https://georgik.rocks/wp-content/python/d1motor.zip (Selber in Firmware eingefroren)
 
 class Motor:
     def __init__(self, name, scl, sda, i2c_addr, mqtt_client, device_id):

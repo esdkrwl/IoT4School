@@ -232,13 +232,17 @@ class Motor:
             print('[INFO] HALT STOP!! Beide Motoren werden sofort gebremst.')
             self.m0.brake()
             self.m1.brake()
+            self.speed_m0 = 0
+            self.speed_m1 = 0
             self.enabled_m0 = False
             self.enabled_m1 = False
         else:
             print('[INFO] HALT STOP!! Motor mit dem Index {} wird sofort gebremst.'.format(motor_index))
             if motor_index == 0:
                 self.m0.brake()
+                self.speed_m0 = 0
                 self.enabled_m0 = False
             elif motor_index == 1:
                 self.m1.brake()
+                self.speed_m1 = 0
                 self.enabled_m1 = False

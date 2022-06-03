@@ -70,11 +70,11 @@ try:
                break
         else:
             for index,line in enumerate(buf):
-                if line.find('<block type="bipes_plot">') != -1:
-                    if buf[index+2].find('</category>') != -1:
+                if line.find('<category name="Machine" colour="%{BKY_VARIABLES_HUE}">') != -1:
+                    if buf[index+1].find('-->') != -1:
                         print('esp8266.xml wurde gepatcht!')
-                        buf[index+2] = buf[index+2] + esp8266_cs.read()
-                        #line = buf[index+2] + esp8266_cs.read()
+                        buf[index+1] = buf[index+1] + esp8266_cs.read()
+                        #line = buf[index+1] + esp8266_cs.read()
                 esp8266_out.write(line)
 except Exception as e:
     print('Es ist etwas beim Patchen (Inplace) der esp8266.xml schiefgelaufen:', e)

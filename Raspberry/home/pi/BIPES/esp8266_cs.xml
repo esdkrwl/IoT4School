@@ -1,5 +1,4 @@
 
-<sep></sep>
   <category name="IoT4School" colour="185">
     <block type="iot_setup"></block>
     <category name="IoT Modul-IDs" colour="185" custom="CREATE_TYPED_MODULE_ID"></category>
@@ -230,3 +229,4 @@
       </category>
     </category>
   </category>
+<sep></sep>

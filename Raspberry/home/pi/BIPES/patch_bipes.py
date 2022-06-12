@@ -27,12 +27,11 @@ if path.exists(CLONE_PATH) == False:
         os.chdir(CLONE_PATH)
         os.system("make submodules")
         os.system("make git-clone")
-        os.system("make copy")
         os.chdir(working_dir)
 
 # Datei einlesen, zwischenspeichern, updaten und neu beschreiben (Ersetzen bestimmter Code-Zeilen)
 i = 0 # Prüfziffer, wie oft etwas in code.js ersetzt wurde
-j = 0 # Prüfziffer, wie oft etwas in esp8266.xml ersetzt wurde
+j = 0 # Prüfziffer, wie oft etwas in utils.js ersetzt wurde
 try:
     print('[INFO] Patche code.js (Inplace) an zwei Stellen.. ', end = '')
     with codecs.open(PATH + 'code.js', 'r', encoding= 'latin-1') as code_in:
@@ -46,19 +45,39 @@ try:
                 else:
                     print(' maxInstances in code.js bereits gepatcht!', end = '')
             if line.find('Code.loadBlocks(\'\');') != -1:
-                i += 1
-                line = '  let default_workspace;\n'
-                line += '  default_workspace = \'<xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none"><block type="iot_setup"></block></xml>\';\n'
-                line += '  Code.workspace.registerToolboxCategoryCallback(\'CREATE_TYPED_MODULE_ID\', createFlyout);\n'
-                line += '  Code.loadBlocks(default_workspace);\n'
-            else:
-                if line.find('Code.loadBlocks(default_workspace)') != -1:
-                    print(' Code.loadBlocks in code.js bereits gepatcht!', end = '')
+                if buf[index-1].find('Code.workspace.registerToolboxCategoryCallback') == -1:
+                    i += 1
+                    line = '  Code.workspace.registerToolboxCategoryCallback(\'CREATE_TYPED_MODULE_ID\', createFlyout);\n' + line 
+                else:
+                    print(' Code.workspace.registerToolboxCategoryCallback in code.js bereits gepatcht!', end = '')
             code_out.write(line)
     print(' Es wurden {} von 2 Stellen in der code.js gepatcht!'.format(i))
 except Exception as e:
     print(' Es ist etwas beim Patchen (Inplace) der code.js schiefgelaufen:', e)
-    
+
+try:
+    print('[INFO] Patche utils.js (Inplace) an zwei Stellen.. ', end = '')
+    with codecs.open(PATH + 'utils.js', 'r', encoding= 'latin-1') as code_in:
+        buf = code_in.readlines()
+    with codecs.open(PATH + 'utils.js', 'w', encoding= 'latin-1') as code_out:
+        for index,line in enumerate(buf):
+            if line.find('return desc ? `${desc [1].replaceAll') != -1:
+                j += 1
+                line = '      return desc ? `main.${ext}` : imp.length ? `my_${imp.slice(-1)[0][1]}_project.bipes.${ext}` : `my_project.bipes.${ext}`;\n'
+            else:
+                if line.find('return desc ? `main.${ext}`') != -1:
+                    print(' main.py-Benennung in utils.js bereits gepatcht!', end = '')
+            if line.find('<value name="project_description"><shadow type="text" id=""><field name="TEXT">My project</field></shadow></value></block></xml>') != -1:
+                j += 1
+                line = '    return `<xml xmlns="https://bipes.net.br"><workspace><databoard><![CDATA[{"currentWorkspace":"kvflqzky5js84d7x5pe","workspace:kvflqzky5js84d7x5pe":[]}]]></databoard></workspace><block type="project_metadata" id="" x="200" y="0"><value name="project_author"><shadow type="text" id=""><field name="TEXT">${account_user}</field></shadow></value><value name="project_iot_id"><shadow type="math_number" id=""><field name="NUM">0</field></shadow></value><value name="project_description"><shadow type="text" id=""><field name="TEXT">My project</field></shadow></value></block><block type="iot_setup" id="" x="-300" y="0"></block></xml>`\n'
+            else:
+                if line.find('<block type="iot_setup" id="" x="-300" y="0"></block>') != -1:
+                    print(' iot_setup-Startblock in utils.js bereits gepatcht!', end = '')
+            code_out.write(line)
+    print(' Es wurden {} von 2 Stellen in der utils.js gepatcht!'.format(j))
+except Exception as e:
+    print(' Es ist etwas beim Patchen (Inplace) der utils.js schiefgelaufen:', e)
+
 try:
     print('[INFO] Patche esp8266.xml (Inplace).. ', end = '')
     with codecs.open(PATH_TOOLBOX + 'esp8266.xml', 'r', encoding= 'latin-1') as esp8266_in:
